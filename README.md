@@ -19,7 +19,7 @@ hoặc
 Mở project bằng Android Studio, chỉ chọn mở thư mục Android thôi nhé !!!
 
 Sau đó chạy lệnh :
-`react-native start`
+`react-native start` hoặc `npm start`
 nếu chạy lệnh start thì bạn phải tự build App bằng Android Studio
 
 ## Double tap R in keyboard to reload app when make code change

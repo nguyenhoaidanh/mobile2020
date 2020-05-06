@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { Platform, StyleSheet, Text, View } from 'react-native';
 import { Link } from 'react-router-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import { Input, Button } from 'react-native-elements';
+import { Input, Button, CheckBox } from 'react-native-elements';
 const styles = StyleSheet.create({
   welcome: {
     fontSize: 20,
@@ -30,7 +30,7 @@ export default class Home extends Component<Props> {
     const { errorMessage = {} } = this.state;
     return (
       <View>
-        <Text style={styles.welcome}>Đây là trang Login</Text>
+        <Text style={styles.welcome}>Đây là trang đăng kí</Text>
         <Link to="/" underlayColor="#f0f4f7">
           <Text style={styles.login}>Click về Home</Text>
         </Link>
@@ -71,6 +71,14 @@ export default class Home extends Component<Props> {
           onChangeText={(value) => this.onchange('repPassword', value)}
           secureTextEntry={true}
         />
+        <View style={{ flexDirection: 'row' }}>
+          <View style={{ width: '50%' }}>
+            <CheckBox checkedIcon="dot-circle-o" uncheckedIcon="circle-o" center title="Nam" checked={true} />
+          </View>
+          <View style={{ width: '50%' }}>
+            <CheckBox checkedIcon="dot-circle-o" uncheckedIcon="circle-o" center title="Nữ" checked={true} />
+          </View>
+        </View>
         <Button style={styles.login} title="Đăng kí" onPress={this.register} />
       </View>
     );
