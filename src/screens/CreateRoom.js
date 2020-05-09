@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { Platform, StyleSheet, Text, View } from 'react-native';
 import { Link } from 'react-router-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import { Input, Button } from 'react-native-elements';
+import { Input, Button, CheckBox } from 'react-native-elements';
 const styles = StyleSheet.create({
   welcome: {
     fontSize: 20,
@@ -30,7 +30,7 @@ export default class Home extends Component<Props> {
     const { errorMessage = {} } = this.state;
     return (
       <View>
-        <Button style={styles.login} title="Username: Danh" onPress={this.register} />
+        <Button style={styles.login} title="Tạo room" onPress={this.register} />
       </View>
     );
   }

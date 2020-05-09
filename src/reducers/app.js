@@ -1,13 +1,17 @@
-import { actions } from '../constants/action-types';
+import ACTIONS from '../constants/action-types';
 const initialState = {
-  loggedIn: false,
+  currentScreent: { icon: 'home', text: 'Home' },
+  lastScreent: null,
+  loading: false,
 };
 const reducer = (state = initialState, action) => {
   switch (action.type) {
-    case actions.TEST: {
+    case ACTIONS.TEST:
+    case ACTIONS.SET_CUR_SCREENT: {
       return {
         ...state,
-        loggedIn: action.loggedIn,
+        lastScreent: state.currentScreent,
+        ...action.payload,
       };
     }
     default: {

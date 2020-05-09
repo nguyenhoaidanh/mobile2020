@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { Platform, StyleSheet, Text, View, ScrollView } from 'react-native';
 import { NativeRouter, Route, Link } from 'react-router-native';
 import { Button, ButtonGroup } from 'react-native-elements';
-import Icon from 'react-native-vector-icons/FontAwesome';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { withRouter } from 'react-router';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
@@ -16,16 +16,18 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     position: 'absolute',
     bottom: 0,
+    padding: 0,
   },
+  group: { width: '100%', height: '100%' },
 });
 const iconSize = 24,
   iconColor = 'black';
 const list = [
   { icon: 'home', text: 'Home', to: '/' },
-  { icon: 'list', text: 'Rooms', to: '/list-room' },
+  { icon: 'view-list', text: 'Rooms', to: '/list-room' },
+  { icon: 'face-recognition', text: 'Face', to: '/register-face' },
   { icon: 'key', text: 'Hello', to: '/' },
-  { icon: 'key', text: 'Hello', to: '/' },
-  { icon: 'user', text: 'Account', to: '/account' },
+  { icon: 'account', text: 'Account', to: '/account' },
 ];
 type Props = {};
 class Footer extends Component<Props> {
@@ -33,6 +35,7 @@ class Footer extends Component<Props> {
   updateIndex = (selectedIndex) => {
     this.setState({ selectedIndex });
     this.props.history.push(list[selectedIndex].to);
+    this.props.appActions.setCurScreent({ currentScreent: list[selectedIndex] });
   };
   render() {
     const { selectedIndex = 0 } = this.state;
@@ -46,7 +49,7 @@ class Footer extends Component<Props> {
     }));
     return (
       <View style={styles.container}>
-        <ButtonGroup onPress={this.updateIndex} selectedIndex={selectedIndex} buttons={buttons} />
+        <ButtonGroup containerStyle={styles.group} onPress={this.updateIndex} selectedIndex={selectedIndex} buttons={buttons} />
       </View>
     );
   }
@@ -62,5 +65,4 @@ const mapDispatchToProps = (dispatch) => {
     appActions: bindActionCreators(appActions, dispatch),
   };
 };
-//connect(mapStateToProps, mapDispatchToProps)
-export default withRouter(Footer);
+export default withRouter(connect(mapStateToProps, mapDispatchToProps)(Footer));

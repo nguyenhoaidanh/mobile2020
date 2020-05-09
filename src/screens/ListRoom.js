@@ -1,8 +1,12 @@
 import React, { Component } from 'react';
-import { Platform, StyleSheet, Text, View } from 'react-native';
-import { Link } from 'react-router-native';
+import { Platform, StyleSheet, Text, View, SafeAreaView, ScrollView } from 'react-native';
+import { Link, withRouter } from 'react-router-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { Input, Button } from 'react-native-elements';
+import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux';
+import * as appActions from '../actions/index';
+import RoomItem from '../components/RoomItem';
 const styles = StyleSheet.create({
   welcome: {
     fontSize: 20,
@@ -18,25 +22,40 @@ const styles = StyleSheet.create({
 });
 
 type Props = {};
-export default class Home extends Component<Props> {
+class Home extends Component<Props> {
   state = {};
   onchange = (name, value) => {
     this.setState({ [name]: value });
   };
-  register = () => {};
+  navigate = (url) => {
+    this.props.history.push(url);
+    this.props.appActions.setCurScreent({ currentScreent: { text: 'Tạo room' } });
+  };
   render() {
     const iconSize = 24;
     const iconColor = 'black';
-    const { errorMessage = {} } = this.state;
+    const { errorMessage = {}, listRoom = [1, 23, 32, 23, 45, 45, 3434] } = this.state;
     return (
-      <View>
-        <Text style={styles.welcome}>Đây là trang ListRoom</Text>
-        <Link to="/" underlayColor="#f0f4f7">
-          <Text style={styles.login}>Click về Home</Text>
-        </Link>
-
-        <Button style={styles.login} title="Đăng kí" onPress={this.register} />
-      </View>
+      <SafeAreaView style={styles.container}>
+        <Button style={styles.login} title="Tạo room" onPress={() => this.navigate('create-room')} />
+        <ScrollView style={styles.scrollView}>
+          {listRoom.map((room, idx) => (
+            <RoomItem room={room} key={idx} />
+          ))}
+        </ScrollView>
+      </SafeAreaView>
     );
   }
 }
+const mapStateToProps = (state) => {
+  // Redux Store --> Component
+  return {
+    app: state.app,
+  };
+};
+const mapDispatchToProps = (dispatch) => {
+  return {
+    appActions: bindActionCreators(appActions, dispatch),
+  };
+};
+export default withRouter(connect(mapStateToProps, mapDispatchToProps)(Home));

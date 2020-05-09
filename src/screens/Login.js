@@ -30,10 +30,6 @@ export default class Home extends Component<Props> {
     const { errorMessage = {} } = this.state;
     return (
       <View>
-        <Text style={styles.welcome}>Đây là trang Login</Text>
-        <Link to="/" underlayColor="#f0f4f7">
-          <Text style={styles.login}>Click về Home</Text>
-        </Link>
         <Input
           errorStyle={styles.errorStyle}
           errorMessage={errorMessage.username}
@@ -71,7 +67,7 @@ export default class Home extends Component<Props> {
           onChangeText={(value) => this.onchange('repPassword', value)}
           secureTextEntry={true}
         />
-        <Button style={styles.login} title="Đăng kí" onPress={this.register} />
+        <Button style={styles.login} title="Đăng nhập" onPress={this.register} />
       </View>
     );
   }

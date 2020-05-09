@@ -1,10 +1,11 @@
-import { actions } from '../constants/action-types';
+import ACTIONS from '../constants/action-types';
 const initialState = {
   loggedIn: false,
+  userInfo: {},
 };
 const reducer = (state = initialState, action) => {
   switch (action.type) {
-    case actions.TEST: {
+    case ACTIONS.TEST: {
       return {
         ...state,
         loggedIn: action.loggedIn,
