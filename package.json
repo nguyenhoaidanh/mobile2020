@@ -8,10 +8,12 @@
   },
   "dependencies": {
     "react": "16.3.1",
-    "react-native": "0.55.4",
+    "react-native": "^0.58.6",
     "react-native-elements": "^2.0.0",
     "react-native-vector-icons": "^6.6.0",
-    "react-router-native": "^5.1.2"
+    "react-redux": "^6.0.1",
+    "react-router-native": "^5.1.2",
+    "redux": "^4.0.5"
   },
   "devDependencies": {
     "babel-jest": "23.4.0",
