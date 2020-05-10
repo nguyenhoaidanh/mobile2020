@@ -24,7 +24,7 @@ class Footer extends Component<Props> {
   render() {
     const { image = {}, height = '80%', width = '100%' } = this.props;
     return (
-      <Card containerStyle={{ width, height, backgroundColor: 'gray' }}>
+      <Card containerStyle={{ width, height, backgroundColor: '#dbd9d9', borderRadius: 10 }}>
         <Avatar
           avatarStyle={styles.img}
           containerStyle={styles.wrapAvatar}

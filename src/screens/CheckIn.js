@@ -5,16 +5,8 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import { Input, Button, CheckBox } from 'react-native-elements';
 import ImageInput from '../components/ImageInput';
 const styles = StyleSheet.create({
-  welcome: {
-    fontSize: 20,
-    textAlign: 'center',
-    margin: 10,
-  },
-  login: {
-    fontSize: 20,
-    textAlign: 'center',
-    color: 'red',
-  },
+  btn: { borderRadius: 20, width: 300 },
+  btnwrap: { marginTop: 10, width: '100%', alignItems: 'center' },
   errorStyle: { color: 'red' },
 });
 
@@ -26,6 +18,7 @@ export default class Home extends Component<Props> {
   };
   checkin = () => {};
   validate = () => {
+    //TODO: check pass is ok
     this.setState({ valid: 1 });
   };
   setImage = (image) => {
@@ -39,20 +32,22 @@ export default class Home extends Component<Props> {
       return (
         <View>
           <Input
+            label="Mật khẩu"
             errorStyle={styles.errorStyle}
             errorMessage={errorMessage.password}
-            placeholder="Nhập mật khẩu"
+            placeholder="Password"
+            keyboardType="numeric"
             leftIcon={<Icon name="key" size={iconSize} color={iconColor} />}
             onChangeText={(value) => this.onchange('password', value)}
             secureTextEntry={true}
           />
-          <Button style={styles.login} title="Vào phòng" onPress={this.validate} />
+          <Button containerStyle={styles.btnwrap} buttonStyle={styles.btn} title="Vào phòng" onPress={this.validate} />
         </View>
       );
     return (
       <View>
         <ImageInput image={image} camera={true} callback={this.setImage} />
-        <Button style={styles.login} title="Điểm danh" onPress={this.checkin} />
+        <Button containerStyle={styles.btnwrap} buttonStyle={styles.btn} title="Điểm danh" onPress={this.checkin} />
       </View>
     );
   }

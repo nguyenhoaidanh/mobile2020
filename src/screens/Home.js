@@ -33,6 +33,8 @@ const styles = StyleSheet.create({
     color: '#333333',
     marginBottom: 5,
   },
+  btn: { borderRadius: 20, width: 300 },
+  btnwrap: { marginTop: 10, width: '100%', alignItems: 'center' },
 });
 
 type Props = {};
@@ -46,8 +48,13 @@ class Home extends Component<Props> {
       <View style={styles.container}>
         <Text style={styles.welcome}>This is Home page, style cho đẹp sau!!!</Text>
         <Text style={styles.instructions}>{instructions}</Text>
-        <Button style={styles.login} title="Đăng kí" onPress={() => this.navigate('/register', { text: 'Đăng kí tài khoản' })} />
-        <Button style={styles.login} title="Đăng nhập" onPress={() => this.navigate('/login', { text: 'Đăng nhập' })} />
+        <Button
+          containerStyle={styles.btnwrap}
+          buttonStyle={styles.btn}
+          title="Đăng kí"
+          onPress={() => this.navigate('/register', { text: 'Đăng kí tài khoản' })}
+        />
+        <Button containerStyle={styles.btnwrap} buttonStyle={styles.btn} title="Đăng nhập" onPress={() => this.navigate('/login', { text: 'Đăng nhập' })} />
       </View>
     );
   }

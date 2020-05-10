@@ -16,6 +16,7 @@ import { Provider } from 'react-redux';
 import appReducer from './reducers/index';
 import { createStore } from 'redux';
 export default class App extends Component<Props> {
+  state = {};
   render() {
     const store = createStore(appReducer);
     return (

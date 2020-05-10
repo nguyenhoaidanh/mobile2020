@@ -1,82 +1,137 @@
 import React, { Component } from 'react';
-import { Platform, StyleSheet, Text, View } from 'react-native';
+import { Platform, StyleSheet, Text, View, KeyboardAvoidingView, TouchableWithoutFeedback, Keyboard, ScrollView } from 'react-native';
 import { Link } from 'react-router-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { Input, Button, CheckBox } from 'react-native-elements';
+
 const styles = StyleSheet.create({
-  welcome: {
-    fontSize: 20,
-    textAlign: 'center',
-    margin: 10,
-  },
-  login: {
-    fontSize: 20,
-    textAlign: 'center',
-    color: 'red',
-  },
   errorStyle: { color: 'red' },
+  btn: { borderRadius: 20, width: 300 },
+  btnwrap: { marginTop: 10, width: '100%', alignItems: 'center' },
 });
 
 type Props = {};
 export default class Home extends Component<Props> {
-  state = {};
+  state = { male: true, username: '', phone: '', email: '', password: '', repPassword: '' };
   onchange = (name, value) => {
     this.setState({ [name]: value });
   };
-  register = () => {};
+  register = () => {
+    let valid = true;
+    const { username, male = true, phone, email, password, repPassword, errorMessage = {} } = this.state;
+    Object.keys(this.state).forEach((key) => {
+      if (['errorMessage', 'male', 'felmale'].includes(key)) return;
+      if (!this.state[key]) {
+        valid = false;
+        errorMessage[key] = 'Không được để trống';
+      } else {
+        errorMessage[key] = '';
+      }
+    });
+    if (!valid) {
+      return this.setState({ errorMessage });
+    }
+    if (username.length < 6) {
+      valid = false;
+      errorMessage.username = 'Tên tài khoản quá ngắn';
+    }
+    if (phone.toString().length < 10) {
+      valid = false;
+      errorMessage.phone = 'Số điện thoại không hợp lệ';
+    }
+    if (!(email.includes('@') && email.includes('.'))) {
+      valid = false;
+      errorMessage.email = 'Email không hợp lệ';
+    }
+    if (password.length < 6) {
+      valid = false;
+      errorMessage.password = 'Mật khẩu quá ngắn';
+    }
+    if (password != repPassword) {
+      valid = false;
+      errorMessage.repPassword = 'Mật khẩu không trùng khớp';
+    }
+    if (!valid) return this.setState({ errorMessage });
+    const user = { username, phone, email, password, male };
+    console.log('Danh', user);
+  };
   render() {
     const iconSize = 24;
     const iconColor = 'black';
-    const { errorMessage = {} } = this.state;
+    const { errorMessage = {}, male = true, felmale = false } = this.state;
     return (
-      <View>
-        <Input
-          errorStyle={styles.errorStyle}
-          errorMessage={errorMessage.username}
-          placeholder="Họ và tên"
-          leftIcon={<Icon name="user" size={iconSize} color={iconColor} />}
-          onChangeText={(value) => this.onchange('username', value)}
-        />
-        <Input
-          errorStyle={styles.errorStyle}
-          errorMessage={errorMessage.phone}
-          placeholder="Số điện thoại"
-          leftIcon={<Icon name="phone" size={iconSize} color={iconColor} />}
-          onChangeText={(value) => this.onchange('phone', value)}
-        />
-        <Input
-          errorStyle={styles.errorStyle}
-          errorMessage={errorMessage.email}
-          placeholder="Địa chỉ Email"
-          leftIcon={<Icon name="paper-plane-o" size={iconSize} color={iconColor} />}
-          onChangeText={(value) => this.onchange('phone', value)}
-        />
-        <Input
-          errorStyle={styles.errorStyle}
-          errorMessage={errorMessage.password}
-          placeholder="Password"
-          leftIcon={<Icon name="key" size={iconSize} color={iconColor} />}
-          onChangeText={(value) => this.onchange('password', value)}
-          secureTextEntry={true}
-        />
-        <Input
-          errorStyle={styles.errorStyle}
-          errorMessage={errorMessage.repPassword}
-          placeholder="Nhập lại Password"
-          leftIcon={<Icon name="key" size={iconSize} color={iconColor} />}
-          onChangeText={(value) => this.onchange('repPassword', value)}
-          secureTextEntry={true}
-        />
-        <View style={{ flexDirection: 'row' }}>
-          <View style={{ width: '50%' }}>
-            <CheckBox checkedIcon="dot-circle-o" uncheckedIcon="circle-o" center title="Nam" checked={true} />
+      <KeyboardAvoidingView style={{ flex: 1, flexDirection: 'column' }}>
+        <ScrollView>
+          <Input
+            label="Họ và tên (Sử dụng tên thật để điểm danh)"
+            errorStyle={styles.errorStyle}
+            errorMessage={errorMessage.username}
+            placeholder="Vd: Nguyễn Văn A"
+            leftIcon={<Icon name="user" size={iconSize} color={iconColor} />}
+            onChangeText={(value) => this.onchange('username', value)}
+          />
+          <Input
+            label="Số điện thoại"
+            errorStyle={styles.errorStyle}
+            errorMessage={errorMessage.phone}
+            placeholder="Vd: 0123456789"
+            maxLength={10}
+            keyboardType="numeric"
+            leftIcon={<Icon name="phone" size={iconSize} color={iconColor} />}
+            onChangeText={(value) => this.onchange('phone', value)}
+          />
+          <Input
+            label="Địa chỉ Email"
+            errorStyle={styles.errorStyle}
+            errorMessage={errorMessage.email}
+            placeholder="Vd: example@hcmut.edu.vn"
+            keyboardType="email-address"
+            leftIcon={<Icon name="paper-plane-o" size={iconSize} color={iconColor} />}
+            onChangeText={(value) => this.onchange('email', value)}
+          />
+          <Input
+            label="Mật khẩu"
+            errorStyle={styles.errorStyle}
+            errorMessage={errorMessage.password}
+            placeholder="Password"
+            leftIcon={<Icon name="key" size={iconSize} color={iconColor} />}
+            onChangeText={(value) => this.onchange('password', value)}
+            secureTextEntry={true}
+          />
+          <Input
+            label="Nhập lại Mật khẩu"
+            errorStyle={styles.errorStyle}
+            errorMessage={errorMessage.repPassword}
+            placeholder="Password"
+            leftIcon={<Icon name="key" size={iconSize} color={iconColor} />}
+            onChangeText={(value) => this.onchange('repPassword', value)}
+            secureTextEntry={true}
+          />
+          <View style={{ flexDirection: 'row' }}>
+            <View style={{ width: '50%' }}>
+              <CheckBox
+                onPress={() => this.setState({ male: true, felmale: false })}
+                checkedIcon="dot-circle-o"
+                uncheckedIcon="circle-o"
+                center
+                title="Nam"
+                checked={male}
+              />
+            </View>
+            <View style={{ width: '50%' }}>
+              <CheckBox
+                onPress={() => this.setState({ male: false, felmale: true })}
+                checkedIcon="dot-circle-o"
+                uncheckedIcon="circle-o"
+                center
+                title="Nữ"
+                checked={felmale}
+              />
+            </View>
           </View>
-          <View style={{ width: '50%' }}>
-            <CheckBox checkedIcon="dot-circle-o" uncheckedIcon="circle-o" center title="Nữ" checked={true} />
-          </View>
-        </View>
-        <Button style={styles.login} title="Đăng kí" onPress={this.register} />
-      </View>
+          <Button containerStyle={styles.btnwrap} buttonStyle={styles.btn} title="Đăng kí" onPress={this.register} />
+        </ScrollView>
+      </KeyboardAvoidingView>
     );
   }
 }

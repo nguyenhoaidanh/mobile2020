@@ -7,19 +7,8 @@ import { withRouter } from 'react-router';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import * as appActions from '../actions/index';
-const styles = StyleSheet.create({
-  container: {
-    width: '100%',
-    flexDirection: 'row',
-    height: 50,
-    backgroundColor: '#EE5407',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-});
 const iconSize = 30,
   iconColor = 'white';
-
 type Props = {};
 class Home extends Component<Props> {
   navigate = (url) => {
@@ -36,7 +25,7 @@ class Home extends Component<Props> {
       <Header
         containerStyle={{
           height: 50,
-          backgroundColor: 'green',
+          backgroundColor: 'lightblue',
           paddingTop: 0,
         }}
       >

@@ -9,17 +9,9 @@ import * as appActions from '../actions/index';
 import RoomItem from '../components/RoomItem';
 import { itemHeight } from '../constants/constants';
 const styles = StyleSheet.create({
-  welcome: {
-    fontSize: 20,
-    textAlign: 'center',
-    margin: 10,
-  },
-  login: {
-    fontSize: 20,
-    textAlign: 'center',
-    color: 'red',
-  },
   errorStyle: { color: 'red' },
+  btn: { borderRadius: 20, width: 300 },
+  btnwrap: { marginTop: 10, marginBottom: 10, width: '100%', alignItems: 'center' },
 });
 
 type Props = {};
@@ -36,10 +28,10 @@ class Home extends Component<Props> {
     const iconSize = 24;
     const iconColor = 'black';
     const { errorMessage = {}, listRoom = [1, 23, 32, 23, 45, 45, 3434] } = this.state;
-    const itemHeight = 190;
+    const itemHeight = 195;
     return (
       <View>
-        <Button style={styles.login} title="Tạo room" onPress={() => this.navigate('create-room')} />
+        <Button containerStyle={styles.btnwrap} buttonStyle={styles.btn} title="Tạo room" onPress={() => this.navigate('create-room')} />
         <ScrollView contentContainerStyle={{ height: listRoom.length * itemHeight, backgroundColor: 'blue', flexGrow: 1 }}>
           {listRoom.map((room, idx) => (
             <RoomItem room={room} key={idx} index={idx} />

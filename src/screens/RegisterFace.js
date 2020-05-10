@@ -6,7 +6,8 @@ import { Card, Button, CheckBox, Avatar } from 'react-native-elements';
 import ImageInput from '../components/ImageInput';
 const styles = StyleSheet.create({
   errorStyle: { color: 'red' },
-  btn: { width: 100, marginTop: 10 },
+  btn: { borderRadius: 20, width: 300 },
+  btnwrap: { marginTop: 10, width: '100%', alignItems: 'center' },
 });
 const iconSize = 24;
 const iconColor = 'black';
@@ -58,7 +59,7 @@ export default class Home extends Component<Props> {
               {this.renderRow(row, idx)}
             </View>
           ))}
-          <Button loading={loading} style={styles.btn} title="Đăng kí gương mặt" onPress={this.register} />
+          <Button loading={loading} containerStyle={styles.btnwrap} buttonStyle={styles.btn} title="Đăng kí gương mặt" onPress={this.register} />
         </ScrollView>
       </View>
     );
