@@ -33,7 +33,6 @@ class Home extends Component<Props> {
     const { currentScreent = {}, lastScreent = null } = this.props.app;
     const { text = '', icon = '' } = currentScreent;
     return (
-      // <View style={styles.container}>
       <Header
         containerStyle={{
           height: 50,

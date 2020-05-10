@@ -7,6 +7,7 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import * as appActions from '../actions/index';
 import RoomItem from '../components/RoomItem';
+import { itemHeight } from '../constants/constants';
 const styles = StyleSheet.create({
   welcome: {
     fontSize: 20,
@@ -35,15 +36,16 @@ class Home extends Component<Props> {
     const iconSize = 24;
     const iconColor = 'black';
     const { errorMessage = {}, listRoom = [1, 23, 32, 23, 45, 45, 3434] } = this.state;
+    const itemHeight = 190;
     return (
-      <SafeAreaView style={styles.container}>
+      <View>
         <Button style={styles.login} title="Tạo room" onPress={() => this.navigate('create-room')} />
-        <ScrollView style={styles.scrollView}>
+        <ScrollView contentContainerStyle={{ height: listRoom.length * itemHeight, backgroundColor: 'blue', flexGrow: 1 }}>
           {listRoom.map((room, idx) => (
-            <RoomItem room={room} key={idx} />
+            <RoomItem room={room} key={idx} index={idx} />
           ))}
         </ScrollView>
-      </SafeAreaView>
+      </View>
     );
   }
 }

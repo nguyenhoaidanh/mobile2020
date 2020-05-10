@@ -22,9 +22,9 @@ class Footer extends Component<Props> {
     this.props.appActions.setCurScreent({ currentScreent: { text: 'Điểm danh' } });
   };
   render() {
-    const { selectedIndex = 0 } = this.state;
+    const { index = 0 } = this.props;
     return (
-      <Card title="Đây là 1 cái room">
+      <Card title={`Room ${index}`}>
         <Text style={{ marginBottom: 10 }}>The idea about component structure than actual design.</Text>
         <Button
           onPress={() => this.navigate('check-in')}
