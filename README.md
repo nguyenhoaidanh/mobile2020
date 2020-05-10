@@ -10,16 +10,17 @@ Install Nodejs, Android Studio first
 
 #### Step 2:
 
+run
 `npm install`
+and then
+`react-native link react-native-vector-icons`
+`react-native link react-native-image-crop-picker`
 
 #### Step 3:
 
-`react-native run-android`
-hoặc
-Mở project bằng Android Studio, chỉ chọn mở thư mục Android thôi nhé !!!
-
-Sau đó chạy lệnh :
-`react-native start` hoặc `npm start`
-nếu chạy lệnh start thì bạn phải tự build App bằng Android Studio
+run `react-native run-android` or Open project by Android Studio.
+and then run
+`react-native start` or `npm start`
+(nếu chạy lệnh start thì bạn phải tự build App bằng Android Studio)
 
 ## Double tap R in keyboard to reload app when make code change

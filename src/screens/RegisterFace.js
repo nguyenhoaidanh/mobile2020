@@ -2,62 +2,63 @@ import React, { Component } from 'react';
 import { Platform, StyleSheet, Text, View, SafeAreaView, ScrollView } from 'react-native';
 import { Link } from 'react-router-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import ImageInput from '../components/ImageInput';
 import { Card, Button, CheckBox, Avatar } from 'react-native-elements';
+import ImageInput from '../components/ImageInput';
 const styles = StyleSheet.create({
   errorStyle: { color: 'red' },
-  card: { width: '45%', height: 150, backgroundColor: 'gray' },
-  img: { width: '100%', height: '100%' },
-  wrapAvatar: { width: '100%', height: '100%' },
+  btn: { width: 100, marginTop: 10 },
 });
 const iconSize = 24;
 const iconColor = 'black';
 type Props = {};
 export default class Home extends Component<Props> {
   state = {};
-  onchange = (name, value) => {
-    this.setState({ [name]: value });
+  componentDidMount() {
+    let list = [];
+    for (let i = 0; i < 10; i++) {
+      list.push({ index: i, image: {} });
+    }
+    this.setState({ list });
+  }
+  register = () => {
+    this.setState({ loading: true });
+    console.log('ok đang xử lý');
   };
-  register = () => {};
-  renderRow = (row) => {
+  setImage = (image, index) => {
+    let { list = [] } = this.state;
+    list[index].image = image;
+    this.setState({ list });
+  };
+  renderRow = (row, rowNum) => {
     return (
       <View style={{ flexDirection: 'row' }}>
         {row.map((el, idx) => (
-          <Card containerStyle={styles.card} key={idx}>
-            <Avatar
-              avatarStyle={styles.img}
-              containerStyle={styles.wrapAvatar}
-              source={{
-                uri: 'https://s3.amazonaws.com/uifaces/faces/twitter/adhamdannaway/128.jpg',
-              }}
-              showAccessory
-              accessory={{ name: 'plus-circle', type: 'font-awesome', color: 'blue', underlayColor: '#000', size: 30 }}
-            />
-          </Card>
+          <ImageInput key={idx} image={el.image} picker={true} callback={(img) => this.setImage(img, rowNum * 2 + idx)} height={150} width="45%" />
         ))}
       </View>
     );
   };
+  parseList = (list) => {
+    //[1,2,3,4]=>[[1,2],[3,4]]
+    let rs = [];
+    for (let i = 0; i < list.length; i += 2) {
+      rs.push(list[i + 1] ? [list[i], list[i + 1]] : [list[i]]);
+    }
+    return rs;
+  };
   render() {
-    const { errorMessage = {} } = this.state;
-    const list = [
-      [1, 2],
-      [3, 3],
-      [3, 3],
-      [3, 3],
-      [3, 3],
-    ];
+    let { errorMessage = {}, list = [], loading = false } = this.state;
     const rowHeight = 200;
+    list = this.parseList(list);
     return (
       <View>
-        <ImageInput />
         <ScrollView contentContainerStyle={{ height: rowHeight * list.length }}>
           {list.map((row, idx) => (
             <View key={idx} style={{ flexDirection: 'column' }}>
-              {this.renderRow(row)}
+              {this.renderRow(row, idx)}
             </View>
           ))}
-          <Button loading style={styles.login} title="Đăng kí gương mặt" onPress={this.register} />
+          <Button loading={loading} style={styles.btn} title="Đăng kí gương mặt" onPress={this.register} />
         </ScrollView>
       </View>
     );

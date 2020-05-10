@@ -26,7 +26,7 @@ const list = [
   { icon: 'home', text: 'Home', to: '/' },
   { icon: 'view-list', text: 'Rooms', to: '/list-room' },
   { icon: 'face-recognition', text: 'Face', to: '/register-face' },
-  { icon: 'key', text: 'Hello', to: '/' },
+  { icon: 'history', text: 'History', to: '/history' },
   { icon: 'account', text: 'Account', to: '/account' },
 ];
 type Props = {};

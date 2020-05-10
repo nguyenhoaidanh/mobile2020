@@ -8,6 +8,7 @@ import RegisterFace from './screens/RegisterFace';
 import ListRoom from './screens/ListRoom';
 import CreateRoom from './screens/CreateRoom';
 import CheckIn from './screens/CheckIn';
+import History from './screens/History';
 import Account from './screens/Account';
 import Footer from './components/Footer';
 import Header from './components/Header';
@@ -28,6 +29,7 @@ export default class App extends Component<Props> {
           <Route exact path="/list-room" component={ListRoom} />
           <Route exact path="/create-room" component={CreateRoom} />
           <Route exact path="/check-in" component={CheckIn} />
+          <Route exact path="/history" component={History} />
           <Route exact path="/account" component={Account} />
           <Footer />
         </NativeRouter>
