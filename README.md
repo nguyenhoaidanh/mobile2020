@@ -13,7 +13,7 @@ Install Nodejs, Android Studio first
 run
 `npm install`
 and then
-`react-native link react-native-vector-icons`
+`react-native link react-native-vector-icons` , 
 `react-native link react-native-image-crop-picker`
 
 #### Step 3:
