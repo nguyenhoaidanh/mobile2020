@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
-import { Platform, StyleSheet, View, ScrollView } from 'react-native';
+import { Platform, StyleSheet, View, ScrollView, Text } from 'react-native';
 import { NativeRouter, Route, Link } from 'react-router-native';
-import { Button, Header, Text } from 'react-native-elements';
+import { Button, Header, SearchBar } from 'react-native-elements';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { withRouter } from 'react-router';
 import { connect } from 'react-redux';
@@ -11,6 +11,7 @@ const iconSize = 30,
   iconColor = 'white';
 type Props = {};
 class Home extends Component<Props> {
+  state = {};
   navigate = (url) => {
     this.props.history.push(url);
   };
@@ -19,8 +20,9 @@ class Home extends Component<Props> {
     this.props.appActions.setCurScreent({ currentScreent: this.props.app.lastScreent });
   };
   render() {
+    const { keyword = '' } = this.state;
     const { currentScreent = {}, lastScreent = null } = this.props.app;
-    const { text = '', icon = '' } = currentScreent;
+    const { title = '', icon = '', to = '' } = currentScreent;
     return (
       <Header
         containerStyle={{
@@ -29,10 +31,19 @@ class Home extends Component<Props> {
           paddingTop: 0,
         }}
       >
-        {lastScreent ? <Icon onPress={this.back} name={'keyboard-backspace'} size={iconSize} color={iconColor} /> : ''}
-        <Text h4 style={{ color: iconColor }}>
-          {text}
-        </Text>
+        {lastScreent && to !== '/list-room' ? <Icon onPress={this.back} name={'keyboard-backspace'} size={iconSize} color={iconColor} /> : null}
+        {to == '/list-room' ? (
+          <SearchBar
+            inputContainerStyle={{ borderRadius: 20, height: '100%', margin: 0 }}
+            containerStyle={{ borderRadius: 20, width: '100%', height: 30, padding: 0 }}
+            placeholder="Tìm kiếm phòng"
+            onChangeText={this.updateSearch}
+            value={keyword}
+          />
+        ) : (
+          <Text style={{ color: iconColor, fontSize: 25 }}>{title}</Text>
+        )}
+
         {icon ? <Icon name={icon} size={iconSize} color={iconColor} /> : null}
       </Header>
     );

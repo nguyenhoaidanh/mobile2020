@@ -22,7 +22,7 @@ class Footer extends Component<Props> {
     showImageInput({ picker, camera, callback });
   };
   render() {
-    const { image = {}, height = '80%', width = '100%' } = this.props;
+    const { image = {}, height = '80%', width = '100%', component = null } = this.props;
     return (
       <Card containerStyle={{ width, height, backgroundColor: '#dbd9d9', borderRadius: 10 }}>
         <Avatar

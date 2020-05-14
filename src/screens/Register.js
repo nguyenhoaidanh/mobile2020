@@ -3,12 +3,8 @@ import { Platform, StyleSheet, Text, View, KeyboardAvoidingView, TouchableWithou
 import { Link } from 'react-router-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { Input, Button, CheckBox } from 'react-native-elements';
-
-const styles = StyleSheet.create({
-  errorStyle: { color: 'red' },
-  btn: { borderRadius: 20, width: 300 },
-  btnwrap: { marginTop: 10, width: '100%', alignItems: 'center' },
-});
+import cStyles from '../constants/common-styles';
+const styles = StyleSheet.create({});
 
 type Props = {};
 export default class Home extends Component<Props> {
@@ -64,7 +60,7 @@ export default class Home extends Component<Props> {
         <ScrollView>
           <Input
             label="Họ và tên (Sử dụng tên thật để điểm danh)"
-            errorStyle={styles.errorStyle}
+            errorStyle={cStyles.errorStyle}
             errorMessage={errorMessage.username}
             placeholder="Vd: Nguyễn Văn A"
             leftIcon={<Icon name="user" size={iconSize} color={iconColor} />}
@@ -72,7 +68,7 @@ export default class Home extends Component<Props> {
           />
           <Input
             label="Số điện thoại"
-            errorStyle={styles.errorStyle}
+            errorStyle={cStyles.errorStyle}
             errorMessage={errorMessage.phone}
             placeholder="Vd: 0123456789"
             maxLength={10}
@@ -82,7 +78,7 @@ export default class Home extends Component<Props> {
           />
           <Input
             label="Địa chỉ Email"
-            errorStyle={styles.errorStyle}
+            errorStyle={cStyles.errorStyle}
             errorMessage={errorMessage.email}
             placeholder="Vd: example@hcmut.edu.vn"
             keyboardType="email-address"
@@ -91,7 +87,7 @@ export default class Home extends Component<Props> {
           />
           <Input
             label="Mật khẩu"
-            errorStyle={styles.errorStyle}
+            errorStyle={cStyles.errorStyle}
             errorMessage={errorMessage.password}
             placeholder="Password"
             leftIcon={<Icon name="key" size={iconSize} color={iconColor} />}
@@ -100,7 +96,7 @@ export default class Home extends Component<Props> {
           />
           <Input
             label="Nhập lại Mật khẩu"
-            errorStyle={styles.errorStyle}
+            errorStyle={cStyles.errorStyle}
             errorMessage={errorMessage.repPassword}
             placeholder="Password"
             leftIcon={<Icon name="key" size={iconSize} color={iconColor} />}
@@ -129,7 +125,7 @@ export default class Home extends Component<Props> {
               />
             </View>
           </View>
-          <Button containerStyle={styles.btnwrap} buttonStyle={styles.btn} title="Đăng kí" onPress={this.register} />
+          <Button containerStyle={cStyles.btnwrap} buttonStyle={cStyles.btn} title="Đăng kí" onPress={this.register} />
         </ScrollView>
       </KeyboardAvoidingView>
     );

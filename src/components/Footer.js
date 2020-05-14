@@ -24,11 +24,11 @@ const styles = StyleSheet.create({
 const iconSize = 24,
   iconColor = 'black';
 const list = [
-  { icon: 'home', text: 'Home', to: '/' },
-  { icon: 'view-list', text: 'Rooms', to: '/list-room' },
-  { icon: 'face-recognition', text: 'Face', to: '/register-face' },
-  { icon: 'history', text: 'History', to: '/history' },
-  { icon: 'account', text: 'Account', to: '/account' },
+  { icon: 'home', text: 'Home', title: 'Trang chủ', to: '/' },
+  { icon: 'view-list', text: 'Rooms', title: 'Danh sách phòng', to: '/list-room' },
+  { icon: 'face-recognition', text: 'Face', title: 'Đăng kí gương mặt', to: '/register-face' },
+  { icon: 'history', text: 'History', title: 'Lịch sử điểm danh', to: '/history' },
+  { icon: 'account', text: 'Account', title: 'Tài khoản', to: '/account' },
 ];
 type Props = {};
 class Footer extends Component<Props> {

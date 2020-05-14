@@ -7,6 +7,7 @@
     "test": "jest"
   },
   "dependencies": {
+    "axios": "^0.19.2",
     "react": "16.3.1",
     "react-native": "^0.55.4",
     "react-native-elements": "^2.0.0",

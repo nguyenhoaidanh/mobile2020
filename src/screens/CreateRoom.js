@@ -3,18 +3,13 @@ import { Platform, StyleSheet, Text, View } from 'react-native';
 import { Link } from 'react-router-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { Input, Button, CheckBox } from 'react-native-elements';
+import cStyles from '../constants/common-styles';
 const styles = StyleSheet.create({
-  welcome: {
-    fontSize: 20,
-    textAlign: 'center',
-    margin: 10,
-  },
   login: {
     fontSize: 20,
     textAlign: 'center',
     color: 'red',
   },
-  errorStyle: { color: 'red' },
 });
 
 type Props = {};

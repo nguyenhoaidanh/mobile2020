@@ -4,11 +4,8 @@ import { Link } from 'react-router-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { Card, Button, CheckBox, Avatar } from 'react-native-elements';
 import ImageInput from '../components/ImageInput';
-const styles = StyleSheet.create({
-  errorStyle: { color: 'red' },
-  btn: { borderRadius: 20, width: 300 },
-  btnwrap: { marginTop: 10, width: '100%', alignItems: 'center' },
-});
+import cStyles from '../constants/common-styles';
+const styles = StyleSheet.create({});
 const iconSize = 24;
 const iconColor = 'black';
 type Props = {};
@@ -59,7 +56,7 @@ export default class Home extends Component<Props> {
               {this.renderRow(row, idx)}
             </View>
           ))}
-          <Button loading={loading} containerStyle={styles.btnwrap} buttonStyle={styles.btn} title="Đăng kí gương mặt" onPress={this.register} />
+          <Button loading={loading} containerStyle={cStyles.btnwrap} buttonStyle={cStyles.btn} title="Đăng kí gương mặt" onPress={this.register} />
         </ScrollView>
       </View>
     );

@@ -2,25 +2,14 @@ import React, { Component } from 'react';
 import { Platform, StyleSheet, Text, View, SafeAreaView, ScrollView } from 'react-native';
 import { Link, withRouter } from 'react-router-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import { Input, Button } from 'react-native-elements';
+import { Input, Button, Card } from 'react-native-elements';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import * as appActions from '../actions/index';
 import RoomItem from '../components/RoomItem';
 import { itemHeight } from '../constants/constants';
-const styles = StyleSheet.create({
-  welcome: {
-    fontSize: 20,
-    textAlign: 'center',
-    margin: 10,
-  },
-  login: {
-    fontSize: 20,
-    textAlign: 'center',
-    color: 'red',
-  },
-  errorStyle: { color: 'red' },
-});
+import cStyles from '../constants/common-styles';
+const styles = StyleSheet.create({});
 
 type Props = {};
 class Home extends Component<Props> {
@@ -40,8 +29,19 @@ class Home extends Component<Props> {
     return (
       <View>
         <ScrollView contentContainerStyle={{ height: list.length * itemHeight, flexGrow: 1 }}>
-          {list.map((room, idx) => (
-            <Text key={idx}>Lịch sử {idx + 1}</Text>
+          {list.map((item, idx) => (
+            <Card key={idx}>
+              <Text style={styles.textLeft}>
+                Bạn đã điểm danh lớp <Text style={{ fontWeight: 'bold' }}>Cơ sở dữ liệu</Text>
+              </Text>
+              <Text style={styles.textLeft}>
+                Giảng viên: <Text style={{ fontWeight: 'bold' }}>Nguyễn Thị X</Text>
+              </Text>
+              <Text style={styles.textLeft}>
+                Sỉ số: <Text style={{ fontWeight: 'bold' }}>90/100</Text>
+              </Text>
+              <Text style={{ alignSelf: 'flex-end' }}>19h30 19/12/2020</Text>
+            </Card>
           ))}
         </ScrollView>
       </View>

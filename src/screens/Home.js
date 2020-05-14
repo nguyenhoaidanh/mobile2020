@@ -7,6 +7,7 @@ import { withRouter } from 'react-router';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import * as appActions from '../actions/index';
+import cStyles from '../constants/common-styles';
 const instructions = Platform.select({
   ios: 'Press Cmd+R to reload,\n' + 'Cmd+D or shake for dev menu',
   android: 'Double tap R on your keyboard to reload,\n' + 'Shake or press menu button for dev menu',
@@ -33,8 +34,6 @@ const styles = StyleSheet.create({
     color: '#333333',
     marginBottom: 5,
   },
-  btn: { borderRadius: 20, width: 300 },
-  btnwrap: { marginTop: 10, width: '100%', alignItems: 'center' },
 });
 
 type Props = {};
@@ -49,12 +48,12 @@ class Home extends Component<Props> {
         <Text style={styles.welcome}>This is Home page, style cho đẹp sau!!!</Text>
         <Text style={styles.instructions}>{instructions}</Text>
         <Button
-          containerStyle={styles.btnwrap}
-          buttonStyle={styles.btn}
+          containerStyle={cStyles.btnwrap}
+          buttonStyle={cStyles.btn}
           title="Đăng kí"
           onPress={() => this.navigate('/register', { text: 'Đăng kí tài khoản' })}
         />
-        <Button containerStyle={styles.btnwrap} buttonStyle={styles.btn} title="Đăng nhập" onPress={() => this.navigate('/login', { text: 'Đăng nhập' })} />
+        <Button containerStyle={cStyles.btnwrap} buttonStyle={cStyles.btn} title="Đăng nhập" onPress={() => this.navigate('/login', { text: 'Đăng nhập' })} />
       </View>
     );
   }

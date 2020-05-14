@@ -23,7 +23,7 @@ export default class App extends Component<Props> {
       <Provider store={store}>
         <NativeRouter>
           <Header />
-          <Route exact path="/" component={Home} />
+          <Route exact path="/" component={ListRoom} />
           <Route exact path="/login" component={Login} />
           <Route exact path="/register" component={Register} />
           <Route exact path="/register-face" component={RegisterFace} />

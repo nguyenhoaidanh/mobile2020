@@ -8,11 +8,8 @@ import { bindActionCreators } from 'redux';
 import * as appActions from '../actions/index';
 import RoomItem from '../components/RoomItem';
 import { itemHeight } from '../constants/constants';
-const styles = StyleSheet.create({
-  errorStyle: { color: 'red' },
-  btn: { borderRadius: 20, width: 300 },
-  btnwrap: { marginTop: 10, marginBottom: 10, width: '100%', alignItems: 'center' },
-});
+import cStyles from '../constants/common-styles';
+const styles = StyleSheet.create({});
 
 type Props = {};
 class Home extends Component<Props> {
@@ -31,8 +28,8 @@ class Home extends Component<Props> {
     const itemHeight = 195;
     return (
       <View>
-        <Button containerStyle={styles.btnwrap} buttonStyle={styles.btn} title="Tạo room" onPress={() => this.navigate('create-room')} />
-        <ScrollView contentContainerStyle={{ height: listRoom.length * itemHeight, backgroundColor: 'blue', flexGrow: 1 }}>
+        <Button containerStyle={cStyles.btnwrap} buttonStyle={cStyles.btn} title="Tạo room" onPress={() => this.navigate('create-room')} />
+        <ScrollView contentContainerStyle={{ marginTop: 30, height: listRoom.length * itemHeight, flexGrow: 1 }}>
           {listRoom.map((room, idx) => (
             <RoomItem room={room} key={idx} index={idx} />
           ))}

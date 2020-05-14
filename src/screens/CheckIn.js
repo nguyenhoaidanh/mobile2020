@@ -4,11 +4,8 @@ import { Link } from 'react-router-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { Input, Button, CheckBox } from 'react-native-elements';
 import ImageInput from '../components/ImageInput';
-const styles = StyleSheet.create({
-  btn: { borderRadius: 20, width: 300 },
-  btnwrap: { marginTop: 10, width: '100%', alignItems: 'center' },
-  errorStyle: { color: 'red' },
-});
+import cStyles from '../constants/common-styles';
+const styles = StyleSheet.create({});
 
 type Props = {};
 export default class Home extends Component<Props> {
@@ -33,7 +30,7 @@ export default class Home extends Component<Props> {
         <View>
           <Input
             label="Mật khẩu"
-            errorStyle={styles.errorStyle}
+            errorStyle={cStyles.errorStyle}
             errorMessage={errorMessage.password}
             placeholder="Password"
             keyboardType="numeric"
@@ -41,13 +38,13 @@ export default class Home extends Component<Props> {
             onChangeText={(value) => this.onchange('password', value)}
             secureTextEntry={true}
           />
-          <Button containerStyle={styles.btnwrap} buttonStyle={styles.btn} title="Vào phòng" onPress={this.validate} />
+          <Button containerStyle={cStyles.btnwrap} buttonStyle={cStyles.btn} title="Vào phòng" onPress={this.validate} />
         </View>
       );
     return (
       <View>
         <ImageInput image={image} camera={true} callback={this.setImage} />
-        <Button containerStyle={styles.btnwrap} buttonStyle={styles.btn} title="Điểm danh" onPress={this.checkin} />
+        <Button containerStyle={cStyles.btnwrap} buttonStyle={cStyles.btn} title="Điểm danh" onPress={this.checkin} />
       </View>
     );
   }
