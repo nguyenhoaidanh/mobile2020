@@ -11,7 +11,7 @@ router.post('/',authorize(role.Teacher),createRoom);
 router.put('/',authorize(role.Teacher), updateRoom);
 router.delete('/',authorize(role.Teacher), closeRoom);
 router.get('/:id', getOneRoom);
-router.get('/',getAllRoom)
+router.get('/classes/:id',getAllRoom)
 
 function createRoom(req, res, next){
     roomService.create(req)

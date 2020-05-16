@@ -14,15 +14,20 @@ module.exports = {
     getById,
     create,
     update,
+    getAllSelf
 };
 
 
-async function getAll() {
-    return await Session.find();
+async function getAllSelf(req) {
+    return await Session.find({create_user:req.user.sub});
+}
+async function getAll(req) {
+    return await Session.find({room_id:req.params.id});
 }
 
-async function getById(id) {
-    return await Session.findById(id);
+
+async function getById(req) {
+    return await Session.findById(req.params.id);
 }
 
 async function create(request) {
