@@ -22,9 +22,9 @@ class Footer extends Component<Props> {
     showImageInput({ picker, camera, callback });
   };
   render() {
-    const { image = {}, height = '80%', width = '100%', component = null } = this.props;
+    const { margin = 20, image = {}, height = '80%', width = '100%', component = null } = this.props;
     return (
-      <Card containerStyle={{ width, height, backgroundColor: '#dbd9d9', borderRadius: 10 }}>
+      <View style={{ width, height, backgroundColor: 'transparent', borderRadius: 10 }}>
         <Avatar
           avatarStyle={styles.img}
           containerStyle={styles.wrapAvatar}
@@ -37,12 +37,12 @@ class Footer extends Component<Props> {
           accessory={{
             name: image.path ? 'mode-edit' : 'plus-circle',
             type: image.path ? 'material' : 'font-awesome',
-            color: 'blue',
-            underlayColor: '#000',
+            color: 'white',
+            underlayColor: 'gray',
             size: 30,
           }}
         />
-      </Card>
+      </View>
     );
   }
 }

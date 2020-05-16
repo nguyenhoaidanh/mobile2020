@@ -1,6 +1,6 @@
 import ACTIONS from '../constants/action-types';
 const initialState = {
-  loggedIn: false,
+  loggedIn: true,
   userInfo: {},
 };
 const reducer = (state = initialState, action) => {

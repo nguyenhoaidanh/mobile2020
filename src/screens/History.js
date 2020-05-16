@@ -27,24 +27,23 @@ class Home extends Component<Props> {
     const { errorMessage = {}, list = [1, 23, 32, 23, 45, 45, 3434] } = this.state;
     const itemHeight = 190;
     return (
-      <View>
-        <ScrollView contentContainerStyle={{ height: list.length * itemHeight, flexGrow: 1 }}>
-          {list.map((item, idx) => (
-            <Card key={idx}>
-              <Text style={styles.textLeft}>
-                Bạn đã điểm danh lớp <Text style={{ fontWeight: 'bold' }}>Cơ sở dữ liệu</Text>
-              </Text>
-              <Text style={styles.textLeft}>
-                Giảng viên: <Text style={{ fontWeight: 'bold' }}>Nguyễn Thị X</Text>
-              </Text>
-              <Text style={styles.textLeft}>
-                Sỉ số: <Text style={{ fontWeight: 'bold' }}>90/100</Text>
-              </Text>
-              <Text style={{ alignSelf: 'flex-end' }}>19h30 19/12/2020</Text>
-            </Card>
-          ))}
-        </ScrollView>
-      </View>
+      <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+        {list.map((item, idx) => (
+          <Card key={idx}>
+            <Text style={styles.textLeft}>
+              Bạn đã điểm danh lớp <Text style={{ fontWeight: 'bold' }}>Cơ sở dữ liệu</Text>
+            </Text>
+            <Text style={styles.textLeft}>
+              Giảng viên: <Text style={{ fontWeight: 'bold' }}>Nguyễn Thị X</Text>
+            </Text>
+            <Text style={styles.textLeft}>
+              Sỉ số: <Text style={{ fontWeight: 'bold' }}>90/100</Text>
+            </Text>
+            <Text style={{ alignSelf: 'flex-end' }}>19h30 19/12/2020</Text>
+          </Card>
+        ))}
+        <View style={{ height: 65 }} />
+      </ScrollView>
     );
   }
 }

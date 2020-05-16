@@ -1,34 +1,26 @@
 import React, { Component } from 'react';
 import { Platform, StyleSheet, Text, View } from 'react-native';
 import { NativeRouter, Route, Link } from 'react-router-native';
-import { Button } from 'react-native-elements';
+import { Button, Image } from 'react-native-elements';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { withRouter } from 'react-router';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import * as appActions from '../actions/index';
 import cStyles from '../constants/common-styles';
-const instructions = Platform.select({
-  ios: 'Press Cmd+R to reload,\n' + 'Cmd+D or shake for dev menu',
-  android: 'Double tap R on your keyboard to reload,\n' + 'Shake or press menu button for dev menu',
-});
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#F5FCFF',
   },
   welcome: {
-    fontSize: 20,
+    fontSize: 24,
     textAlign: 'center',
     margin: 10,
+    color: 'white',
   },
-  login: {
-    fontSize: 20,
-    textAlign: 'center',
-    color: 'red',
-  },
+
   instructions: {
     textAlign: 'center',
     color: '#333333',
@@ -45,15 +37,25 @@ class Home extends Component<Props> {
   render() {
     return (
       <View style={styles.container}>
-        <Text style={styles.welcome}>This is Home page, style cho đẹp sau!!!</Text>
-        <Text style={styles.instructions}>{instructions}</Text>
+        <Image
+          source={{ uri: 'https://upload.wikimedia.org/wikipedia/vi/thumb/c/cd/Logo-hcmut.svg/543px-Logo-hcmut.svg.png' }}
+          style={{ width: 200, height: 200 }}
+        />
+        <Text style={styles.welcome}>Bach khoa Attendance Application</Text>
         <Button
           containerStyle={cStyles.btnwrap}
+          titleStyle={cStyles.btnText}
           buttonStyle={cStyles.btn}
           title="Đăng kí"
           onPress={() => this.navigate('/register', { text: 'Đăng kí tài khoản' })}
         />
-        <Button containerStyle={cStyles.btnwrap} buttonStyle={cStyles.btn} title="Đăng nhập" onPress={() => this.navigate('/login', { text: 'Đăng nhập' })} />
+        <Button
+          containerStyle={cStyles.btnwrap}
+          titleStyle={cStyles.btnText}
+          buttonStyle={cStyles.btn}
+          title="Đăng nhập"
+          onPress={() => this.navigate('/login', { text: 'Đăng nhập' })}
+        />
       </View>
     );
   }

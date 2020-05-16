@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { NativeRouter, Route, Link } from 'react-router-native';
-import { View } from 'react-native';
+import { View, ImageBackground } from 'react-native';
 import Home from './screens/Home';
 import Login from './screens/Login';
 import Register from './screens/Register';
@@ -12,18 +12,24 @@ import History from './screens/History';
 import Account from './screens/Account';
 import Footer from './components/Footer';
 import Header from './components/Header';
-import { Provider } from 'react-redux';
+import { Provider, connect } from 'react-redux';
 import appReducer from './reducers/index';
-import { createStore } from 'redux';
-export default class App extends Component<Props> {
-  state = {};
+import { createStore, bindActionCreators } from 'redux';
+import * as appActions from './actions/index';
+type Props = {};
+class App extends Component<Props> {
   render() {
-    const store = createStore(appReducer);
+    console.log(1111, this.props);
     return (
-      <Provider store={store}>
+      <ImageBackground
+        source={{
+          uri: 'https://www.desktopbackground.org/download/720x1280/2011/02/01/150988_church-hill-middle-school-blue-abstract-backgrounds_2543x1553_h.jpg',
+        }}
+        style={{ flex: 1 }}
+      >
         <NativeRouter>
-          <Header />
-          <Route exact path="/" component={ListRoom} />
+          {true ? <Header /> : null}
+          <Route exact path="/" component={Home} />
           <Route exact path="/login" component={Login} />
           <Route exact path="/register" component={Register} />
           <Route exact path="/register-face" component={RegisterFace} />
@@ -34,7 +40,19 @@ export default class App extends Component<Props> {
           <Route exact path="/account" component={Account} />
           <Footer />
         </NativeRouter>
-      </Provider>
+      </ImageBackground>
     );
   }
 }
+const mapStateToProps = (state) => {
+  // Redux Store --> Component
+  return {
+    isLogin: state.user.isLogin,
+  };
+};
+const mapDispatchToProps = (dispatch) => {
+  return {
+    appActions: bindActionCreators(appActions, dispatch),
+  };
+};
+export default connect(mapStateToProps, mapDispatchToProps)(App);

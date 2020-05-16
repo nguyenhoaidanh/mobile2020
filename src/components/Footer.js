@@ -18,18 +18,22 @@ const styles = StyleSheet.create({
     bottom: 0,
     padding: 0,
   },
-  group: { width: '100%', height: '100%' },
-  selected: { backgroundColor: 'lightblue' },
+  group: { width: '100%', height: '100%', backgroundColor: '#1885f9' },
+  selected: { backgroundColor: 'transparent' },
 });
 const iconSize = 24,
-  iconColor = 'black';
+  iconColor = 'white';
 const list = [
   { icon: 'home', text: 'Home', title: 'Trang chủ', to: '/' },
-  { icon: 'view-list', text: 'Rooms', title: 'Danh sách phòng', to: '/list-room' },
+  { icon: 'view-list', customIcon: 'sort', customText: 'sort', text: 'Rooms', title: 'Danh sách phòng', to: '/list-room', showSearch: true },
   { icon: 'face-recognition', text: 'Face', title: 'Đăng kí gương mặt', to: '/register-face' },
   { icon: 'history', text: 'History', title: 'Lịch sử điểm danh', to: '/history' },
   { icon: 'account', text: 'Account', title: 'Tài khoản', to: '/account' },
 ];
+list = list.map((e) => ({
+  ...e,
+  icon: <Icon name={e.icon} size={iconSize} color={iconColor} />,
+}));
 type Props = {};
 class Footer extends Component<Props> {
   state = {};
@@ -49,15 +53,16 @@ class Footer extends Component<Props> {
     this.props.appActions.setCurScreent({ currentScreent: list[selectedIndex] });
   };
   componentWillReceiveProps(props) {
-    console.log('Danh', this.props.app.lastScreent);
+    console.log('xx');
   }
   render() {
+    console.log(22);
     const { selectedIndex = 0, hideFooter = 0 } = this.state;
     const buttons = list.map((el) => ({
       element: () => (
-        <View style={{ alignItems: 'center' }}>
-          <Icon name={el.icon} size={iconSize} color={iconColor} />
-          <Text>{el.text}</Text>
+        <View style={{ width: '100%', alignItems: 'center' }}>
+          {el.icon}
+          <Text style={{ color: iconColor }}>{el.text}</Text>
         </View>
       ),
     }));
@@ -66,6 +71,7 @@ class Footer extends Component<Props> {
       <View style={styles.container}>
         <ButtonGroup
           selectedButtonStyle={styles.selected}
+          selectedTextStyle={styles.selectedText}
           containerStyle={styles.group}
           onPress={this.updateIndex}
           selectedIndex={selectedIndex}

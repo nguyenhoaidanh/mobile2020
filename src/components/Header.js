@@ -9,6 +9,13 @@ import { bindActionCreators } from 'redux';
 import * as appActions from '../actions/index';
 const iconSize = 30,
   iconColor = 'white';
+const styles = StyleSheet.create({
+  header: {
+    height: 50,
+    backgroundColor: 'transparent',
+    paddingTop: 0,
+  },
+});
 type Props = {};
 class Home extends Component<Props> {
   state = {};
@@ -22,29 +29,42 @@ class Home extends Component<Props> {
   render() {
     const { keyword = '' } = this.state;
     const { currentScreent = {}, lastScreent = null } = this.props.app;
-    const { title = '', icon = '', to = '' } = currentScreent;
-    return (
-      <Header
-        containerStyle={{
-          height: 50,
-          backgroundColor: 'lightblue',
-          paddingTop: 0,
-        }}
-      >
-        {lastScreent && to !== '/list-room' ? <Icon onPress={this.back} name={'keyboard-backspace'} size={iconSize} color={iconColor} /> : null}
-        {to == '/list-room' ? (
+    const { title = '', icon = null, customIcon = null, to = '', showSearch = false } = currentScreent;
+    if (showSearch)
+      return (
+        <View style={styles.header}>
           <SearchBar
-            inputContainerStyle={{ borderRadius: 20, height: '100%', margin: 0 }}
-            containerStyle={{ borderRadius: 20, width: '100%', height: 30, padding: 0 }}
+            inputContainerStyle={{
+              alignSelf: 'center',
+              borderColor: 'transparent',
+              borderRadius: 20,
+              height: 40,
+              width: '70%',
+              margin: 0,
+              backgroundColor: 'white',
+            }}
+            containerStyle={{
+              borderTopColor: 'transparent',
+              backgroundColor: 'transparent',
+              alignSelf: 'center',
+              borderRadius: 40,
+              width: '100%',
+              height: '100%',
+              marginTop: 5,
+              alignItems: 'center',
+              padding: 0,
+            }}
             placeholder="Tìm kiếm phòng"
             onChangeText={this.updateSearch}
             value={keyword}
           />
-        ) : (
-          <Text style={{ color: iconColor, fontSize: 25 }}>{title}</Text>
-        )}
-
-        {icon ? <Icon name={icon} size={iconSize} color={iconColor} /> : null}
+        </View>
+      );
+    return (
+      <Header containerStyle={styles.header}>
+        {!lastScreent ? null : <Icon onPress={this.back} name={'keyboard-backspace'} size={iconSize} color={iconColor} />}
+        <Text style={{ color: iconColor, fontSize: 25 }}>{title}</Text>
+        {icon}
       </Header>
     );
   }

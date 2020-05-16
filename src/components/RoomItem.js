@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import { Platform, StyleSheet, Text, View, ScrollView } from 'react-native';
 import { NativeRouter, Route, Link } from 'react-router-native';
-import { Button, ButtonGroup, Card } from 'react-native-elements';
-import Icon from 'react-native-vector-icons/FontAwesome';
+import { Button, Badge, ButtonGroup, Card } from 'react-native-elements';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { withRouter } from 'react-router';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
@@ -28,15 +28,23 @@ class Footer extends Component<Props> {
   };
   render() {
     const { index = 0, room = {} } = this.props;
+    const isExpire = Math.floor(Math.random() * 10) % 2 == 0;
     return (
       <Card>
         <View style={styles.row}>
-          <Text style={{ width: '100%', fontSize: 25, alignContent: 'center', fontWeight: 'bold' }}>Đồ họa máy tính - 20/12/2020</Text>
-          <Text style={styles.textLeft}>Giảng viên: Nguyễn Thị X</Text>
+          <Text style={{ width: '100%', fontSize: 20, alignContent: 'center', fontWeight: 'bold' }}>Đồ họa máy tính - 20/12/2020</Text>
           <Text style={styles.textLeft}>Sỉ số: 90/100</Text>
-          <Text style={styles.textLeft}>Lớp: L01</Text>
         </View>
-        <Button containerStyle={cStyles.btnwrap} buttonStyle={cStyles.btn} title="Điểm danh" onPress={() => this.navigate('check-in')} />
+        {isExpire ? (
+          <Button containerStyle={cStyles.btnwrap} titleStyle={cStyles.btnText} buttonStyle={cStyles.btn} title="Vào điểm danh" onPress={this.props.onClick} />
+        ) : (
+          <Badge
+            textStyle={{ fontSize: 15 }}
+            badgeStyle={{ paddingLeft: 15, paddingRight: 15, paddingTop: 15, paddingBottom: 15 }}
+            status="warning"
+            value={'Đã hết hạn điểm danh'}
+          />
+        )}
       </Card>
     );
   }

@@ -49,7 +49,6 @@ export default class Home extends Component<Props> {
     }
     if (!valid) return this.setState({ errorMessage });
     const user = { username, phone, email, password, male };
-    console.log('Danh', user);
   };
   render() {
     const iconSize = 24;
@@ -57,7 +56,7 @@ export default class Home extends Component<Props> {
     const { errorMessage = {}, male = true, felmale = false } = this.state;
     return (
       <KeyboardAvoidingView style={{ flex: 1, flexDirection: 'column' }}>
-        <ScrollView>
+        <ScrollView style={{ backgroundColor: 'white', paddingLeft: 10, paddingRight: 10, paddingTop: 10, paddingBottom: 10 }}>
           <Input
             label="Họ và tên (Sử dụng tên thật để điểm danh)"
             errorStyle={cStyles.errorStyle}
@@ -125,7 +124,7 @@ export default class Home extends Component<Props> {
               />
             </View>
           </View>
-          <Button containerStyle={cStyles.btnwrap} buttonStyle={cStyles.btn} title="Đăng kí" onPress={this.register} />
+          <Button containerStyle={cStyles.btnwrap} titleStyle={cStyles.btnText} buttonStyle={cStyles.btn} title="Đăng kí" onPress={this.register} />
         </ScrollView>
       </KeyboardAvoidingView>
     );

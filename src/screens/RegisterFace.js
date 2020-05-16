@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { Platform, StyleSheet, Text, View, SafeAreaView, ScrollView } from 'react-native';
 import { Link } from 'react-router-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import { Card, Button, CheckBox, Avatar } from 'react-native-elements';
+import { ButtonGroup, Card, Button, CheckBox, Avatar } from 'react-native-elements';
 import ImageInput from '../components/ImageInput';
 import cStyles from '../constants/common-styles';
 const styles = StyleSheet.create({});
@@ -29,11 +29,14 @@ export default class Home extends Component<Props> {
   };
   renderRow = (row, rowNum) => {
     return (
-      <View style={{ flexDirection: 'row' }}>
-        {row.map((el, idx) => (
-          <ImageInput key={idx} image={el.image} picker={true} callback={(img) => this.setImage(img, rowNum * 2 + idx)} height={150} width="45%" />
-        ))}
-      </View>
+      <ButtonGroup
+        key={rowNum}
+        buttons={row.map((el, idx) => ({
+          element: () => <ImageInput key={idx} image={el.image} picker={true} callback={(img) => this.setImage(img, rowNum * 2 + idx)} height={'100%'} />,
+        }))}
+        buttonStyle={{ marginLeft: 15, marginRight: 15 }}
+        containerStyle={{ height: 200, marginBottom: 10, marginTop: 10 }}
+      />
     );
   };
   parseList = (list) => {
@@ -49,16 +52,18 @@ export default class Home extends Component<Props> {
     const rowHeight = 200;
     list = this.parseList(list);
     return (
-      <View>
-        <ScrollView contentContainerStyle={{ height: rowHeight * list.length }}>
-          {list.map((row, idx) => (
-            <View key={idx} style={{ flexDirection: 'column' }}>
-              {this.renderRow(row, idx)}
-            </View>
-          ))}
-          <Button loading={loading} containerStyle={cStyles.btnwrap} buttonStyle={cStyles.btn} title="Đăng kí gương mặt" onPress={this.register} />
-        </ScrollView>
-      </View>
+      <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+        {list.map((row, idx) => this.renderRow(row, idx))}
+        <Button
+          loading={loading}
+          containerStyle={cStyles.btnwrap}
+          titleStyle={cStyles.btnText}
+          buttonStyle={cStyles.btn}
+          title="Đăng kí gương mặt"
+          onPress={this.register}
+        />
+        <View style={{ height: 65 }} />
+      </ScrollView>
     );
   }
 }

@@ -38,7 +38,7 @@ export default class Home extends Component<Props> {
     const { errorMessage = {}, mode = 0, image = {} } = this.state;
     if (!mode)
       return (
-        <View>
+        <View style={{ paddingLeft: 10, paddingRight: 10, paddingTop: 10, paddingBottom: 10 }}>
           <Input
             label="Số điện thoại hoặc email"
             errorStyle={cStyles.errorStyle}
@@ -55,12 +55,12 @@ export default class Home extends Component<Props> {
             onChangeText={(value) => this.onchange('password', value)}
             secureTextEntry={true}
           />
-          <Button containerStyle={cStyles.btnwrap} buttonStyle={cStyles.btn} title="Đăng nhập" onPress={this.register} />
-          <Divider style={{ backgroundColor: 'green', marginBottom: 20, marginTop: 20 }} />
+          <Button containerStyle={cStyles.btnwrap} titleStyle={cStyles.btnText} buttonStyle={cStyles.btn} title="Đăng nhập" onPress={this.register} />
           <Button
             containerStyle={cStyles.btnwrap}
+            titleStyle={cStyles.btnText}
             buttonStyle={cStyles.btn}
-            title="Đăng nhập bằng gương mặt"
+            title="Nhận diện gương mặt"
             onPress={() => this.setState({ mode: 1 }, this.openCamera)}
           />
         </View>
@@ -69,7 +69,7 @@ export default class Home extends Component<Props> {
       // face id
       <View>
         <ImageInput image={image} camera={true} callback={this.setImage} />
-        <Button containerStyle={cStyles.btnwrap} buttonStyle={cStyles.btn} title="Đăng nhập" onPress={this.login} />
+        <Button containerStyle={cStyles.btnwrap} titleStyle={cStyles.btnText} buttonStyle={cStyles.btn} title="Đăng nhập" onPress={this.login} />
       </View>
     );
   }
