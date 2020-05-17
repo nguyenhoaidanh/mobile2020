@@ -5,9 +5,7 @@ import DatePicker from 'react-native-datepicker';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { Input, Button, CheckBox } from 'react-native-elements';
 import cStyles from '../constants/common-styles';
-const styles = StyleSheet.create({
-  label: { marginBottom: 8, marginLeft: 10, fontSize: 17, fontWeight: 'bold' },
-});
+const styles = StyleSheet.create({});
 
 type Props = {};
 export default class Home extends Component<Props> {
@@ -22,7 +20,7 @@ export default class Home extends Component<Props> {
     const { date = '2016-05-15', errorMessage = {}, password = '', repPassword = '', name = '', number = 1 } = this.state;
     return (
       <KeyboardAvoidingView style={{ flex: 1, flexDirection: 'column' }}>
-        <ScrollView style={{ backgroundColor: 'white', paddingLeft: 10, paddingRight: 10, paddingTop: 10, paddingBottom: 10 }}>
+        <ScrollView style={cStyles.scroll}>
           <Input
             label="Tên phòng"
             errorStyle={cStyles.errorStyle}
@@ -60,7 +58,7 @@ export default class Home extends Component<Props> {
             onChangeText={(value) => this.onchange('repPassword', value)}
             secureTextEntry={true}
           />
-          <Text style={styles.label}>Thời gian bắt đầu </Text>
+          <Text style={cStyles.label}>Thời gian bắt đầu </Text>
           <DatePicker
             style={{ width: '100%' }}
             mode="datetime"
@@ -85,7 +83,7 @@ export default class Home extends Component<Props> {
               },
             }}
           />
-          <Text style={styles.label}> Thời gian kết thúc</Text>
+          <Text style={cStyles.label}> Thời gian kết thúc</Text>
           <DatePicker
             style={{ width: '100%' }}
             mode="datetime"
@@ -110,7 +108,7 @@ export default class Home extends Component<Props> {
               },
             }}
           />
-          <Button containerStyle={cStyles.btnwrap} titleStyle={cStyles.btnText} buttonStyle={cStyles.btn} title="Tạo phòng" onPress={this.makeRoom} />
+          <Button containerStyle={cStyles.btnwrap} titleStyle={cStyles.btnText} buttonStyle={cStyles.btnPrimary} title="Tạo phòng" onPress={this.makeRoom} />
         </ScrollView>
       </KeyboardAvoidingView>
     );

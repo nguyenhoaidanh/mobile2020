@@ -34,3 +34,17 @@ export const AXIOS = function (path, method = 'GET', data = {}, option = {}) {
     console.log(err);
   });
 };
+export const shadow = () => ({
+  shadowColor: '#000',
+  shadowOffset: {
+    width: 0,
+    height: 9,
+  },
+  shadowOpacity: 0.5,
+  shadowRadius: 12.35,
+  elevation: 19,
+});
+
+export const setAvatar = (image) => {
+  return image.path ? { uri: image.path } : require('../../img/default-avatar.jpg');
+};

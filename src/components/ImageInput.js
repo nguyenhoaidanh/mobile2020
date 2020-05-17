@@ -7,10 +7,10 @@ import { withRouter } from 'react-router';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import * as appActions from '../actions/index';
-import { showImageInput } from '../utils/functions';
+import { showImageInput, setAvatar } from '../utils/functions';
 const styles = StyleSheet.create({
-  img: { width: '100%', height: '100%' },
-  wrapAvatar: { width: '100%', height: '100%' },
+  img: { width: '100%', height: '100%', paddingBottom: 0, marginBottom: 0 },
+  wrapAvatar: { width: '100%', height: '100%', paddingBottom: 0 },
 });
 const iconSize = 24,
   iconColor = 'black';
@@ -22,16 +22,14 @@ class Footer extends Component<Props> {
     showImageInput({ picker, camera, callback });
   };
   render() {
-    const { margin = 20, image = {}, height = '80%', width = '100%', component = null } = this.props;
+    const { showAccessory = true, backgroundColor = 'transparent', margin = 20, image = {}, height = '80%', width = '100%', component = null } = this.props;
     return (
-      <View style={{ width, height, backgroundColor: 'transparent', borderRadius: 10 }}>
+      <View style={{ width, height, backgroundColor, borderRadius: 10, paddingBottom: 0 }}>
         <Avatar
           avatarStyle={styles.img}
           containerStyle={styles.wrapAvatar}
-          source={{
-            uri: image.path ? image.path : 'https://cdn2.iconfinder.com/data/icons/user/539/default-avatar.png',
-          }}
-          showAccessory
+          source={setAvatar(image)}
+          showAccessory={showAccessory}
           onAccessoryPress={this.showImageInput}
           onPress={this.showImageInput}
           accessory={{

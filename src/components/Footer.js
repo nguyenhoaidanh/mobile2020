@@ -18,22 +18,19 @@ const styles = StyleSheet.create({
     bottom: 0,
     padding: 0,
   },
-  group: { width: '100%', height: '100%', backgroundColor: '#1885f9' },
+  group: { width: '100%', height: '100%' },
   selected: { backgroundColor: 'transparent' },
 });
 const iconSize = 24,
   iconColor = 'white';
 const list = [
-  { icon: 'home', text: 'Home', title: 'Trang chủ', to: '/' },
+  { icon: 'home', text: 'Home', title: 'BK Attendance', to: '/' },
   { icon: 'view-list', customIcon: 'sort', customText: 'sort', text: 'Rooms', title: 'Danh sách phòng', to: '/list-room', showSearch: true },
   { icon: 'face-recognition', text: 'Face', title: 'Đăng kí gương mặt', to: '/register-face' },
   { icon: 'history', text: 'History', title: 'Lịch sử điểm danh', to: '/history' },
   { icon: 'account', text: 'Account', title: 'Tài khoản', to: '/account' },
 ];
-list = list.map((e) => ({
-  ...e,
-  icon: <Icon name={e.icon} size={iconSize} color={iconColor} />,
-}));
+
 type Props = {};
 class Footer extends Component<Props> {
   state = {};
@@ -61,8 +58,8 @@ class Footer extends Component<Props> {
     const buttons = list.map((el) => ({
       element: () => (
         <View style={{ width: '100%', alignItems: 'center' }}>
-          {el.icon}
-          <Text style={{ color: iconColor }}>{el.text}</Text>
+          <Icon name={el.icon} size={iconSize} color={'black'} />
+          <Text style={{ color: 'black' }}>{el.text}</Text>
         </View>
       ),
     }));

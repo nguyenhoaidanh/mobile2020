@@ -5,14 +5,14 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import { Input, Button, Avatar, Divider, Card, ListItem } from 'react-native-elements';
 import cStyles from '../constants/common-styles';
 import ImageInput from '../components/ImageInput';
-import { showImageInput } from '../utils/functions';
+import { showImageInput, setAvatar } from '../utils/functions';
 const styles = StyleSheet.create({
   row: {
     flexDirection: 'row',
   },
   hr: { backgroundColor: 'blue' },
   ava: {
-    backgroundColor: '#1885f9',
+    backgroundColor: 'transparent',
     height: 220,
     alignItems: 'center',
     paddingTop: 15,
@@ -78,9 +78,7 @@ export default class Home extends Component<Props> {
                 onAccessoryPress={this.showImageInput}
                 rounded
                 size="xlarge"
-                source={{
-                  uri: image.path ? image.path : 'https://s3.amazonaws.com/uifaces/faces/twitter/adhamdannaway/128.jpg',
-                }}
+                source={setAvatar(image)}
                 showAccessory
                 accessory={{
                   name: image.path ? 'mode-edit' : 'plus-circle',
@@ -105,7 +103,7 @@ export default class Home extends Component<Props> {
                 </View>
               </View>
             }
-            containerStyle={{ padding: 0, backgroundColor: 'lightblue' }}
+            containerStyle={{ margin: 10, padding: 0, backgroundColor: '#E9EBEE' }}
           >
             {edit ? (
               <View>

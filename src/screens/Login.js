@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
-import { Platform, StyleSheet, Text, View } from 'react-native';
+import { Platform, StyleSheet, Text, View, ScrollView } from 'react-native';
 import { Link } from 'react-router-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { Input, Button, Card, Avatar, Divider } from 'react-native-elements';
 import ImageInput from '../components/ImageInput';
 import cStyles from '../constants/common-styles';
@@ -38,7 +39,7 @@ export default class Home extends Component<Props> {
     const { errorMessage = {}, mode = 0, image = {} } = this.state;
     if (!mode)
       return (
-        <View style={{ paddingLeft: 10, paddingRight: 10, paddingTop: 10, paddingBottom: 10 }}>
+        <ScrollView style={cStyles.scroll}>
           <Input
             label="Số điện thoại hoặc email"
             errorStyle={cStyles.errorStyle}
@@ -55,20 +56,27 @@ export default class Home extends Component<Props> {
             onChangeText={(value) => this.onchange('password', value)}
             secureTextEntry={true}
           />
-          <Button containerStyle={cStyles.btnwrap} titleStyle={cStyles.btnText} buttonStyle={cStyles.btn} title="Đăng nhập" onPress={this.register} />
+          <Button containerStyle={cStyles.btnwrap} titleStyle={cStyles.btnText} buttonStyle={cStyles.btnPrimary} title="Đăng nhập" onPress={this.register} />
+          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            <View style={{ width: '100%', alignSelf: 'center' }}>
+              <Text style={{ marginTop: 15, marginBottom: 10, fontSize: 20, alignSelf: 'center' }}>Hoặc đăng nhập bằng</Text>
+            </View>
+          </View>
           <Button
             containerStyle={cStyles.btnwrap}
             titleStyle={cStyles.btnText}
             buttonStyle={cStyles.btn}
-            title="Nhận diện gương mặt"
+            icon={<MaterialCommunityIcons style={{ marginRight: 10 }} name="face-recognition" size={iconSize} color={'white'} />}
+            title="Face ID"
             onPress={() => this.setState({ mode: 1 }, this.openCamera)}
           />
-        </View>
+        </ScrollView>
       );
     return (
       // face id
       <View>
-        <ImageInput image={image} camera={true} callback={this.setImage} />
+        {/* <Text style={{ alignSelf: 'center', color: 'white', margin: 10, fontSize: 20 }}>Chạm để bật camera</Text> */}
+        <ImageInput showAccessory={false} backgroundColor="white" image={image} camera={true} callback={this.setImage} />
         <Button containerStyle={cStyles.btnwrap} titleStyle={cStyles.btnText} buttonStyle={cStyles.btn} title="Đăng nhập" onPress={this.login} />
       </View>
     );

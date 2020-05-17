@@ -8,12 +8,33 @@ import { bindActionCreators } from 'redux';
 import * as appActions from '../actions/index';
 import RoomItem from '../components/RoomItem';
 import { itemHeight } from '../constants/constants';
+import { shadow } from '../utils/functions';
 import cStyles from '../constants/common-styles';
 const styles = StyleSheet.create({
-  group: { width: '100%', height: 50, marginLeft: 0, marginTop: 0, padding: 0, backgroundColor: 'transparent' },
-  btn: { borderColor: 'transparent', borderRadius: 30, backgroundColor: 'white', marginLeft: 10, marginRight: 10, marginBottom: 5, marginTop: 5 },
-  btnText: { fontSize: 15, color: 'blue' },
-  btnIcon: { marginRight: 20 },
+  group: {
+    ...shadow(),
+    borderColor: 'transparent',
+    width: '100%',
+    height: 50,
+    marginLeft: 0,
+    marginTop: 0,
+    padding: 0,
+    backgroundColor: 'transparent',
+  },
+  btn: {
+    alignSelf: 'center',
+    width: 130,
+    borderRightColor: 'transparent',
+    borderLeftColor: 'transparent',
+    borderRadius: 30,
+    backgroundColor: '#F4F4F4',
+    marginLeft: 10,
+    marginRight: 10,
+    marginBottom: 5,
+    marginTop: 5,
+  },
+  btnText: { fontSize: 18, color: 'black' },
+  btnIcon: { marginRight: 20, paddingRight: 10 },
 });
 
 type Props = {};
@@ -25,13 +46,17 @@ class Home extends Component<Props> {
   navigate = (url) => {
     this.props.history.push(url);
   };
+  createRoom = () => {
+    this.props.appActions.setCurScreent({ currentScreent: { title: 'Tạo phòng mới' } });
+    this.navigate('/create-room');
+  };
   openListRoom = (_class) => {
     this.setState({ isListClass: false });
   };
   validate = () => {
     const { currentRoom = {} } = this.state;
     //call api here
-    this.props.appActions.setCurScreent({ currentScreent: { text: 'Điểm danh' } });
+    this.props.appActions.setCurScreent({ currentScreent: { title: 'Điểm danh' } });
     this.navigate('/check-in');
   };
   renderPopupPassword = () => {
@@ -54,14 +79,14 @@ class Home extends Component<Props> {
             <Button
               containerStyle={{ width: '50%' }}
               titleStyle={cStyles.btnText}
-              buttonStyle={{ width: '80%', borderRadius: 20, backgroundColor: '#f99a34' }}
+              buttonStyle={{ alignSelf: 'center', width: '80%', borderRadius: 20, backgroundColor: '#f99a34' }}
               title="Hủy bỏ"
               onPress={() => this.setState({ showForm: false })}
             />
             <Button
               containerStyle={{ width: '50%' }}
               titleStyle={cStyles.btnText}
-              buttonStyle={{ width: '80%', borderRadius: 20 }}
+              buttonStyle={{ alignSelf: 'center', width: '80%', borderRadius: 20 }}
               title="Vào phòng"
               onPress={this.validate}
             />
@@ -126,9 +151,9 @@ class Home extends Component<Props> {
       {
         element: () => (
           <View style={{ alignItems: 'center' }} onPress={() => this.navigate('/create-room')}>
-            <Text onPress={() => this.navigate('/create-room')} style={styles.btnText}>
+            <Text onPress={this.createRoom} style={styles.btnText}>
               <Icon style={styles.btnIcon} name={'plus'} size={iconSize} color={iconColor} />
-              Tạo phòng
+              <Text style={{ marginLeft: 30 }}>Tạo phòng</Text>
             </Text>
           </View>
         ),
@@ -138,7 +163,7 @@ class Home extends Component<Props> {
           <View style={{ alignItems: 'center' }}>
             <Text style={styles.btnText}>
               <Icon style={styles.btnIcon} name={'sort'} size={iconSize} color={iconColor} />
-              Sắp xếp
+              <Text style={{ marginLeft: 30 }}> Sắp xếp</Text>
             </Text>
           </View>
         ),
@@ -150,7 +175,7 @@ class Home extends Component<Props> {
         <ButtonGroup buttonStyle={styles.btn} containerStyle={styles.group} onPress={this.updateIndex} buttons={buttons} />
         <View style={{ flexDirection: 'row', width: '100%', alignItems: 'center' }}>
           <View style={{ width: '100%', paddingTop: 10, paddingBottom: 10 }}>
-            <Text style={{ fontSize: 30, alignSelf: 'center', color: 'white' }}>{isListClass ? 'Danh sách lớp' : 'Danh sách phòng'}</Text>
+            <Text style={{ fontStyle: 'italic', fontSize: 25, alignSelf: 'center', color: 'white' }}>{isListClass ? 'Danh sách lớp' : 'Danh sách phòng'}</Text>
           </View>
         </View>
         <ScrollView contentContainerStyle={{ flexGrow: 1, paddingLeft: 15, paddingRight: 15, marginTop: 10, paddingTop: 0 }}>

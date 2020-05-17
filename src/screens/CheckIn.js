@@ -27,7 +27,7 @@ export default class Home extends Component<Props> {
     const { errorMessage = {}, valid = 1, image = {} } = this.state;
     return (
       <View>
-        <ImageInput image={image} camera={true} callback={this.setImage} />
+        <ImageInput showAccessory={false} backgroundColor="white" image={image} camera={true} callback={this.setImage} />
         <Button containerStyle={cStyles.btnwrap} titleStyle={cStyles.btnText} buttonStyle={cStyles.btn} title="Điểm danh" onPress={this.checkin} />
       </View>
     );

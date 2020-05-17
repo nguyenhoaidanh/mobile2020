@@ -7,6 +7,7 @@ import { withRouter } from 'react-router';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import * as appActions from '../actions/index';
+import { shadow } from '../utils/functions';
 const iconSize = 30,
   iconColor = 'white';
 const styles = StyleSheet.create({
@@ -30,6 +31,7 @@ class Home extends Component<Props> {
     const { keyword = '' } = this.state;
     const { currentScreent = {}, lastScreent = null } = this.props.app;
     const { title = '', icon = null, customIcon = null, to = '', showSearch = false } = currentScreent;
+
     if (showSearch)
       return (
         <View style={styles.header}>
@@ -64,7 +66,7 @@ class Home extends Component<Props> {
       <Header containerStyle={styles.header}>
         {!lastScreent ? null : <Icon onPress={this.back} name={'keyboard-backspace'} size={iconSize} color={iconColor} />}
         <Text style={{ color: iconColor, fontSize: 25 }}>{title}</Text>
-        {icon}
+        <Icon name={icon} size={iconSize} color={iconColor} />
       </Header>
     );
   }

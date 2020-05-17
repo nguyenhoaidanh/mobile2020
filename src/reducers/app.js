@@ -1,6 +1,6 @@
 import ACTIONS from '../constants/action-types';
 const initialState = {
-  currentScreent: { icon: null, title: 'Trang chủ' },
+  currentScreent: { icon: null, title: 'BK Attendance' },
   lastScreent: null,
   loading: false,
 };

@@ -24,7 +24,7 @@ class Footer extends Component<Props> {
   state = {};
   navigate = (url) => {
     this.props.history.push(url);
-    this.props.appActions.setCurScreent({ currentScreent: { text: 'Điểm danh' } });
+    this.props.appActions.setCurScreent({ currentScreent: { title: 'Điểm danh' } });
   };
   render() {
     const { index = 0, room = {} } = this.props;
@@ -36,14 +36,18 @@ class Footer extends Component<Props> {
           <Text style={styles.textLeft}>Sỉ số: 90/100</Text>
         </View>
         {isExpire ? (
-          <Button containerStyle={cStyles.btnwrap} titleStyle={cStyles.btnText} buttonStyle={cStyles.btn} title="Vào điểm danh" onPress={this.props.onClick} />
-        ) : (
-          <Badge
-            textStyle={{ fontSize: 15 }}
-            badgeStyle={{ paddingLeft: 15, paddingRight: 15, paddingTop: 15, paddingBottom: 15 }}
-            status="warning"
-            value={'Đã hết hạn điểm danh'}
+          <Button
+            containerStyle={cStyles.btnwrap}
+            titleStyle={cStyles.btnText}
+            buttonStyle={cStyles.btnPrimary}
+            title="Vào điểm danh"
+            onPress={this.props.onClick}
           />
+        ) : (
+          <View style={{ width: '100%', flexDirection: 'row', alignItems: 'center' }}>
+            <Badge status="warning" />
+            <Text style={{ marginLeft: 10, fontSize: 20, color: 'orange' }}>{'Đã hết hạn điểm danh'}</Text>
+          </View>
         )}
       </Card>
     );
