@@ -18,18 +18,18 @@ function authenticate(req, res, next) {
 function registerForStudent(req, res, next) {
     console.log(req.body)
     userService.createStudent(req.body)
-        .then(() => res.json({message:"dang ky thanh cong"}))
+        .then(() => res.json({"result":"dang ky thanh cong"}))
         .catch(err => next(err));
 }
 function registerForTeacher(req, res, next) {
     console.log(req.body)
     userService.createTeacher(req.body)
-        .then(() => res.json({message:"dang ky thanh cong"}))
+        .then(() => res.json({"result":"dang ky thanh cong"}))
         .catch(err => next(err));
 }
 function getOneUser(req,res,next){
     userService.getById(req.body.id)
-    .then((result)=>res.json(result))
+    .then((result)=>res.json({"result":result}))
     .catch(err=> next(err))
 }
 // var getOneUser = function (req, res) {

@@ -1,5 +1,5 @@
 'use strict';
-
+require('dotenv').config();
 //mongoose file must be loaded before all other files in order to provide
 // models to other modules
 var express = require('express'),
@@ -10,8 +10,6 @@ var express = require('express'),
   const jwt = require('./helper/jwt');
   const errorHandler = require('./helper/error');
   const cors = require('cors');
-
-  
 
 // var mongoose = require('mongoose'),
 //   Schema = mongoose.Schema;
@@ -115,10 +113,12 @@ app.use(jwt());
 app.use(errorHandler);
 //route
 app.use('/users', require('./controller/auth.controller'));
+app.use('/users/images', require('./controller/user.controller'));
 app.use('/classes', require('./controller/class.controller'));
 app.use('/rooms', require('./controller/room.controller'));
 app.use('/sessions', require('./controller/session.controller'));
-
+app.use('/static',express.static('public'));
+// app.use('/static/',express.static('store'));
 app.listen(3000);
 module.exports = app;
 

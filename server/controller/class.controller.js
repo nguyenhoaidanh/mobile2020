@@ -18,12 +18,12 @@ router.get('/',authorize(role.Teacher),getAllClassOfTeacher);
 
 function createClass(req, res, next){
     classServie.create(req)
-    .then((result)=>res.json(result))
+    .then((result)=>res.json({"result":result}))
     .catch(err => next(err));
 }
 function updateClassForUser(req, res, next){
     classServie.updateClassForUser(req)
-    .then((result)=>res.json(result))
+    .then((result)=>res.json({"result":result}))
     .catch(err => next(err));
 }
 function removeClass(){
@@ -34,7 +34,7 @@ function updateClass(){
 }
 function getOneClass(req,res,next){
     classServie.getById(req.params.id)
-    .then((result)=>res.json({result}))
+    .then((result)=>res.json({"result":result}))
     .catch(err=>res.status(404).json({message:err}))
 }
 function getAllClassOfTeacher(req,res,next){

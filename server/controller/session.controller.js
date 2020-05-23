@@ -16,7 +16,7 @@ router.get('/joined/class/:id',authorize(role.Student),getAllSelfSession)
 
 function createSession(req, res, next){
     sessionService.create(req)
-    .then((result)=>res.json(result))
+    .then((result)=>res.json({"result":result}))
     .catch(err => res.status(400).json({message:err}));
 }
 function removeSession(){
@@ -24,17 +24,17 @@ function removeSession(){
 }
 function updateSession(req, res, next){
     sessionService.update(req,res)
-    .then((result)=>res.json({"message":"Checkin thanh cong"}))
+    .then((result)=>res.json({"result":result}))
     .catch(err => res.status(400).json({message:err}));
 }
 function getOneSession(req,res,next){
     sessionService.getById(req,res)
-    .then((result)=>res.json({result}))
+    .then((result)=>res.json({"result":result}))
     .catch(err => res.status(400).json({message:err}));
 }
 function getAllSession(req,res,next){
     sessionService.getAll(req,res)
-    .then((result)=>res.json({result}))
+    .then((result)=>res.json({"result":result}))
     .catch(err => res.status(400).json({message:err}));
 }
 function getAllSelfSession(){

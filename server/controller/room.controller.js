@@ -15,12 +15,12 @@ router.get('/classes/:id',getAllRoom)
 
 function createRoom(req, res, next){
     roomService.create(req)
-    .then((result)=>res.json(result))
+    .then((result)=>res.json({"result":result}))
     .catch(err => next(err));
 }
 function closeRoom(){
     roomService.close(req)
-    .then((result)=>res.json(result))
+    .then((result)=>res.json({"result":result}))
     .catch(err => next(err));
 }
 function updateRoom(){
@@ -31,6 +31,6 @@ function getOneRoom(req,res,next){
 }
 function getAllRoom(req,res,next){
     roomService.getAll(req)
-    .then((result)=>res.json(result))
+    .then((result)=>res.json({"result":result}))
     .catch(err => next(err));
 }
