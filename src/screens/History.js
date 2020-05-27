@@ -19,7 +19,7 @@ class Home extends Component<Props> {
   };
   navigate = (url) => {
     this.props.history.push(url);
-    this.props.appActions.setCurScreent({ currentScreent: { text: 'Tạo room' } });
+    this.props.appActions.setCurScreent({ currentScreent: { title: 'Tạo room' } });
   };
   render() {
     const iconSize = 24;

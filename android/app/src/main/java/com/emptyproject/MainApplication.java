@@ -3,7 +3,8 @@ package com.emptyproject;
 import android.app.Application;
 
 import com.facebook.react.ReactApplication;
-import com.beefe.picker.PickerViewPackage;
+import com.reactnativecommunity.asyncstorage.AsyncStoragePackage;
+import com.wheelpicker.WheelPickerPackage;
 import com.reactnative.ivpusic.imagepicker.PickerPackage;
 import com.oblador.vectoricons.VectorIconsPackage;
 import com.facebook.react.ReactNativeHost;
@@ -26,7 +27,8 @@ public class MainApplication extends Application implements ReactApplication {
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
-            new PickerViewPackage(),
+            new AsyncStoragePackage(),
+            new WheelPickerPackage(),
             new PickerPackage(),
             new VectorIconsPackage()
       );

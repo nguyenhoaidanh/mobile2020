@@ -5,3 +5,14 @@ export function setCurScreent(data) {
     payload: { ...data },
   };
 }
+export function setUserInfo(data) {
+  return {
+    type: ACTIONS.SET_USER_INFO,
+    payload: { ...data },
+  };
+}
+export function logout() {
+  return {
+    type: ACTIONS.LOGOUT,
+  };
+}

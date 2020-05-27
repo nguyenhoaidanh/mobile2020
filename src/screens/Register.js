@@ -11,39 +11,48 @@ import {
   Keyboard,
   ScrollView,
 } from 'react-native';
+import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux';
+import * as appActions from '../actions/index';
+import { withRouter } from 'react-router';
 import { Link } from 'react-router-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import { Avatar, Input, Button, CheckBox } from 'react-native-elements';
+import { Avatar, Input, Button, CheckBox, Overlay } from 'react-native-elements';
 import cStyles from '../constants/common-styles';
 import DatePicker from 'react-native-datepicker';
-import Picker from 'react-native-picker';
-import { showImageInput } from '../utils/functions';
-
+import { showImageInput, AXIOS } from '../utils/functions';
+import { WheelPicker, TimePicker } from 'react-native-wheel-picker-android';
+import { list_screen_map, facultys } from '../constants/constants';
 const styles = StyleSheet.create({});
-let facultys = ['KH & KT Máy tính', 'KH & KT Máy tính', 'KH & KT Máy tính', 'KH & KT Máy tính'];
 
+let academic_years = [];
+for (let i = 2000; i <= 2020; i++) {
+  academic_years.push(`${i}-${i + 1}`);
+}
 type Props = {};
-export default class Home extends Component<Props> {
-  state = { male: true, username: '', phone: '', email: '', password: '', repPassword: '' };
+class Register extends Component<Props> {
+  state = { male: true, username: '', phone: '', email: '', password: '', repPassword: '', academic_year: '' };
+  state = {
+    male: true,
+    username: Math.floor(Math.random() * 1000),
+    phone: '1322345666',
+    email: '123@12123312.23' + Math.random(),
+    password: '123123123',
+    repPassword: '123123123',
+    academic_year: '2020',
+    mssv: 123213,
+    faculty: '123213',
+  };
   onchange = (name, value) => {
     this.setState({ [name]: value });
   };
   showImageInput = () => {
     showImageInput({ picker: true, callback: this.setImage });
   };
-  componentDidMount() {
-    Picker.init({
-      pickerData: facultys,
-      selectedValue: ['KH & KT Máy tính'],
-      onPickerConfirm: (faculty) => {
-        console.log('Danh', faculty);
-        this.setState({ faculty: faculty[0] });
-      },
-    });
-  }
+  componentDidMount() {}
   register = () => {
     let valid = true;
-    const { username, male = true, phone, email, password, repPassword, errorMessage = {} } = this.state;
+    const { username, male = true, phone, email, password, mssv, repPassword, errorMessage = {}, faculty, academic_year } = this.state;
     Object.keys(this.state).forEach((key) => {
       if (['errorMessage', 'male', 'felmale'].includes(key)) return;
       if (!this.state[key]) {
@@ -76,43 +85,84 @@ export default class Home extends Component<Props> {
       valid = false;
       errorMessage.repPassword = 'Mật khẩu không trùng khớp';
     }
-    if (!valid) return this.setState({ errorMessage });
-    const user = { username, phone, email, password, male };
+    //if (!valid) return this.setState({ errorMessage });
+    const user = { username, mssv, phone, gmail: email, hash: password, male, fullname: username, nien_khoa: academic_year, khoa: faculty };
+    //console.log('123123', user);
+
+    AXIOS('/users/register', 'POST', user)
+      .then(({ data }) => {
+        console.log('123456', 1, data);
+        this.props.history.push('/login');
+        this.props.appActions.setCurScreent({ currentScreent: list_screen_map.login });
+      })
+      .catch((err) => console.log('123456', 2, err.response.data));
+  };
+  onItemSelected = (selectedItem) => {
+    this.setState({ selectedItem });
+  };
+  renderPicker = (key = 'faculty') => {
+    if (key == 'faculty') {
+      dataList = facultys;
+    } else dataList = academic_years;
+    let { selectedItem = 0 } = this.state;
+    return (
+      <Overlay overlayStyle={{ width: '90%' }} isVisible={this.state.showPicker} onBackdropPress={() => this.setState({ showPicker: false })}>
+        <View>
+          <View style={{ alignSelf: 'center' }}>
+            <WheelPicker selectedItem={selectedItem} data={dataList} onItemSelected={this.onItemSelected} />
+          </View>
+          <View style={{ alignSelf: 'center', marginTop: 0, paddingTop: 0 }}>
+            <Button
+              containerStyle={{ width: '50%' }}
+              titleStyle={cStyles.btnText}
+              buttonStyle={{ alignSelf: 'center', width: '80%', borderRadius: 20 }}
+              title="Xác nhận"
+              onPress={() => {
+                this.setState({ showPicker: false, [key]: dataList[this.state.selectedItem] });
+                console.log('123123', dataList[this.state.selectedItem]);
+              }}
+            />
+          </View>
+        </View>
+      </Overlay>
+    );
   };
   render() {
     const iconSize = 24,
       maxStep = 3;
     const iconColor = 'black';
-    const { image = {}, step = 1, faculty, errorMessage = {}, male = true, felmale = false } = this.state;
+    const { loading = false, image = {}, step = 1, faculty, errorMessage = {}, male = true, felmale = false, academic_year = '' } = this.state;
 
     return (
       <KeyboardAvoidingView style={{ flex: 1, flexDirection: 'column' }}>
         <ScrollView style={cStyles.scroll}>
-          <View
-            style={{
-              alignItems: 'center',
-              paddingTop: 10,
-              paddingBottom: 10,
-            }}
-          >
-            <Avatar
-              onPress={this.showImageInput}
-              onAccessoryPress={this.showImageInput}
-              rounded
-              size="xlarge"
-              source={{
-                uri: image.path ? image.path : 'https://s3.amazonaws.com/uifaces/faces/twitter/adhamdannaway/128.jpg',
+          {step == maxStep ? (
+            <View
+              style={{
+                alignItems: 'center',
+                paddingTop: 10,
+                paddingBottom: 10,
               }}
-              showAccessory
-              accessory={{
-                name: image.path ? 'mode-edit' : 'plus-circle',
-                type: image.path ? 'material' : 'font-awesome',
-                color: 'white',
-                underlayColor: 'gray',
-                size: 30,
-              }}
-            />
-          </View>
+            >
+              <Avatar
+                onPress={this.showImageInput}
+                onAccessoryPress={this.showImageInput}
+                rounded
+                size="xlarge"
+                source={{
+                  uri: image.path ? image.path : 'https://s3.amazonaws.com/uifaces/faces/twitter/adhamdannaway/128.jpg',
+                }}
+                showAccessory
+                accessory={{
+                  name: image.path ? 'mode-edit' : 'plus-circle',
+                  type: image.path ? 'material' : 'font-awesome',
+                  color: 'white',
+                  underlayColor: 'gray',
+                  size: 30,
+                }}
+              />
+            </View>
+          ) : null}
           {step == 1 ? (
             <View>
               <Input
@@ -133,17 +183,29 @@ export default class Home extends Component<Props> {
                 leftIcon={<Icon name="graduation-cap" size={iconSize} color={iconColor} />}
                 onChangeText={(value) => this.onchange('mssv', value)}
               />
-              <TouchableOpacity onPress={() => Picker.show()}>
+              <TouchableOpacity onPress={() => this.setState({ showPicker: true, keyPicker: 'faculty' })}>
                 <Input
                   label="Khoa"
                   errorStyle={cStyles.errorStyle}
                   errorMessage={errorMessage.faculty}
                   disabled
-                  placeholder="Vd: KH & KT Máy tính"
+                  placeholder="Chạm để chọn"
                   value={faculty}
                   leftIcon={<Icon name="graduation-cap" size={iconSize} color={iconColor} />}
                 />
               </TouchableOpacity>
+              <TouchableOpacity onPress={() => this.setState({ showPicker: true, keyPicker: 'academic_year' })}>
+                <Input
+                  label="Niên khóa"
+                  errorStyle={cStyles.errorStyle}
+                  errorMessage={errorMessage.faculty}
+                  disabled
+                  placeholder="Chạm để chọn"
+                  value={academic_year}
+                  leftIcon={<Icon name="graduation-cap" size={iconSize} color={iconColor} />}
+                />
+              </TouchableOpacity>
+              {this.state.showPicker ? this.renderPicker(this.state.keyPicker) : null}
             </View>
           ) : null}
           {step == 2 ? (
@@ -254,10 +316,29 @@ export default class Home extends Component<Props> {
             ) : null}
           </View>
           {step == maxStep ? (
-            <Button containerStyle={cStyles.btnwrap} titleStyle={cStyles.btnText} buttonStyle={cStyles.btnPrimary} title="Hoàn tất" onPress={this.register} />
+            <Button
+              loading={loading}
+              containerStyle={cStyles.btnwrap}
+              titleStyle={cStyles.btnText}
+              buttonStyle={cStyles.btnPrimary}
+              title="Hoàn tất"
+              onPress={this.register}
+            />
           ) : null}
         </ScrollView>
       </KeyboardAvoidingView>
     );
   }
 }
+const mapStateToProps = (state) => {
+  // Redux Store --> Component
+  return {
+    app: state.app,
+  };
+};
+const mapDispatchToProps = (dispatch) => {
+  return {
+    appActions: bindActionCreators(appActions, dispatch),
+  };
+};
+export default withRouter(connect(mapStateToProps, mapDispatchToProps)(Register));

@@ -1,19 +1,39 @@
 import React, { Component } from 'react';
 import { TouchableOpacity, KeyboardAvoidingView, ScrollView, Platform, StyleSheet, Text, View } from 'react-native';
-import { Link } from 'react-router-native';
+import { Link, withRouter } from 'react-router-native';
 import DatePicker from 'react-native-datepicker';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { Input, Button, CheckBox } from 'react-native-elements';
 import cStyles from '../constants/common-styles';
+import { AXIOS } from '../utils/functions';
+import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux';
+import * as appActions from '../actions/index';
 const styles = StyleSheet.create({});
-
 type Props = {};
-export default class Home extends Component<Props> {
+class CreateRoom extends Component<Props> {
   state = {};
   onchange = (name, value) => {
     this.setState({ [name]: value });
   };
-  makeRoom = () => {};
+  makeRoom = () => {
+    let room = {
+      class_id: '5ebf6a865971877e1ab4c33f',
+      secret: '123456',
+      secret_create_room: '123456',
+      location: {
+        longtitude: 20.0,
+        latitude: 20.0,
+      },
+    };
+    AXIOS('/rooms', 'POST', room, {}, this.props.userInfo.token)
+      .then(({ data }) => {
+        console.log('123456', 1, data);
+        // this.props.history.push('/login');
+        //this.props.appActions.setCurScreent({ currentScreent: list_screen_map.login });
+      })
+      .catch((err) => console.log('123456', 2, err.response.data));
+  };
   render() {
     const iconSize = 24;
     const iconColor = 'black';
@@ -114,3 +134,16 @@ export default class Home extends Component<Props> {
     );
   }
 }
+const mapStateToProps = (state) => {
+  // Redux Store --> Component
+  return {
+    app: state.app,
+    userInfo: state.user.userInfo,
+  };
+};
+const mapDispatchToProps = (dispatch) => {
+  return {
+    appActions: bindActionCreators(appActions, dispatch),
+  };
+};
+export default withRouter(connect(mapStateToProps, mapDispatchToProps)(CreateRoom));

@@ -1,3 +1,3 @@
-export const appConfig = {
-  api_domain: 'http://localhost:3000',
+export default appConfig = {
+  api_domain: 'http://192.168.0.3:3000',
 };

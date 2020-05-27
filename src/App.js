@@ -16,10 +16,24 @@ import { Provider, connect } from 'react-redux';
 import appReducer from './reducers/index';
 import { createStore, bindActionCreators } from 'redux';
 import * as appActions from './actions/index';
+import AsyncStorage from '@react-native-community/async-storage';
+
 type Props = {};
 class App extends Component<Props> {
+  state = { loading: true };
+  componentWillMount() {
+    (async (value) => {
+      try {
+        let userInfo = await AsyncStorage.getItem('@userInfo');
+        console.log(123456, 'old', userInfo);
+        userInfo = userInfo ? JSON.parse(userInfo) : null;
+        if (userInfo) this.props.appActions.setUserInfo({ userInfo });
+      } catch (e) {
+        console.log(123456, e);
+      }
+    })();
+  }
   render() {
-    console.log(1111, this.props);
     return (
       <ImageBackground
         source={{
@@ -47,7 +61,7 @@ class App extends Component<Props> {
 const mapStateToProps = (state) => {
   // Redux Store --> Component
   return {
-    isLogin: state.user.isLogin,
+    loggedIn: state.user.loggedIn,
   };
 };
 const mapDispatchToProps = (dispatch) => {

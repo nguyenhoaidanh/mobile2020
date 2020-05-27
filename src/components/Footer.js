@@ -6,6 +6,7 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { withRouter } from 'react-router';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
+import { list_screen } from '../constants/constants';
 import * as appActions from '../actions/index';
 const styles = StyleSheet.create({
   container: {
@@ -23,13 +24,7 @@ const styles = StyleSheet.create({
 });
 const iconSize = 24,
   iconColor = 'white';
-const list = [
-  { icon: 'home', text: 'Home', title: 'BK Attendance', to: '/' },
-  { icon: 'view-list', customIcon: 'sort', customText: 'sort', text: 'Rooms', title: 'Danh sách phòng', to: '/list-room', showSearch: true },
-  { icon: 'face-recognition', text: 'Face', title: 'Đăng kí gương mặt', to: '/register-face' },
-  { icon: 'history', text: 'History', title: 'Lịch sử điểm danh', to: '/history' },
-  { icon: 'account', text: 'Account', title: 'Tài khoản', to: '/account' },
-];
+const list = list_screen;
 
 type Props = {};
 class Footer extends Component<Props> {

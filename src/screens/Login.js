@@ -1,11 +1,17 @@
 import React, { Component } from 'react';
 import { Platform, StyleSheet, Text, View, ScrollView } from 'react-native';
-import { Link } from 'react-router-native';
+import { Link, withRouter } from 'react-router-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { Input, Button, Card, Avatar, Divider } from 'react-native-elements';
 import ImageInput from '../components/ImageInput';
 import cStyles from '../constants/common-styles';
+import { list_screen_map } from '../constants/constants';
+import { AXIOS } from '../utils/functions';
+import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux';
+import * as appActions from '../actions/index';
+import AsyncStorage from '@react-native-community/async-storage';
 const styles = StyleSheet.create({
   login: {
     fontSize: 20,
@@ -15,7 +21,7 @@ const styles = StyleSheet.create({
 });
 
 type Props = {};
-export default class Home extends Component<Props> {
+class Login extends Component<Props> {
   state = {};
   onchange = (name, value) => {
     this.setState({ [name]: value });
@@ -26,9 +32,18 @@ export default class Home extends Component<Props> {
       console.log('ok login by face', user);
       return;
     }
+    console.log('123456', 1, username, password);
     if (!username || !password) return;
     const user = { username, password };
-    console.log('ok login', user);
+    AXIOS('/users/authenticate', 'POST', user)
+      .then(({ data }) => {
+        console.log('123456', 1, data);
+        this.props.history.push('/');
+        this.props.appActions.setCurScreent({ currentScreent: list_screen_map.home });
+        this.props.appActions.setUserInfo({ userInfo: data });
+        AsyncStorage.setItem('@userInfo', JSON.stringify(data));
+      })
+      .catch((err) => console.log('123456', 2, err.response.data));
   };
   setImage = (image) => {
     this.setState({ image });
@@ -56,7 +71,7 @@ export default class Home extends Component<Props> {
             onChangeText={(value) => this.onchange('password', value)}
             secureTextEntry={true}
           />
-          <Button containerStyle={cStyles.btnwrap} titleStyle={cStyles.btnText} buttonStyle={cStyles.btnPrimary} title="Đăng nhập" onPress={this.register} />
+          <Button containerStyle={cStyles.btnwrap} titleStyle={cStyles.btnText} buttonStyle={cStyles.btnPrimary} title="Đăng nhập" onPress={this.login} />
           <View style={{ flexDirection: 'row', alignItems: 'center' }}>
             <View style={{ width: '100%', alignSelf: 'center' }}>
               <Text style={{ marginTop: 15, marginBottom: 10, fontSize: 20, alignSelf: 'center' }}>Hoặc đăng nhập bằng</Text>
@@ -82,3 +97,15 @@ export default class Home extends Component<Props> {
     );
   }
 }
+const mapStateToProps = (state) => {
+  // Redux Store --> Component
+  return {
+    app: state.app,
+  };
+};
+const mapDispatchToProps = (dispatch) => {
+  return {
+    appActions: bindActionCreators(appActions, dispatch),
+  };
+};
+export default withRouter(connect(mapStateToProps, mapDispatchToProps)(Login));

@@ -16,23 +16,20 @@ export const showImageInput = ({ picker, camera, width = 300, height = 400, crop
       console.log('lỗi ', err);
     });
 };
-export const AXIOS = function (path, method = 'GET', data = {}, option = {}) {
+export const AXIOS = function (path, method = 'GET', data = {}, option = {}, token = '') {
   let url = appConfig.api_domain + path;
   let config = {
     method,
     url,
     data,
     timeout: 2 * 60 * 1000,
-    // headers: {
-    //   Authorization: getCookie('access-token')
-    // }
+    headers: {
+      Authorization: token,
+    },
     ...option,
     //onUploadProgress
   };
-  return axios(config).catch((err) => {
-    console.log('[err when call axios]');
-    console.log(err);
-  });
+  return axios(config);
 };
 export const shadow = () => ({
   shadowColor: '#000',

@@ -1,4 +1,5 @@
 export default ACTIONS = {
   SET_CUR_SCREENT: 'SET_CUR_SCREENT',
-  TEST: 'TEST',
+  SET_USER_INFO: 'SET_USER_INFO',
+  LOGOUT: 'LOGOUT',
 };

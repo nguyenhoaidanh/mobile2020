@@ -7,14 +7,15 @@
     "test": "jest"
   },
   "dependencies": {
+    "@react-native-community/async-storage": "^1.11.0",
     "axios": "^0.19.2",
     "react": "16.3.1",
     "react-native": "^0.55.4",
     "react-native-datepicker": "^1.7.2",
     "react-native-elements": "^2.0.0",
     "react-native-image-crop-picker": "^0.24.0",
-    "react-native-picker": "^4.3.7",
     "react-native-vector-icons": "^6.6.0",
+    "react-native-wheel-picker-android": "^2.0.6",
     "react-redux": "^6.0.1",
     "react-router-native": "^5.1.2",
     "redux": "^4.0.5"

@@ -15,7 +15,8 @@ run
 and then
 `react-native link react-native-vector-icons` ,
 `react-native link react-native-image-crop-picker` ,
-`react-native link react-native-picker`
+`react-native link react-native-wheel-picker-android` ,
+`react-native link @react-native-community/async-storage`
 
 #### Step 3:
 

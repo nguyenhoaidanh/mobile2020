@@ -23,7 +23,14 @@ const styles = StyleSheet.create({
   },
   ava: { flexDirection: 'row', width: '100%' },
 });
-
+const list = [
+  { to: '/check-in', text: 'Điểm danh', image: require('../../img/checkin.png') },
+  { to: '/list-room', text: 'Phòng học', image: require('../../img/room.png') },
+  { to: '/register-face', text: 'Gương mặt', image: require('../../img/face.png') },
+  { to: '/history', text: 'Lịch sử', image: require('../../img/history.png') },
+  { text: 'Giáo viên', image: require('../../img/teacher.png') },
+  { to: '/account', text: 'Tài khoản', image: require('../../img/default-avatar.png') },
+];
 type Props = {};
 class Home extends Component<Props> {
   state = {};
@@ -31,17 +38,14 @@ class Home extends Component<Props> {
     this.props.history.push(url);
     this.props.appActions.setCurScreent({ currentScreent: creent });
   };
+  componentWillReceiveProps(props) {
+    this.setState({ loggedIn: props.loggedIn });
+  }
   render() {
+    let { loggedIn = false } = this.props;
     const { image = {}, mssv = '1610391', username = 'Nguyễn Hoài Danh' } = this.state;
-    const list = [
-      { text: 'Điểm danh', image: require('../../img/checkin.png') },
-      { text: 'Phòng học', image: require('../../img/room.png') },
-      { text: 'Gương mặt', image: require('../../img/face.png') },
-      { text: 'Lịch sử', image: require('../../img/history.png') },
-      { text: 'Giáo viên', image: require('../../img/teacher.png') },
-      { text: 'Tài khoản', image: require('../../img/default-avatar.png') },
-    ];
-    if (Math.random() > 0.5)
+    console.log(123456, 'loggedIn', loggedIn);
+    if (!loggedIn)
       return (
         <View style={styles.container}>
           <Image source={require('../../img/bku.png')} style={{ width: 200, height: 200 }} />
@@ -101,6 +105,7 @@ const mapStateToProps = (state) => {
   // Redux Store --> Component
   return {
     app: state.app,
+    loggedIn: state.user.loggedIn,
   };
 };
 const mapDispatchToProps = (dispatch) => {
