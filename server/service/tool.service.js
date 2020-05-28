@@ -4,12 +4,14 @@ const db = require('../helper/db');
 var formidable = require('formidable');
 var fs = require('fs');
 path = require('path')
-
+const express = require('express');
+const fileUpload = require('express-fileupload');
 const User = db.User;
 
 module.exports = {
     upFile,
-    updateImageForUser
+    updateImageForUser,
+    updateFileExpress
 }
 async function upFile(req,res){
     var form = formidable.IncomingForm();
@@ -30,6 +32,21 @@ async function upFile(req,res){
     // user.list_images=old_list_array;
     // await user.save()
     return old_list_array;
+}
+async function updateFileExpress(req,res){
+    console.log(req);
+    if(!req.files || Object.keys(req.files).length==0){
+        return res.status(400).send('No files were uploaded.');
+    }
+    
+    let sampleFile = req.files.sampleFile;
+    let dirmain = path.join(__dirname, '../');
+
+    sampleFile.mv(dirmain+"/public/store/"+sampleFile.name, function(err) {
+        if (err)
+          return res.status(500).send(err);
+        res.send('File uploaded!');
+      });
 }
 async function updateImageForUser(req,res){
     var user = await User.findOne({_id:req.user.sub});

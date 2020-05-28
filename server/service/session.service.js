@@ -7,6 +7,8 @@ const Session = db.Session;
 
 const Room = db.Room;
 
+const Class = db.Class;
+
 const User = db.User;
 module.exports = {
     getAll,
@@ -18,12 +20,30 @@ module.exports = {
 
 
 async function getAllSelf(req) {
-    return await Session.find({create_user:req.user.sub});
+    console.log(req.user.sub)
+    var collections = [];
+    var session =  await Session.find({user_create:req.user.sub,isAccept:true});
+    for (let count = 0;count <session.length;count++){
+        console.log(session[count].user_create);
+        if(session[count]){
+            var room = await Room.findById(session[count].room_id);
+            
+            if(room){
+                var class_var = await Class.findById(room.class_id);
+                console.log(class_var);
+                if(class_var){
+                    var session_item = session[count];
+                    collections.push({"class name":class_var,"session":session_item});
+                }
+            }
+        }
+    }
+    return collections;
+    
 }
 async function getAll(req) {
-    return await Session.find({room_id:req.params.id});
+    return await Session.find({room_id:req.params.id,isAccept:true});
 }
-
 
 async function getById(req) {
     return await Session.findById(req.params.id);

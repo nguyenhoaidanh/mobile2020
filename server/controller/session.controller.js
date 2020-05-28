@@ -8,11 +8,11 @@ module.exports = router;
 
 
 router.post('/authorize',authorize(role.Student),createSession);
+router.get('/joined',authorize(role.Student),getAllSelfSession);
 router.put('/',authorize(role.Student), updateSession);
 // router.delete('/',authorize(role.Teacher), removeSession);
 router.get('/:id',authorize(role.Teacher), getOneSession);
-router.get('/rooms/:id',authorize(role.Teacher),getAllSession)
-router.get('/joined/class/:id',authorize(role.Student),getAllSelfSession)
+router.get('/rooms/:id',authorize(role.Teacher),getAllSession);
 
 function createSession(req, res, next){
     sessionService.create(req)
@@ -37,6 +37,9 @@ function getAllSession(req,res,next){
     .then((result)=>res.json({"result":result}))
     .catch(err => res.status(400).json({message:err}));
 }
-function getAllSelfSession(){
-
+function getAllSelfSession(req,res,next){
+    console.log("debug here");
+    sessionService.getAllSelf(req,res)
+    .then((result)=>res.json({"result":result}))
+    .catch(err => res.status(400).json({message:err}));
 }
