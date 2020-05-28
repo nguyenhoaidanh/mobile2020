@@ -3,10 +3,15 @@ const initialState = {
   currentScreent: { icon: null, title: 'BK Attendance' },
   lastScreent: null,
   loading: false,
+  listClass: [],
 };
 const reducer = (state = initialState, action) => {
   switch (action.type) {
-    case ACTIONS.TEST:
+    case ACTIONS.SET_LIST_CLASS:
+      return {
+        ...state,
+        listClass: action.payload.listClass,
+      };
     case ACTIONS.SET_CUR_SCREENT: {
       return {
         ...state,

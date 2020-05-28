@@ -8,6 +8,7 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import * as appActions from '../actions/index';
 import { setAvatar } from '../utils/functions';
+import { list_screen_map } from '../constants/constants';
 import cStyles from '../constants/common-styles';
 const styles = StyleSheet.create({
   container: {
@@ -24,19 +25,22 @@ const styles = StyleSheet.create({
   ava: { flexDirection: 'row', width: '100%' },
 });
 const list = [
-  { to: '/check-in', text: 'Điểm danh', image: require('../../img/checkin.png') },
-  { to: '/list-room', text: 'Phòng học', image: require('../../img/room.png') },
-  { to: '/register-face', text: 'Gương mặt', image: require('../../img/face.png') },
-  { to: '/history', text: 'Lịch sử', image: require('../../img/history.png') },
+  { name: 'listRoom', to: '/list-room', text: 'Điểm danh', image: require('../../img/checkin.png') },
+  { name: 'listRoom', to: '/list-room', text: 'Phòng học', image: require('../../img/room.png') },
+  { name: 'registerFace', to: '/register-face', text: 'Gương mặt', image: require('../../img/face.png') },
+  { name: 'history', to: '/history', text: 'Lịch sử', image: require('../../img/history.png') },
   { text: 'Giáo viên', image: require('../../img/teacher.png') },
-  { to: '/account', text: 'Tài khoản', image: require('../../img/default-avatar.png') },
+  { name: 'account', to: '/account', text: 'Tài khoản', image: require('../../img/default-avatar.png') },
 ];
 type Props = {};
 class Home extends Component<Props> {
   state = {};
-  navigate = (url, creent) => {
+  navigate = (url, creent = null) => {
+    if (!url) return;
     this.props.history.push(url);
-    this.props.appActions.setCurScreent({ currentScreent: creent });
+    console.log(123456, creent);
+
+    creent && this.props.appActions.setCurScreent({ currentScreent: creent });
   };
   componentWillReceiveProps(props) {
     this.setState({ loggedIn: props.loggedIn });
@@ -55,14 +59,14 @@ class Home extends Component<Props> {
             titleStyle={cStyles.btnText}
             buttonStyle={cStyles.btn}
             title="Đăng kí"
-            onPress={() => this.navigate('/register', { title: 'Đăng kí tài khoản' })}
+            onPress={() => this.navigate('/register', list_screen_map.register)}
           />
           <Button
             containerStyle={cStyles.btnwrap}
             titleStyle={cStyles.btnText}
             buttonStyle={cStyles.btn}
             title="Đăng nhập"
-            onPress={() => this.navigate('/login', { title: 'Đăng nhập' })}
+            onPress={() => this.navigate('/login', list_screen_map.login)}
           />
         </View>
       );
@@ -70,7 +74,7 @@ class Home extends Component<Props> {
       <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
         <View style={styles.ava}>
           <View style={{ width: 100, padding: 10 }}>
-            <Avatar onPress={this.showImageInput} onAccessoryPress={this.showImageInput} rounded size="large" source={setAvatar(image)} />
+            <Avatar onPress={this.showImageInput} rounded size="large" source={setAvatar(image)} />
           </View>
           <View style={{ padding: 10 }}>
             <Text style={{ fontWeight: 'bold', fontSize: 20, color: 'white' }}>{username}</Text>
@@ -86,7 +90,7 @@ class Home extends Component<Props> {
           {list.map((e, i) => (
             <View key={i} style={{ margin: 5, alignItems: 'center', backgroundColor: 'white', borderRadius: 10, height: 120, width: 120 }}>
               <Avatar
-                onPress={this.showImageInput}
+                onPress={() => this.navigate(e.to, list_screen_map[e.name])}
                 size="xlarge"
                 source={e.image}
                 containerStyle={{ marginTop: 10, alignSelf: 'center', width: 80, height: 80 }}

@@ -1,11 +1,16 @@
 import React, { Component } from 'react';
 import { Platform, StyleSheet, View, Text, KeyboardAvoidingView, ScrollView } from 'react-native';
-import { Link } from 'react-router-native';
+import { Link, withRouter } from 'react-router-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { Input, Button, Avatar, Divider, Card, ListItem } from 'react-native-elements';
 import cStyles from '../constants/common-styles';
 import ImageInput from '../components/ImageInput';
-import { showImageInput, setAvatar } from '../utils/functions';
+import { showImageInput, setAvatar, shorterString, AXIOS, uploadFileToServer } from '../utils/functions';
+import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux';
+import * as appActions from '../actions/index';
+import { list_screen_map } from '../constants/constants';
+import AsyncStorage from '@react-native-community/async-storage';
 const styles = StyleSheet.create({
   row: {
     flexDirection: 'row',
@@ -22,14 +27,57 @@ const styles = StyleSheet.create({
   textLeft: { fontSize: 20, color: 'grey' },
   textRight: { fontSize: 20, color: 'grey', fontWeight: 'bold' },
 });
-
+const mapKey = {
+  username: 'Tên',
+  email: 'Địa chỉ email',
+  gmail: 'Địa chỉ email',
+  male: 'Giới tính',
+  birthday: 'Ngày sinh',
+  faculty: 'Khoa',
+  phone: 'Số điện thọai',
+  mssv: 'Mssv',
+  khoa: 'Khoa',
+  nien_khoa: 'Niên khóa',
+  role: 'Loại tài khoản',
+};
+const mapIcon = {
+  phone: 'phone',
+  username: 'user',
+  male: 'male',
+  faculty: 'graduation-cap',
+  khoa: 'graduation-cap',
+  mssv: 'graduation-cap',
+  email: 'envelope-o',
+  gmail: 'envelope-o',
+  birthday: 'calendar',
+  nien_khoa: 'calendar',
+  role: 'user',
+};
 type Props = {};
-export default class Home extends Component<Props> {
+class Home extends Component<Props> {
   state = {};
+  logout = () => {
+    AsyncStorage.removeItem('@userInfo');
+    this.props.appActions.logout();
+    this.props.appActions.setCurScreent({ currentScreent: list_screen_map.home });
+    this.props.history.push('/');
+  };
   onchange = (name, value) => {
     this.setState({ [name]: value });
   };
   setImage = (image) => {
+    console.log(123456, image);
+    uploadFileToServer([image], this.props.userInfo.token, (progressEvent) => {
+      const { loaded, total } = progressEvent;
+      let percent = Math.floor((loaded / total) * 100);
+      console.log(123456, 'percent', percent);
+    })
+      .then(({ data }) => {
+        console.log('123456', 11, data);
+      })
+      .catch((err) => {
+        console.log('123456', 2, err.response.data);
+      });
     this.setState({ image });
   };
   showImageInput = () => {
@@ -39,8 +87,9 @@ export default class Home extends Component<Props> {
     console.log('update');
   };
   renderItem = (key, value) => {
-    const mapKey = { username: 'Tên', email: 'Địa chỉ email', male: 'Giới tính', birthday: 'Ngày sinh', faculty: 'Khoa' };
-    const mapIcon = { username: 'user', male: 'male', faculty: 'graduation-cap', email: 'envelope-o', birthday: 'calendar' };
+    const keys = ['fullname', 'token', 'list_images', 'create_date', 'class_ids', 'id'];
+    if (keys.includes(key)) return;
+
     return (
       <ListItem
         key={key}
@@ -53,7 +102,7 @@ export default class Home extends Component<Props> {
               <Text>{mapKey[key]}</Text>
             </View>
             <View style={styles.end}>
-              <Text style={{ fontWeight: 'bold', fontSize: 15 }}>{value}</Text>
+              <Text style={{ fontWeight: 'bold', fontSize: 15 }}>{shorterString(value, 20)}</Text>
             </View>
           </View>
         }
@@ -65,7 +114,9 @@ export default class Home extends Component<Props> {
     const iconSize = 24;
     const iconColor = 'black';
     const { errorMessage = {}, edit = false, image = {} } = this.state;
-    const userInfo = { username: 'Nguyễn Hoài Danh', male: 'male', birthday: '03/02/1998', faculty: 'KH & KT Máy tính', email: '1610391@hcmut.edu.vn' };
+    let { userInfo = {} } = this.props;
+    if (!userInfo.username)
+      userInfo = { username: 'Nguyễn Hoài Danh', male: 'male', birthday: '03/02/1998', faculty: 'KH & KT Máy tính', email: '1610391@hcmut.edu.vn' };
     const { username = '', mssv = '' } = userInfo;
     const infos = [];
     return (
@@ -118,7 +169,19 @@ export default class Home extends Component<Props> {
                 <Button containerStyle={cStyles.btnwrap} titleStyle={cStyles.btnText} buttonStyle={cStyles.btn} title="Lưu" onPress={this.update} />
               </View>
             ) : (
-              <View>{Object.keys(userInfo).map((key, i) => this.renderItem(key, userInfo[key]))}</View>
+              <View>
+                {Object.keys(userInfo).map((key, i) => this.renderItem(key, userInfo[key]))}
+                <ListItem
+                  onPress={this.logout}
+                  bottomDivider
+                  title={
+                    <View style={{ width: '100%' }}>
+                      <Text style={{ fontWeight: 'bold', color: 'blue', fontSize: 18, alignSelf: 'center' }}>Đăng xuất</Text>
+                    </View>
+                  }
+                  bottomDivider
+                />
+              </View>
             )}
           </Card>
           <View style={{ height: 65 }} />
@@ -127,3 +190,16 @@ export default class Home extends Component<Props> {
     );
   }
 }
+const mapStateToProps = (state) => {
+  // Redux Store --> Component
+  return {
+    app: state.app,
+    userInfo: state.user.userInfo,
+  };
+};
+const mapDispatchToProps = (dispatch) => {
+  return {
+    appActions: bindActionCreators(appActions, dispatch),
+  };
+};
+export default withRouter(connect(mapStateToProps, mapDispatchToProps)(Home));

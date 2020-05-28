@@ -11,6 +11,12 @@ export function setUserInfo(data) {
     payload: { ...data },
   };
 }
+export function setListClass(data) {
+  return {
+    type: ACTIONS.SET_LIST_CLASS,
+    payload: { ...data },
+  };
+}
 export function logout() {
   return {
     type: ACTIONS.LOGOUT,

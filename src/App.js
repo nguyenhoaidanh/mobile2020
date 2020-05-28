@@ -27,7 +27,7 @@ class App extends Component<Props> {
         let userInfo = await AsyncStorage.getItem('@userInfo');
         console.log(123456, 'old', userInfo);
         userInfo = userInfo ? JSON.parse(userInfo) : null;
-        if (userInfo) this.props.appActions.setUserInfo({ userInfo });
+        if (userInfo && Object.keys(userInfo).length != 0) this.props.appActions.setUserInfo({ userInfo });
       } catch (e) {
         console.log(123456, e);
       }

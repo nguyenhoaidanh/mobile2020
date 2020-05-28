@@ -24,10 +24,9 @@ export const AXIOS = function (path, method = 'GET', data = {}, option = {}, tok
     data,
     timeout: 2 * 60 * 1000,
     headers: {
-      Authorization: token,
+      Authorization: 'bearer ' + token,
     },
     ...option,
-    //onUploadProgress
   };
   return axios(config);
 };
@@ -44,4 +43,21 @@ export const shadow = () => ({
 
 export const setAvatar = (image) => {
   return image.path ? { uri: image.path } : require('../../img/default-avatar.jpg');
+};
+export const shorterString = (str = '', maxlength) => {
+  return str.length > maxlength ? str.substring(0, maxlength) + '...' : str;
+};
+
+export const uploadFileToServer = (listFile, token, onUploadProgress = () => {}) => {
+  var formData = new FormData();
+  for (var i = 0; i < listFile.length; i++) {
+    var file = listFile[i];
+    console.log(123456, 'hi', file);
+    formData.append('image', {
+      uri: file.path,
+      type: 'image/jpeg',
+      name: 'teste',
+    });
+  }
+  return AXIOS('/users/images/uploadfile', 'POST', formData, { onUploadProgress }, token);
 };

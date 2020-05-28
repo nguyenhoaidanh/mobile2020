@@ -89,7 +89,7 @@ class Register extends Component<Props> {
     const user = { username, mssv, phone, gmail: email, hash: password, male, fullname: username, nien_khoa: academic_year, khoa: faculty };
     //console.log('123123', user);
 
-    AXIOS('/users/register', 'POST', user)
+    AXIOS('/users/teachers/register', 'POST', user)
       .then(({ data }) => {
         console.log('123456', 1, data);
         this.props.history.push('/login');

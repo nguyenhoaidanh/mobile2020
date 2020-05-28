@@ -43,7 +43,10 @@ class Login extends Component<Props> {
         this.props.appActions.setUserInfo({ userInfo: data });
         AsyncStorage.setItem('@userInfo', JSON.stringify(data));
       })
-      .catch((err) => console.log('123456', 2, err.response.data));
+      .catch((err) => {
+        console.log('123456', 2, err.response.data);
+        this.setState({ errorMessage: { password: 'Thông tin đăng nhập chưa đúng' } });
+      });
   };
   setImage = (image) => {
     this.setState({ image });

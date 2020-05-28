@@ -8,7 +8,7 @@ import { bindActionCreators } from 'redux';
 import * as appActions from '../actions/index';
 import RoomItem from '../components/RoomItem';
 import { itemHeight } from '../constants/constants';
-import { shadow } from '../utils/functions';
+import { shadow, AXIOS } from '../utils/functions';
 import cStyles from '../constants/common-styles';
 const styles = StyleSheet.create({
   group: {
@@ -36,10 +36,93 @@ const styles = StyleSheet.create({
   btnText: { fontSize: 18, color: 'black' },
   btnIcon: { marginRight: 20, paddingRight: 10 },
 });
-
+const listClassDefault = [
+  {
+    name: 'Cơ sở dữ liệu - L01',
+    avatar_url: 'https://s3.amazonaws.com/uifaces/faces/twitter/ladylexy/128.jpg',
+    subtitle: 'Nguyễn Thị A - 18 phòng',
+    _id: 1,
+  },
+  {
+    name: 'Cơ sở dữ liệu - L01',
+    avatar_url: 'https://s3.amazonaws.com/uifaces/faces/twitter/ladylexy/128.jpg',
+    subtitle: 'Nguyễn Thị A - 18 phòng',
+    _id: 2,
+  },
+  {
+    name: 'Cơ sở dữ liệu - L01',
+    avatar_url: 'https://s3.amazonaws.com/uifaces/faces/twitter/ladylexy/128.jpg',
+    subtitle: 'Nguyễn Thị A - 18 phòng',
+    _id: 3,
+  },
+  {
+    name: 'Cơ sở dữ liệu - L01',
+    avatar_url: 'https://s3.amazonaws.com/uifaces/faces/twitter/ladylexy/128.jpg',
+    subtitle: 'Nguyễn Thị A - 18 phòng',
+    _id: 4,
+  },
+  {
+    name: 'Cơ sở dữ liệu - L01',
+    avatar_url: 'https://s3.amazonaws.com/uifaces/faces/twitter/ladylexy/128.jpg',
+    subtitle: 'Nguyễn Thị A - 18 phòng',
+    _id: 5,
+  },
+  {
+    name: 'Cơ sở dữ liệu - L01',
+    avatar_url: 'https://s3.amazonaws.com/uifaces/faces/twitter/ladylexy/128.jpg',
+    subtitle: 'Nguyễn Thị A - 18 phòng',
+    _id: 6,
+  },
+  {
+    name: 'Cơ sở dữ liệu - L01',
+    avatar_url: 'https://s3.amazonaws.com/uifaces/faces/twitter/ladylexy/128.jpg',
+    subtitle: 'Nguyễn Thị A - 18 phòng',
+    _id: 7,
+  },
+  {
+    name: 'Cơ sở dữ liệu - L01',
+    avatar_url: 'https://s3.amazonaws.com/uifaces/faces/twitter/ladylexy/128.jpg',
+    subtitle: 'Nguyễn Thị A - 18 phòng',
+    _id: 7,
+  },
+  {
+    name: 'Cơ sở dữ liệu - L01',
+    avatar_url: 'https://s3.amazonaws.com/uifaces/faces/twitter/ladylexy/128.jpg',
+    subtitle: 'Nguyễn Thị A - 18 phòng',
+    _id: 7,
+  },
+];
 type Props = {};
 class Home extends Component<Props> {
   state = {};
+  componentDidMount() {
+    const { listClass = [] } = this.props;
+    if (listClass.length == 0)
+      AXIOS('/classes', 'GET', {}, {}, this.props.userInfo.token)
+        .then(({ data }) => {
+          console.log('123456', 1, data);
+          this.props.appActions.setListClass({ listClass: data.result });
+        })
+        .catch((err) => {
+          console.log('123456', 2, err.response.data);
+          this.setState({ errorMessage: { password: 'Thông tin đăng nhập chưa đúng' } });
+        });
+  }
+  sortListRoom() {
+    const { listRoom = [] } = this.state;
+    this.setState({ listRoom: listRoom.sort((x, y) => 1) });
+  }
+  openListRoom = (_class) => {
+    AXIOS(`/rooms/classes/${_class._id}`, 'GET', {}, {}, this.props.userInfo.token)
+      .then(({ data }) => {
+        console.log('123456', 11, data);
+        this.setState({ listRoom: data, isListClass: false });
+      })
+      .catch((err) => {
+        console.log('123456', 2, err.response.data);
+        this.setState({ errorMessage: { password: 'Thông tin đăng nhập chưa đúng' } });
+      });
+  };
   onchange = (name, value) => {
     this.setState({ [name]: value });
   };
@@ -50,9 +133,7 @@ class Home extends Component<Props> {
     this.props.appActions.setCurScreent({ currentScreent: { title: 'Tạo phòng mới' } });
     this.navigate('/create-room');
   };
-  openListRoom = (_class) => {
-    this.setState({ isListClass: false });
-  };
+
   validate = () => {
     const { currentRoom = {} } = this.state;
     //call api here
@@ -98,55 +179,11 @@ class Home extends Component<Props> {
   render() {
     const iconSize = 15;
     const iconColor = 'black';
-    const { showForm = false, errorMessage = {}, listRoom = [1, 23, 32, 23, 45, 45, 3434], isListClass = true } = this.state;
+    let { showForm = false, errorMessage = {}, isListClass = true } = this.state;
     const itemHeight = 195;
-    const listClass = [
-      {
-        name: 'Cơ sở dữ liệu - L01',
-        avatar_url: 'https://s3.amazonaws.com/uifaces/faces/twitter/ladylexy/128.jpg',
-        subtitle: 'Nguyễn Thị A - 18 phòng',
-      },
-      {
-        name: 'Cơ sở dữ liệu - L01',
-        avatar_url: 'https://s3.amazonaws.com/uifaces/faces/twitter/ladylexy/128.jpg',
-        subtitle: 'Nguyễn Thị A - 18 phòng',
-      },
-      {
-        name: 'Cơ sở dữ liệu - L01',
-        avatar_url: 'https://s3.amazonaws.com/uifaces/faces/twitter/ladylexy/128.jpg',
-        subtitle: 'Nguyễn Thị A - 18 phòng',
-      },
-      {
-        name: 'Cơ sở dữ liệu - L01',
-        avatar_url: 'https://s3.amazonaws.com/uifaces/faces/twitter/ladylexy/128.jpg',
-        subtitle: 'Nguyễn Thị A - 18 phòng',
-      },
-      {
-        name: 'Cơ sở dữ liệu - L01',
-        avatar_url: 'https://s3.amazonaws.com/uifaces/faces/twitter/ladylexy/128.jpg',
-        subtitle: 'Nguyễn Thị A - 18 phòng',
-      },
-      {
-        name: 'Cơ sở dữ liệu - L01',
-        avatar_url: 'https://s3.amazonaws.com/uifaces/faces/twitter/ladylexy/128.jpg',
-        subtitle: 'Nguyễn Thị A - 18 phòng',
-      },
-      {
-        name: 'Cơ sở dữ liệu - L01',
-        avatar_url: 'https://s3.amazonaws.com/uifaces/faces/twitter/ladylexy/128.jpg',
-        subtitle: 'Nguyễn Thị A - 18 phòng',
-      },
-      {
-        name: 'Cơ sở dữ liệu - L01',
-        avatar_url: 'https://s3.amazonaws.com/uifaces/faces/twitter/ladylexy/128.jpg',
-        subtitle: 'Nguyễn Thị A - 18 phòng',
-      },
-      {
-        name: 'Cơ sở dữ liệu - L01',
-        avatar_url: 'https://s3.amazonaws.com/uifaces/faces/twitter/ladylexy/128.jpg',
-        subtitle: 'Nguyễn Thị A - 18 phòng',
-      },
-    ];
+    let { listClass = [], listRoom = [] } = this.props;
+    if (listClass.length == 0) listClass = listClassDefault;
+    if (listRoom.length == 0) listRoom = listClassDefault;
     const buttons = [
       {
         element: () => (
@@ -203,7 +240,8 @@ class Home extends Component<Props> {
 const mapStateToProps = (state) => {
   // Redux Store --> Component
   return {
-    app: state.app,
+    listClass: state.app.listClass,
+    userInfo: state.user.userInfo,
   };
 };
 const mapDispatchToProps = (dispatch) => {
