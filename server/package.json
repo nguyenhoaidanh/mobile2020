@@ -28,6 +28,7 @@
     "method-override": "2.3.9",
     "mongoose": "4.11.5",
     "mongoose-float": "^1.0.4",
+    "multer": "^1.4.2",
     "swagger-ui-express": "2.0.6"
   },
   "engines": {
