@@ -27,13 +27,13 @@ class Footer extends Component<Props> {
     this.props.appActions.setCurScreent({ currentScreent: { title: 'Điểm danh' } });
   };
   render() {
-    const { index = 0, room = {} } = this.props;
+    const { index = 0, room = {}, currentClass = {} } = this.props;
     const isExpire = Math.floor(Math.random() * 10) % 2 == 0;
     return (
       <Card>
         <View style={styles.row}>
-          <Text style={{ width: '100%', fontSize: 20, alignContent: 'center', fontWeight: 'bold' }}>Đồ họa máy tính - 20/12/2020</Text>
-          <Text style={styles.textLeft}>Sỉ số: 90/100</Text>
+          <Text style={{ width: '100%', fontSize: 20, alignContent: 'center', fontWeight: 'bold' }}>{currentClass.name_subject} - 20/12/2020</Text>
+          <Text style={styles.textLeft}>Sỉ số: 90/{currentClass.number_of_student}</Text>
         </View>
         {isExpire ? (
           <Button
@@ -41,7 +41,7 @@ class Footer extends Component<Props> {
             titleStyle={cStyles.btnText}
             buttonStyle={cStyles.btnPrimary}
             title="Vào điểm danh"
-            onPress={this.props.onClick}
+            onPress={this.props.onClickFunc}
           />
         ) : (
           <View style={{ width: '100%', flexDirection: 'row', alignItems: 'center' }}>

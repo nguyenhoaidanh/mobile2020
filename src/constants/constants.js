@@ -29,3 +29,4 @@ export const facultys = [
   'Kỹ Thuật Hóa Học',
   'Môi Trường',
 ];
+export const ROLES = { teacher: 'Teacher', student: 'Student' };

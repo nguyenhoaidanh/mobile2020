@@ -53,6 +53,7 @@ const mapIcon = {
   nien_khoa: 'calendar',
   role: 'user',
 };
+const account_map = { teacher: 'Giáo viên', student: 'Sinh viên' };
 type Props = {};
 class Home extends Component<Props> {
   state = {};
@@ -89,7 +90,7 @@ class Home extends Component<Props> {
   renderItem = (key, value) => {
     const keys = ['fullname', 'token', 'list_images', 'create_date', 'class_ids', 'id'];
     if (keys.includes(key)) return;
-
+    value = key == 'role' ? account_map[value.toLowerCase()] : value;
     return (
       <ListItem
         key={key}

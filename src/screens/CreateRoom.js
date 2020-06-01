@@ -18,9 +18,9 @@ class CreateRoom extends Component<Props> {
   };
   makeRoom = () => {
     let room = {
-      class_id: '5ebf6a865971877e1ab4c33f',
+      class_id: '5ed509551c4fa731b41345f4',
       secret: '123456',
-      secret_create_room: '123456',
+      secret_create_room: '123',
       location: {
         longtitude: 20.0,
         latitude: 20.0,

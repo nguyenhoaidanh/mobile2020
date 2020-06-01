@@ -7,7 +7,7 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import * as appActions from '../actions/index';
 import RoomItem from '../components/RoomItem';
-import { itemHeight } from '../constants/constants';
+import { itemHeight, ROLES } from '../constants/constants';
 import { shadow, AXIOS } from '../utils/functions';
 import cStyles from '../constants/common-styles';
 const styles = StyleSheet.create({
@@ -35,77 +35,21 @@ const styles = StyleSheet.create({
   },
   btnText: { fontSize: 18, color: 'black' },
   btnIcon: { marginRight: 20, paddingRight: 10 },
+  notify: { color: 'white', fontSize: 20, alignSelf: 'center' },
 });
-const listClassDefault = [
-  {
-    name: 'Cơ sở dữ liệu - L01',
-    avatar_url: 'https://s3.amazonaws.com/uifaces/faces/twitter/ladylexy/128.jpg',
-    subtitle: 'Nguyễn Thị A - 18 phòng',
-    _id: 1,
-  },
-  {
-    name: 'Cơ sở dữ liệu - L01',
-    avatar_url: 'https://s3.amazonaws.com/uifaces/faces/twitter/ladylexy/128.jpg',
-    subtitle: 'Nguyễn Thị A - 18 phòng',
-    _id: 2,
-  },
-  {
-    name: 'Cơ sở dữ liệu - L01',
-    avatar_url: 'https://s3.amazonaws.com/uifaces/faces/twitter/ladylexy/128.jpg',
-    subtitle: 'Nguyễn Thị A - 18 phòng',
-    _id: 3,
-  },
-  {
-    name: 'Cơ sở dữ liệu - L01',
-    avatar_url: 'https://s3.amazonaws.com/uifaces/faces/twitter/ladylexy/128.jpg',
-    subtitle: 'Nguyễn Thị A - 18 phòng',
-    _id: 4,
-  },
-  {
-    name: 'Cơ sở dữ liệu - L01',
-    avatar_url: 'https://s3.amazonaws.com/uifaces/faces/twitter/ladylexy/128.jpg',
-    subtitle: 'Nguyễn Thị A - 18 phòng',
-    _id: 5,
-  },
-  {
-    name: 'Cơ sở dữ liệu - L01',
-    avatar_url: 'https://s3.amazonaws.com/uifaces/faces/twitter/ladylexy/128.jpg',
-    subtitle: 'Nguyễn Thị A - 18 phòng',
-    _id: 6,
-  },
-  {
-    name: 'Cơ sở dữ liệu - L01',
-    avatar_url: 'https://s3.amazonaws.com/uifaces/faces/twitter/ladylexy/128.jpg',
-    subtitle: 'Nguyễn Thị A - 18 phòng',
-    _id: 7,
-  },
-  {
-    name: 'Cơ sở dữ liệu - L01',
-    avatar_url: 'https://s3.amazonaws.com/uifaces/faces/twitter/ladylexy/128.jpg',
-    subtitle: 'Nguyễn Thị A - 18 phòng',
-    _id: 7,
-  },
-  {
-    name: 'Cơ sở dữ liệu - L01',
-    avatar_url: 'https://s3.amazonaws.com/uifaces/faces/twitter/ladylexy/128.jpg',
-    subtitle: 'Nguyễn Thị A - 18 phòng',
-    _id: 7,
-  },
-];
 type Props = {};
 class Home extends Component<Props> {
   state = {};
   componentDidMount() {
     const { listClass = [] } = this.props;
     if (listClass.length == 0)
-      AXIOS('/classes', 'GET', {}, {}, this.props.userInfo.token)
+      AXIOS('/classes/joined', 'GET', {}, {}, this.props.userInfo.token)
         .then(({ data }) => {
           console.log('123456', 1, data);
           this.props.appActions.setListClass({ listClass: data.result });
         })
         .catch((err) => {
           console.log('123456', 2, err.response.data);
-          this.setState({ errorMessage: { password: 'Thông tin đăng nhập chưa đúng' } });
         });
   }
   sortListRoom() {
@@ -113,14 +57,14 @@ class Home extends Component<Props> {
     this.setState({ listRoom: listRoom.sort((x, y) => 1) });
   }
   openListRoom = (_class) => {
-    AXIOS(`/rooms/classes/${_class._id}`, 'GET', {}, {}, this.props.userInfo.token)
+    this.setState({ currentClass: _class });
+    AXIOS(`/rooms/classes/${_class.id}`, 'GET', {}, {}, this.props.userInfo.token)
       .then(({ data }) => {
         console.log('123456', 11, data);
-        this.setState({ listRoom: data, isListClass: false });
+        this.setState({ listRoom: data.result, isListClass: false });
       })
       .catch((err) => {
         console.log('123456', 2, err.response.data);
-        this.setState({ errorMessage: { password: 'Thông tin đăng nhập chưa đúng' } });
       });
   };
   onchange = (name, value) => {
@@ -136,9 +80,18 @@ class Home extends Component<Props> {
 
   validate = () => {
     const { currentRoom = {} } = this.state;
-    //call api here
     this.props.appActions.setCurScreent({ currentScreent: { title: 'Điểm danh' } });
-    this.navigate('/check-in');
+    return this.navigate('/check-in');
+    AXIOS(`/rooms/validate`, 'POST', {}, {}, this.props.userInfo.token)
+      .then(({ data }) => {
+        console.log('123456', 11, data);
+        this.props.appActions.setCurScreent({ currentScreent: { title: 'Điểm danh' } });
+        this.navigate('/check-in');
+      })
+      .catch((err) => {
+        console.log('123456', 2, err.response.data);
+        this.setState({ errorMessage: { password: 'Mật khẩu chưa chính xác' } });
+      });
   };
   renderPopupPassword = () => {
     const { errorMessage = {}, password = '' } = this.state;
@@ -179,12 +132,12 @@ class Home extends Component<Props> {
   render() {
     const iconSize = 15;
     const iconColor = 'black';
-    let { showForm = false, errorMessage = {}, isListClass = true } = this.state;
+    let { showForm = false, errorMessage = {}, isListClass = true, listRoom = [] } = this.state;
     const itemHeight = 195;
-    let { listClass = [], listRoom = [] } = this.props;
-    if (listClass.length == 0) listClass = listClassDefault;
-    if (listRoom.length == 0) listRoom = listClassDefault;
-    const buttons = [
+    let { listClass = [] } = this.props;
+    // if (listClass.length == 0) listClass = listClassDefault;
+    //if (listRoom.length == 0) listRoom = listClassDefault;
+    let buttons = [
       {
         element: () => (
           <View style={{ alignItems: 'center' }} onPress={() => this.navigate('/create-room')}>
@@ -206,6 +159,7 @@ class Home extends Component<Props> {
         ),
       },
     ];
+    if (this.props.userInfo.role !== ROLES.teacher) buttons = buttons.slice(1);
     return (
       <View>
         {showForm ? this.renderPopupPassword() : null}
@@ -217,7 +171,15 @@ class Home extends Component<Props> {
         </View>
         <ScrollView contentContainerStyle={{ flexGrow: 1, paddingLeft: 15, paddingRight: 15, marginTop: 10, paddingTop: 0 }}>
           {!isListClass
-            ? listRoom.map((room, idx) => <RoomItem onClick={() => this.setState({ showForm: true, currentRoom: room })} room={room} key={idx} index={idx} />)
+            ? listRoom.map((room, idx) => (
+                <RoomItem
+                  currentClass={this.state.currentClass}
+                  onClickFunc={() => this.setState({ showForm: true, currentRoom: room })}
+                  room={room}
+                  key={idx}
+                  index={idx}
+                />
+              ))
             : listClass.map((l, i) => (
                 <ListItem
                   onPress={() => this.openListRoom(l)}
@@ -225,12 +187,14 @@ class Home extends Component<Props> {
                   chevron
                   bottomDivider
                   leftIcon={<Icon name={'graduation-cap'} size={30} color={'black'} />}
-                  title={l.name}
+                  title={`${l.code_subject} - ${l.name_subject}`}
                   titleStyle={{ fontWeight: 'bold' }}
-                  subtitle={l.subtitle}
+                  subtitle={l.code_class}
                   bottomDivider
                 />
               ))}
+          {isListClass && listClass.length == 0 ? <Text style={styles.notify}>Bạn chưa có môn học nào</Text> : null}
+          {!isListClass && listRoom.length == 0 ? <Text style={styles.notify}>Không có phòng học nào</Text> : null}
           <View style={{ height: 265 }} />
         </ScrollView>
       </View>

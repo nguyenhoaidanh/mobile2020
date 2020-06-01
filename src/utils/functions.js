@@ -16,7 +16,7 @@ export const showImageInput = ({ picker, camera, width = 300, height = 400, crop
       console.log('lỗi ', err);
     });
 };
-export const AXIOS = function (path, method = 'GET', data = {}, option = {}, token = '') {
+export const AXIOS = function (path, method = 'GET', data = {}, option = {}, token = '', isFile = false) {
   let url = appConfig.api_domain + path;
   let config = {
     method,
@@ -28,6 +28,7 @@ export const AXIOS = function (path, method = 'GET', data = {}, option = {}, tok
     },
     ...option,
   };
+  if (isFile) config.headers['Content-Type'] = 'multipart/form-data';
   return axios(config);
 };
 export const shadow = () => ({
@@ -53,11 +54,16 @@ export const uploadFileToServer = (listFile, token, onUploadProgress = () => {})
   for (var i = 0; i < listFile.length; i++) {
     var file = listFile[i];
     console.log(123456, 'hi', file);
-    formData.append('image', {
+    formData.append('images', {
       uri: file.path,
-      type: 'image/jpeg',
-      name: 'teste',
+      type: `image/${file.path.split('.').pop()}`,
+      name: file.path.split('/').pop(),
+    });
+    formData.append('images', {
+      uri: file.path,
+      type: `image/${file.path.split('.').pop()}2`,
+      name: file.path.split('/').pop(),
     });
   }
-  return AXIOS('/users/images/uploadfile', 'POST', formData, { onUploadProgress }, token);
+  return AXIOS('/users/images/uploadfile', 'POST', formData, { onUploadProgress }, token, true);
 };

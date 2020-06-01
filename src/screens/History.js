@@ -8,12 +8,23 @@ import { bindActionCreators } from 'redux';
 import * as appActions from '../actions/index';
 import RoomItem from '../components/RoomItem';
 import { itemHeight } from '../constants/constants';
+import { AXIOS } from '../utils/functions';
 import cStyles from '../constants/common-styles';
 const styles = StyleSheet.create({});
 
 type Props = {};
 class Home extends Component<Props> {
   state = {};
+  componentDidMount() {
+    AXIOS('/sessions/joined', 'GET', {}, {}, this.props.userInfo.token)
+      .then(({ data }) => {
+        console.log('123456', 1, data);
+        this.setState({ history: data.result });
+      })
+      .catch((err) => {
+        console.log('123456', 2, err.response.data);
+      });
+  }
   onchange = (name, value) => {
     this.setState({ [name]: value });
   };
@@ -24,11 +35,11 @@ class Home extends Component<Props> {
   render() {
     const iconSize = 24;
     const iconColor = 'black';
-    const { errorMessage = {}, list = [1, 23, 32, 23, 45, 45, 3434] } = this.state;
+    const { errorMessage = {}, history = [1, 23, 32, 23, 45, 45, 3434] } = this.state;
     const itemHeight = 190;
     return (
       <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-        {list.map((item, idx) => (
+        {history.map((item, idx) => (
           <Card key={idx}>
             <Text style={styles.textLeft}>
               Bạn đã điểm danh lớp <Text style={{ fontWeight: 'bold' }}>Cơ sở dữ liệu</Text>
@@ -42,6 +53,7 @@ class Home extends Component<Props> {
             <Text style={{ alignSelf: 'flex-end' }}>19h30 19/12/2020</Text>
           </Card>
         ))}
+        {history.length ? null : <Text style={{ marginTop: 50, color: 'white', fontSize: 20, alignSelf: 'center' }}>Bạn chưa có lượt điểm danh nào</Text>}
         <View style={{ height: 65 }} />
       </ScrollView>
     );
@@ -51,6 +63,7 @@ const mapStateToProps = (state) => {
   // Redux Store --> Component
   return {
     app: state.app,
+    userInfo: state.user.userInfo,
   };
 };
 const mapDispatchToProps = (dispatch) => {

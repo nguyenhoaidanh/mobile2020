@@ -20,9 +20,8 @@ function update_image_for_user(req, res, next) {
     .then((result) => res.json({ result: result }))
     .catch((err) => next(err));
 }
-function upload_file(req,res,next){
-    toolService.updateFileExpress(req,res)
-    .then((result)=>res.json({"result":result}))
-    .catch(err => next(err));   
-}
-
+// function upload_file(req,res,next){
+//     toolService.updateFileExpress(req,res)
+//     .then((result)=>res.json({"result":result}))
+//     .catch(err => next(err));
+// }
