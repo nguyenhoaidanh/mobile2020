@@ -8,7 +8,7 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import * as appActions from '../actions/index';
 import { setAvatar } from '../utils/functions';
-import { list_screen_map } from '../constants/constants';
+import { list_screen_map, ROLES } from '../constants/constants';
 import cStyles from '../constants/common-styles';
 const styles = StyleSheet.create({
   container: {
@@ -25,12 +25,12 @@ const styles = StyleSheet.create({
   ava: { flexDirection: 'row', width: '100%' },
 });
 const list = [
-  { name: 'listRoom', to: '/list-room', text: 'Điểm danh', image: require('../../img/checkin.png') },
-  { name: 'listRoom', to: '/list-room', text: 'Phòng học', image: require('../../img/room.png') },
-  { name: 'registerFace', to: '/register-face', text: 'Gương mặt', image: require('../../img/face.png') },
-  { name: 'history', to: '/history', text: 'Lịch sử', image: require('../../img/history.png') },
-  { text: 'Giáo viên', image: require('../../img/teacher.png') },
-  { name: 'account', to: '/account', text: 'Tài khoản', image: require('../../img/default-avatar.png') },
+  { showRole: [ROLES.student, ROLES.teacher], name: 'listRoom', to: '/list-room', text: 'Điểm danh', image: require('../../img/checkin.png') },
+  { showRole: [ROLES.student, ROLES.teacher], name: 'listRoom', to: '/list-room', text: 'Phòng học', image: require('../../img/room.png') },
+  { showRole: [ROLES.student, ROLES.teacher], name: 'registerFace', to: '/register-face', text: 'Gương mặt', image: require('../../img/face.png') },
+  { showRole: [ROLES.student], name: 'history', to: '/history', text: 'Lịch sử', image: require('../../img/history.png') },
+  { showRole: [ROLES.teacher], text: 'Giáo viên', image: require('../../img/teacher.png') },
+  { showRole: [ROLES.student, ROLES.teacher], name: 'account', to: '/account', text: 'Tài khoản', image: require('../../img/default-avatar.png') },
 ];
 type Props = {};
 class Home extends Component<Props> {
@@ -38,17 +38,14 @@ class Home extends Component<Props> {
   navigate = (url, creent = null) => {
     if (!url) return;
     this.props.history.push(url);
-    console.log(123456, creent);
-
     creent && this.props.appActions.setCurScreent({ currentScreent: creent });
   };
   componentWillReceiveProps(props) {
     this.setState({ loggedIn: props.loggedIn });
   }
   render() {
-    let { loggedIn = false } = this.props;
-    const { image = {}, mssv = '1610391', username = 'Nguyễn Hoài Danh' } = this.state;
-    console.log(123456, 'loggedIn', loggedIn);
+    let { loggedIn = false, userInfo = {} } = this.props;
+    const { image = {}, mssv = '1610391', username = 'Nguyễn Hoài Danh' } = userInfo;
     if (!loggedIn)
       return (
         <View style={styles.container}>
@@ -87,18 +84,21 @@ class Home extends Component<Props> {
           <Text style={{ fontStyle: 'italic', paddingTop: 10, paddingLeft: 10, fontSize: 20, color: 'white' }}>Danh mục</Text>
         </View>
         <View style={{ flexDirection: 'row', padding: 5, flexWrap: 'wrap', alignItems: 'center', alignContent: 'center' }}>
-          {list.map((e, i) => (
-            <View key={i} style={{ margin: 5, alignItems: 'center', backgroundColor: 'white', borderRadius: 10, height: 120, width: 120 }}>
-              <Avatar
-                onPress={() => this.navigate(e.to, list_screen_map[e.name])}
-                size="xlarge"
-                source={e.image}
-                containerStyle={{ marginTop: 10, alignSelf: 'center', width: 80, height: 80 }}
-                avatarStyle={{ alignSelf: 'center', width: 80, height: 80 }}
-              />
-              <Text style={{ fontWeight: 'bold', fontSize: 15, color: 'black' }}>{e.text}</Text>
-            </View>
-          ))}
+          {list.map((e, i) => {
+            if (!e.showRole.includes(userInfo.role)) return null;
+            return (
+              <View key={i} style={{ margin: 5, alignItems: 'center', backgroundColor: 'white', borderRadius: 10, height: 120, width: 120 }}>
+                <Avatar
+                  onPress={() => this.navigate(e.to, list_screen_map[e.name])}
+                  size="xlarge"
+                  source={e.image}
+                  containerStyle={{ marginTop: 10, alignSelf: 'center', width: 80, height: 80 }}
+                  avatarStyle={{ alignSelf: 'center', width: 80, height: 80 }}
+                />
+                <Text style={{ fontWeight: 'bold', fontSize: 15, color: 'black' }}>{e.text}</Text>
+              </View>
+            );
+          })}
         </View>
         <View style={{ height: 65 }} />
       </ScrollView>
@@ -108,7 +108,7 @@ class Home extends Component<Props> {
 const mapStateToProps = (state) => {
   // Redux Store --> Component
   return {
-    app: state.app,
+    userInfo: state.user.userInfo,
     loggedIn: state.user.loggedIn,
   };
 };

@@ -1,9 +1,19 @@
+export const ROLES = { teacher: 'Teacher', student: 'Student' };
 export const list_screen = [
-  { icon: 'home', text: 'Home', title: 'BK Attendance', to: '/' },
-  { icon: 'view-list', customIcon: 'sort', customText: 'sort', text: 'Rooms', title: 'Danh sách phòng', to: '/list-room', showSearch: true },
-  { icon: 'face-recognition', text: 'Face', title: 'Đăng kí gương mặt', to: '/register-face' },
-  { icon: 'history', text: 'History', title: 'Lịch sử điểm danh', to: '/history' },
-  { icon: 'account', text: 'Account', title: 'Tài khoản', to: '/account' },
+  { showRole: [ROLES.student, ROLES.teacher], icon: 'home', text: 'Home', title: 'BK Attendance', to: '/' },
+  {
+    showRole: [ROLES.student, ROLES.teacher],
+    icon: 'view-list',
+    customIcon: 'sort',
+    customText: 'sort',
+    text: 'Rooms',
+    title: 'Danh sách phòng',
+    to: '/list-room',
+    showSearch: true,
+  },
+  { showRole: [ROLES.student, ROLES.teacher], icon: 'face-recognition', text: 'Face', title: 'Đăng kí gương mặt', to: '/register-face' },
+  { showRole: [ROLES.student], icon: 'history', text: 'History', title: 'Lịch sử điểm danh', to: '/history' },
+  { showRole: [ROLES.student, ROLES.teacher], icon: 'account', text: 'Account', title: 'Tài khoản', to: '/account' },
 ];
 export const list_screen_map = {
   home: { icon: 'home', text: 'Bach khoa Attendance Application', title: 'BK Attendance', to: '/' },
@@ -29,4 +39,3 @@ export const facultys = [
   'Kỹ Thuật Hóa Học',
   'Môi Trường',
 ];
-export const ROLES = { teacher: 'Teacher', student: 'Student' };

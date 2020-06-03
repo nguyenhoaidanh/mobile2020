@@ -7,6 +7,7 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import * as appActions from '../actions/index';
 import RoomItem from '../components/RoomItem';
+import Loading from '../components/Loading';
 import { itemHeight } from '../constants/constants';
 import { AXIOS } from '../utils/functions';
 import cStyles from '../constants/common-styles';
@@ -23,7 +24,8 @@ class Home extends Component<Props> {
       })
       .catch((err) => {
         console.log('123456', 2, err.response.data);
-      });
+      })
+      .finally(() => this.setState({ loading: false }));
   }
   onchange = (name, value) => {
     this.setState({ [name]: value });
@@ -35,7 +37,7 @@ class Home extends Component<Props> {
   render() {
     const iconSize = 24;
     const iconColor = 'black';
-    const { errorMessage = {}, history = [1, 23, 32, 23, 45, 45, 3434] } = this.state;
+    const { errorMessage = {}, history = [], loading = true } = this.state;
     const itemHeight = 190;
     return (
       <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
@@ -53,7 +55,11 @@ class Home extends Component<Props> {
             <Text style={{ alignSelf: 'flex-end' }}>19h30 19/12/2020</Text>
           </Card>
         ))}
-        {history.length ? null : <Text style={{ marginTop: 50, color: 'white', fontSize: 20, alignSelf: 'center' }}>Bạn chưa có lượt điểm danh nào</Text>}
+        {loading ? (
+          <Loading />
+        ) : history.length === 0 ? (
+          <Text style={{ marginTop: 50, color: 'white', fontSize: 20, alignSelf: 'center' }}>Bạn chưa có lượt điểm danh nào</Text>
+        ) : null}
         <View style={{ height: 65 }} />
       </ScrollView>
     );

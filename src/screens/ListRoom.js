@@ -10,6 +10,7 @@ import RoomItem from '../components/RoomItem';
 import { itemHeight, ROLES } from '../constants/constants';
 import { shadow, AXIOS } from '../utils/functions';
 import cStyles from '../constants/common-styles';
+import Loading from '../components/Loading';
 const styles = StyleSheet.create({
   group: {
     ...shadow(),
@@ -40,32 +41,45 @@ const styles = StyleSheet.create({
 type Props = {};
 class Home extends Component<Props> {
   state = {};
+  componentWillReceiveProps(props) {
+    this.setState({ listClass: props.listClass });
+  }
   componentDidMount() {
     const { listClass = [] } = this.props;
-    if (listClass.length == 0)
+    this.setState({ loading: listClass.length == 0 });
+    if (listClass.length == 0) {
       AXIOS('/classes/joined', 'GET', {}, {}, this.props.userInfo.token)
         .then(({ data }) => {
-          console.log('123456', 1, data);
+          console.log('123456', `found ${data.result.length} class`);
           this.props.appActions.setListClass({ listClass: data.result });
         })
         .catch((err) => {
           console.log('123456', 2, err.response.data);
-        });
+        })
+        .finally(() => this.setState({ loading: false }));
+    }
   }
-  sortListRoom() {
-    const { listRoom = [] } = this.state;
-    this.setState({ listRoom: listRoom.sort((x, y) => 1) });
-  }
+  onSort = () => {
+    const { listRoom = [], listClass = [], sort = false } = this.state;
+    const func = (x, y) => {
+      if (x.name_subject) {
+        return (sort ? -1 : 1) * x.name_subject.localeCompare(y.name_subject);
+      }
+      return 1;
+    };
+    this.setState({ sort: !sort, listRoom: listRoom.sort(func), listClass: listClass.sort(func) });
+  };
   openListRoom = (_class) => {
-    this.setState({ currentClass: _class });
+    this.setState({ currentClass: _class, loading: true });
     AXIOS(`/rooms/classes/${_class.id}`, 'GET', {}, {}, this.props.userInfo.token)
       .then(({ data }) => {
-        console.log('123456', 11, data);
+        console.log('123456', `found ${data.result.length} room`);
         this.setState({ listRoom: data.result, isListClass: false });
       })
       .catch((err) => {
         console.log('123456', 2, err.response.data);
-      });
+      })
+      .finally(() => this.setState({ loading: false }));
   };
   onchange = (name, value) => {
     this.setState({ [name]: value });
@@ -79,9 +93,11 @@ class Home extends Component<Props> {
   };
 
   validate = () => {
-    const { currentRoom = {} } = this.state;
+    const { currentRoom = {}, password } = this.state;
     this.props.appActions.setCurScreent({ currentScreent: { title: 'Điểm danh' } });
+    this.props.appActions.setCurRoom({ currentRoom: { ...currentRoom, secret: password } });
     return this.navigate('/check-in');
+    this.setState({ loading: true });
     AXIOS(`/rooms/validate`, 'POST', {}, {}, this.props.userInfo.token)
       .then(({ data }) => {
         console.log('123456', 11, data);
@@ -91,7 +107,8 @@ class Home extends Component<Props> {
       .catch((err) => {
         console.log('123456', 2, err.response.data);
         this.setState({ errorMessage: { password: 'Mật khẩu chưa chính xác' } });
-      });
+      })
+      .finally(() => this.setState({ loading: false }));
   };
   renderPopupPassword = () => {
     const { errorMessage = {}, password = '' } = this.state;
@@ -132,9 +149,8 @@ class Home extends Component<Props> {
   render() {
     const iconSize = 15;
     const iconColor = 'black';
-    let { showForm = false, errorMessage = {}, isListClass = true, listRoom = [] } = this.state;
+    let { listClass = [], showForm = false, loading = true, errorMessage = {}, isListClass = true, listRoom = [] } = this.state;
     const itemHeight = 195;
-    let { listClass = [] } = this.props;
     // if (listClass.length == 0) listClass = listClassDefault;
     //if (listRoom.length == 0) listRoom = listClassDefault;
     let buttons = [
@@ -151,7 +167,7 @@ class Home extends Component<Props> {
       {
         element: () => (
           <View style={{ alignItems: 'center' }}>
-            <Text style={styles.btnText}>
+            <Text style={styles.btnText} onPress={this.onSort}>
               <Icon style={styles.btnIcon} name={'sort'} size={iconSize} color={iconColor} />
               <Text style={{ marginLeft: 30 }}> Sắp xếp</Text>
             </Text>
@@ -193,8 +209,14 @@ class Home extends Component<Props> {
                   bottomDivider
                 />
               ))}
-          {isListClass && listClass.length == 0 ? <Text style={styles.notify}>Bạn chưa có môn học nào</Text> : null}
-          {!isListClass && listRoom.length == 0 ? <Text style={styles.notify}>Không có phòng học nào</Text> : null}
+          {loading ? (
+            <Loading />
+          ) : listClass.length === 0 || listRoom.length == 0 ? (
+            <View>
+              {isListClass && listClass.length == 0 ? <Text style={styles.notify}>Bạn chưa có môn học nào</Text> : null}
+              {!isListClass && listRoom.length == 0 ? <Text style={styles.notify}>Không có phòng học nào</Text> : null}
+            </View>
+          ) : null}
           <View style={{ height: 265 }} />
         </ScrollView>
       </View>

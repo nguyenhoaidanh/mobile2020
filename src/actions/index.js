@@ -17,6 +17,12 @@ export function setListClass(data) {
     payload: { ...data },
   };
 }
+export function setCurRoom(data) {
+  return {
+    type: ACTIONS.SET_CUR_ROOM,
+    payload: { ...data },
+  };
+}
 export function logout() {
   return {
     type: ACTIONS.LOGOUT,

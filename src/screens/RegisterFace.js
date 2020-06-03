@@ -53,13 +53,18 @@ export default class Home extends Component<Props> {
     list = this.parseList(list);
     return (
       <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+        <View>
+          <Text style={{ paddingLeft: 10, paddingRight: 10, marginBottom: 10, marginTop: 10, alignSelf: 'center', fontSize: 25, color: 'white' }}>
+            Chọn ít nhất 10 ảnh khác nhau có mặt của bạn để đăng ký gương mặt trên hệ thống
+          </Text>
+        </View>
         {list.map((row, idx) => this.renderRow(row, idx))}
         <Button
           loading={loading}
           containerStyle={cStyles.btnwrap}
           titleStyle={cStyles.btnText}
           buttonStyle={cStyles.btn}
-          title="Đăng kí gương mặt"
+          title={loading ? 'Đang xử lý' : 'Đăng kí gương mặt'}
           onPress={this.register}
         />
         <View style={{ height: 65 }} />

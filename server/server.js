@@ -10,7 +10,6 @@ var express = require('express'),
 const jwt = require('./helper/jwt');
 const errorHandler = require('./helper/error');
 const cors = require('cors');
-
 var app = express();
 
 // //rest API requirements
@@ -31,6 +30,13 @@ app.use('/**', (req, res, next) => {
 [Authorization] ${req.headers.authorization}\n`);
   next();
 });
+
+//testtttt
+app.get('/test', async (req, res) => {
+  let data = await require('./helper/db').User.find({});
+  res.send(data);
+});
+//end testttt
 
 //jwt
 app.use(jwt());

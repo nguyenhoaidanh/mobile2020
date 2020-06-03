@@ -44,13 +44,14 @@ class Footer extends Component<Props> {
     this.props.history.push(list[selectedIndex].to);
     this.props.appActions.setCurScreent({ currentScreent: list[selectedIndex] });
   };
-  componentWillReceiveProps(props) {
-    console.log('xx');
-  }
   render() {
-    console.log(22);
     const { selectedIndex = 0, hideFooter = 0 } = this.state;
-    const buttons = list.map((el) => ({
+    const { userInfo = {} } = this.props;
+    if (userInfo.role)
+      list = list.filter((e) => {
+        return e.showRole.includes(userInfo.role);
+      });
+    let buttons = list.map((el) => ({
       element: () => (
         <View style={{ width: '100%', alignItems: 'center' }}>
           <Icon name={el.icon} size={iconSize} color={'black'} />
@@ -58,6 +59,7 @@ class Footer extends Component<Props> {
         </View>
       ),
     }));
+
     if (hideFooter) return null;
     return (
       <View style={styles.container}>
@@ -76,7 +78,7 @@ class Footer extends Component<Props> {
 const mapStateToProps = (state) => {
   // Redux Store --> Component
   return {
-    app: state.app,
+    userInfo: state.user.userInfo,
   };
 };
 const mapDispatchToProps = (dispatch) => {

@@ -17,6 +17,7 @@ export const showImageInput = ({ picker, camera, width = 300, height = 400, crop
     });
 };
 export const AXIOS = function (path, method = 'GET', data = {}, option = {}, token = '', isFile = false) {
+  console.log('123456', 'call api', path);
   let url = appConfig.api_domain + path;
   let config = {
     method,
