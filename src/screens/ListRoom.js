@@ -57,7 +57,7 @@ class Home extends Component<Props> {
           console.log('123456', 2, err.response.data);
         })
         .finally(() => this.setState({ loading: false }));
-    }
+    } else this.setState({ listClass });
   }
   onSort = () => {
     const { listRoom = [], listClass = [], sort = false } = this.state;
@@ -75,6 +75,12 @@ class Home extends Component<Props> {
       .then(({ data }) => {
         console.log('123456', `found ${data.result.length} room`);
         this.setState({ listRoom: data.result, isListClass: false });
+        this.props.appActions.setCurScreent({
+          currentScreent: {
+            icon: 'view-list',
+            title: 'Danh sách phòng',
+          },
+        });
       })
       .catch((err) => {
         console.log('123456', 2, err.response.data);
@@ -180,11 +186,7 @@ class Home extends Component<Props> {
       <View>
         {showForm ? this.renderPopupPassword() : null}
         <ButtonGroup buttonStyle={styles.btn} containerStyle={styles.group} onPress={this.updateIndex} buttons={buttons} />
-        <View style={{ flexDirection: 'row', width: '100%', alignItems: 'center' }}>
-          <View style={{ width: '100%', paddingTop: 10, paddingBottom: 10 }}>
-            <Text style={{ fontStyle: 'italic', fontSize: 25, alignSelf: 'center', color: 'white' }}>{isListClass ? 'Danh sách lớp' : 'Danh sách phòng'}</Text>
-          </View>
-        </View>
+
         <ScrollView contentContainerStyle={{ flexGrow: 1, paddingLeft: 15, paddingRight: 15, marginTop: 10, paddingTop: 0 }}>
           {!isListClass
             ? listRoom.map((room, idx) => (

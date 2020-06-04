@@ -20,7 +20,7 @@ class Home extends Component<Props> {
   checkin = () => {
     this.showConfirm();
   };
-  showConfirm = () =>
+  showConfirm = () => {
     Alert.alert(
       '',
       `Phát hiện 3 người:
@@ -35,6 +35,9 @@ class Home extends Component<Props> {
       ],
       { cancelable: false }
     );
+    const { currentRoom = {}, currentClass } = this.props;
+    console.log(123456, currentRoom, currentClass);
+  };
   saveSession = () => {
     const { currentRoom = {} } = this.props;
     const session = {
@@ -91,6 +94,7 @@ const mapStateToProps = (state) => {
   // Redux Store --> Component
   return {
     currentRoom: state.app.currentRoom,
+    currentClass: state.app.currentClass,
     userInfo: state.user.userInfo,
   };
 };

@@ -51,7 +51,7 @@ async function upFile(req, res) {
   form.on('fileBegin', function (name, file) {
     file.name = new Date().getTime() + '.' + file.name.split('.').pop();
     file.path = dirmain + '/public/store/' + file.name;
-    old_list_array.push(process.env.HOST + '/static/store/' + file.name);
+    old_list_array.push('/static/store/' + file.name);
     console.log('?/?', file.name);
   });
   form.on('file', function (name, file) {
@@ -77,7 +77,7 @@ async function updateFileExpress(req, res) {
         data
           .split('\n')
           .filter((el) => el != '')
-          .map((el) => process.env.HOST + '/static/store/' + el),
+          .map((el) => '/static/store/' + el),
         user.list_images
       );
       // user.list_images=[];

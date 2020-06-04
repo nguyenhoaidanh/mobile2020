@@ -1,4 +1,5 @@
 import ACTIONS from '../constants/action-types';
+import AsyncStorage from '@react-native-community/async-storage';
 const initialState = {
   loggedIn: false,
   userInfo: {},
@@ -6,10 +7,12 @@ const initialState = {
 const reducer = (state = initialState, action) => {
   switch (action.type) {
     case ACTIONS.SET_USER_INFO: {
+      const newUserInfo = { ...state.userInfo, ...action.payload.userInfo };
+      AsyncStorage.setItem('@userInfo', JSON.stringify(newUserInfo));
       return {
         ...state,
         loggedIn: true,
-        userInfo: action.payload.userInfo,
+        userInfo: newUserInfo,
       };
     }
     case ACTIONS.LOGOUT: {

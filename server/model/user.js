@@ -15,6 +15,7 @@ const schema = new Schema({
   address: { type: String },
   role: { type: role, require: true },
   class_ids: { type: [] },
+  male: { type: Boolean, default: true },
   create_date: { type: Date, default: Date.now },
   list_images: { type: [] },
 });

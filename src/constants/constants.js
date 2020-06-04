@@ -7,7 +7,7 @@ export const list_screen = [
     customIcon: 'sort',
     customText: 'sort',
     text: 'Rooms',
-    title: 'Danh sách phòng',
+    title: 'Danh sách lớp',
     to: '/list-room',
     showSearch: true,
   },

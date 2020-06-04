@@ -19,20 +19,18 @@ module.exports = {
 };
 
 async function getAllSelf(req) {
-  console.log(req.user.sub);
   var collections = [];
-  var session = await Session.find({ user_create: req.user.sub, isAccept: true });
+  var session = await Session.find({ user_create: req.user.sub });
   for (let count = 0; count < session.length; count++) {
-    console.log(session[count].user_create);
     if (session[count]) {
       var room = await Room.findById(session[count].room_id);
-
       if (room) {
         var class_var = await Class.findById(room.class_id);
-        console.log(class_var);
         if (class_var) {
+          var author = await User.findById(class_var.user_create);
+          class_var.user_create = author.fullname;
           var session_item = session[count];
-          collections.push({ 'class name': class_var, session: session_item });
+          collections.push({ class: class_var, session: session_item });
         }
       }
     }

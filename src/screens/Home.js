@@ -10,6 +10,8 @@ import * as appActions from '../actions/index';
 import { setAvatar } from '../utils/functions';
 import { list_screen_map, ROLES } from '../constants/constants';
 import cStyles from '../constants/common-styles';
+import AsyncStorage from '@react-native-community/async-storage';
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -43,9 +45,41 @@ class Home extends Component<Props> {
   componentWillReceiveProps(props) {
     this.setState({ loggedIn: props.loggedIn });
   }
+  componentWillMount() {
+    (async () => {
+      try {
+        let userInfo = await AsyncStorage.getItem('@userInfo');
+        console.log(123456, userInfo);
+        userInfo = userInfo ? JSON.parse(userInfo) : null;
+        if (userInfo && Object.keys(userInfo).length != 0) {
+          this.props.appActions.setUserInfo({ userInfo });
+        }
+        setTimeout(() => {
+          this.setState({ loading: false });
+        }, 500);
+      } catch (e) {
+        setTimeout(() => {
+          this.setState({ loading: false });
+        }, 500);
+      }
+    })();
+  }
+  componentWillUnmount() {
+    global.firstLoad = true;
+  }
   render() {
     let { loggedIn = false, userInfo = {} } = this.props;
-    const { image = {}, mssv = '1610391', username = 'Nguyễn Hoài Danh' } = userInfo;
+    const { image = {}, mssv = '1610391', username = 'Nguyễn Hoài Danh', list_images = [] } = userInfo;
+    const avaSource = list_images.length ? setAvatar(list_images.slice(-1)[0], true) : setAvatar(image);
+    const { loading = !global.firstLoad } = this.state;
+    console.log(123456, loading, global.firstLoad);
+    if (loading)
+      return (
+        <View style={styles.container}>
+          <Image source={require('../../img/bku.png')} style={{ width: 200, height: 200 }} />
+          <Text style={styles.welcome}>Bach khoa Attendance Application</Text>
+        </View>
+      );
     if (!loggedIn)
       return (
         <View style={styles.container}>
@@ -71,7 +105,7 @@ class Home extends Component<Props> {
       <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
         <View style={styles.ava}>
           <View style={{ width: 100, padding: 10 }}>
-            <Avatar onPress={this.showImageInput} rounded size="large" source={setAvatar(image)} />
+            <Avatar onPress={this.showImageInput} rounded size="large" source={avaSource} />
           </View>
           <View style={{ padding: 10 }}>
             <Text style={{ fontWeight: 'bold', fontSize: 20, color: 'white' }}>{username}</Text>
@@ -81,7 +115,7 @@ class Home extends Component<Props> {
 
         <View>
           <Divider style={{ backgroundColor: 'white' }} />
-          <Text style={{ fontStyle: 'italic', paddingTop: 10, paddingLeft: 10, fontSize: 20, color: 'white' }}>Danh mục</Text>
+          <Text style={{ fontStyle: 'italic', fontWeight: 'bold', paddingTop: 10, paddingLeft: 10, fontSize: 20, color: 'white' }}>Danh mục</Text>
         </View>
         <View style={{ flexDirection: 'row', padding: 5, flexWrap: 'wrap', alignItems: 'center', alignContent: 'center' }}>
           {list.map((e, i) => {

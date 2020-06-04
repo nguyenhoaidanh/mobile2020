@@ -16,23 +16,11 @@ import { Provider, connect } from 'react-redux';
 import appReducer from './reducers/index';
 import { createStore, bindActionCreators } from 'redux';
 import * as appActions from './actions/index';
-import AsyncStorage from '@react-native-community/async-storage';
 
 type Props = {};
 class App extends Component<Props> {
   state = { loading: true };
-  componentWillMount() {
-    (async (value) => {
-      try {
-        let userInfo = await AsyncStorage.getItem('@userInfo');
-        console.log(123456, 'old', userInfo);
-        userInfo = userInfo ? JSON.parse(userInfo) : null;
-        if (userInfo && Object.keys(userInfo).length != 0) this.props.appActions.setUserInfo({ userInfo });
-      } catch (e) {
-        console.log(123456, e);
-      }
-    })();
-  }
+  componentWillMount() {}
   render() {
     return (
       <ImageBackground

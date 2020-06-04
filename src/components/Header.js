@@ -27,12 +27,15 @@ class Home extends Component<Props> {
     this.props.history.goBack();
     this.props.appActions.setCurScreent({ currentScreent: this.props.app.lastScreent });
   };
+  updateSearch = (keyword) => {
+    this.setState({ keyword });
+    console.log(123456, keyword);
+  };
   render() {
     const { keyword = '' } = this.state;
     const { currentScreent = {}, lastScreent = null } = this.props.app;
     const { title = '', icon = null, customIcon = null, to = '', showSearch = false } = currentScreent;
-
-    if (showSearch)
+    if (false)
       return (
         <View style={styles.header}>
           <SearchBar
@@ -75,6 +78,7 @@ const mapStateToProps = (state) => {
   // Redux Store --> Component
   return {
     app: state.app,
+    loggedIn: state.user.loggedIn,
   };
 };
 const mapDispatchToProps = (dispatch) => {

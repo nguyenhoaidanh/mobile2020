@@ -46,7 +46,7 @@ class Footer extends Component<Props> {
   };
   render() {
     const { selectedIndex = 0, hideFooter = 0 } = this.state;
-    const { userInfo = {} } = this.props;
+    const { userInfo = {}, loggedIn = false } = this.props;
     if (userInfo.role)
       list = list.filter((e) => {
         return e.showRole.includes(userInfo.role);
@@ -60,7 +60,7 @@ class Footer extends Component<Props> {
       ),
     }));
 
-    if (hideFooter) return null;
+    if (hideFooter || !loggedIn) return null;
     return (
       <View style={styles.container}>
         <ButtonGroup
@@ -79,6 +79,7 @@ const mapStateToProps = (state) => {
   // Redux Store --> Component
   return {
     userInfo: state.user.userInfo,
+    loggedIn: state.user.loggedIn,
   };
 };
 const mapDispatchToProps = (dispatch) => {

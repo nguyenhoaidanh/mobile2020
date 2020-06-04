@@ -6,7 +6,7 @@ import { Input, Button, Card } from 'react-native-elements';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import * as appActions from '../actions/index';
-import RoomItem from '../components/RoomItem';
+import HistoryItem from '../components/HistoryItem';
 import Loading from '../components/Loading';
 import { itemHeight } from '../constants/constants';
 import { AXIOS } from '../utils/functions';
@@ -19,7 +19,7 @@ class Home extends Component<Props> {
   componentDidMount() {
     AXIOS('/sessions/joined', 'GET', {}, {}, this.props.userInfo.token)
       .then(({ data }) => {
-        console.log('123456', 1, data);
+        console.log('123456', `found ${data.result.length} session`);
         this.setState({ history: data.result });
       })
       .catch((err) => {
@@ -42,18 +42,7 @@ class Home extends Component<Props> {
     return (
       <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
         {history.map((item, idx) => (
-          <Card key={idx}>
-            <Text style={styles.textLeft}>
-              Bạn đã điểm danh lớp <Text style={{ fontWeight: 'bold' }}>Cơ sở dữ liệu</Text>
-            </Text>
-            <Text style={styles.textLeft}>
-              Giảng viên: <Text style={{ fontWeight: 'bold' }}>Nguyễn Thị X</Text>
-            </Text>
-            <Text style={styles.textLeft}>
-              Sỉ số: <Text style={{ fontWeight: 'bold' }}>90/100</Text>
-            </Text>
-            <Text style={{ alignSelf: 'flex-end' }}>19h30 19/12/2020</Text>
-          </Card>
+          <HistoryItem data={item} key={idx} />
         ))}
         {loading ? (
           <Loading />

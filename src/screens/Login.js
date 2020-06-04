@@ -41,7 +41,6 @@ class Login extends Component<Props> {
         this.props.history.push('/');
         this.props.appActions.setCurScreent({ currentScreent: list_screen_map.home });
         this.props.appActions.setUserInfo({ userInfo: data });
-        AsyncStorage.setItem('@userInfo', JSON.stringify(data));
       })
       .catch((err) => {
         console.log('123456', 2, err.response.data);

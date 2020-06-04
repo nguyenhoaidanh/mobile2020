@@ -37,7 +37,7 @@ app.get('/test', async (req, res) => {
   res.send(data);
 });
 //end testttt
-
+app.use('/static', express.static('public'));
 //jwt
 app.use(jwt());
 app.use(errorHandler);
@@ -47,7 +47,7 @@ app.use('/users/images', require('./controller/user.controller'));
 app.use('/classes', require('./controller/class.controller'));
 app.use('/rooms', require('./controller/room.controller'));
 app.use('/sessions', require('./controller/session.controller'));
-app.use('/static', express.static('public'));
+
 // app.use('/static/',express.static('store'));
 app.listen(3000, () => {
   console.log(`app is running on port ${3000}`);

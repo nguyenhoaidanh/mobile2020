@@ -75,6 +75,15 @@ class Home extends Component<Props> {
     })
       .then(({ data }) => {
         console.log('123456', 11, data);
+        AXIOS('/users/images', 'POST', data.result, {}, this.props.userInfo.token)
+          .then((resp) => {
+            console.log('123456', 11, resp);
+            const { list_images = [] } = this.props.userInfo;
+            this.props.appActions.setUserInfo({ userInfo: { list_images: list_images.concat(data.result) } });
+          })
+          .catch((err) => {
+            console.log('123456', 2, err.response.data);
+          });
       })
       .catch((err) => {
         console.log('123456', 2, err.response.data);
@@ -118,39 +127,42 @@ class Home extends Component<Props> {
     let { userInfo = {} } = this.props;
     if (!userInfo.username)
       userInfo = { username: 'Nguyễn Hoài Danh', male: 'male', birthday: '03/02/1998', faculty: 'KH & KT Máy tính', email: '1610391@hcmut.edu.vn' };
-    const { username = '', mssv = '' } = userInfo;
+    const { username = '', mssv = '', list_images = [] } = userInfo;
+    const avaSource = list_images.length ? setAvatar(list_images.slice(-1)[0], true) : setAvatar(image);
+    console.log(123456, avaSource, list_images.slice(-1)[0], list_images);
     const infos = [];
     return (
       <KeyboardAvoidingView style={{ flex: 1, flexDirection: 'column' }}>
         <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-          <View style={styles.ava}>
-            <View>
-              <Avatar
-                onPress={this.showImageInput}
-                onAccessoryPress={this.showImageInput}
-                rounded
-                size="xlarge"
-                source={setAvatar(image)}
-                showAccessory
-                accessory={{
-                  name: image.path ? 'mode-edit' : 'plus-circle',
-                  type: image.path ? 'material' : 'font-awesome',
-                  color: 'white',
-                  underlayColor: 'gray',
-                  size: 30,
-                }}
-              />
+          {edit ? null : (
+            <View style={styles.ava}>
+              <View>
+                <Avatar
+                  onPress={this.showImageInput}
+                  onAccessoryPress={this.showImageInput}
+                  rounded
+                  size="xlarge"
+                  source={avaSource}
+                  showAccessory
+                  accessory={{
+                    name: image.path ? 'mode-edit' : 'plus-circle',
+                    type: image.path ? 'material' : 'font-awesome',
+                    color: 'white',
+                    underlayColor: 'gray',
+                    size: 30,
+                  }}
+                />
+              </View>
+              <Text style={{ fontSize: 30, color: 'white' }}>{username}</Text>
             </View>
-            <Text style={{ fontSize: 30, color: 'white' }}>{username}</Text>
-          </View>
-
+          )}
           <Card
             title={
               <View style={{ flexDirection: 'row', paddingTop: 10, paddingBottom: 10 }}>
                 <View style={{ alignItems: 'center', width: '100%' }}>
                   <Text style={{ fontSize: 20, fontWeight: 'bold', alignSelf: 'center' }}>
                     <Text>{'Thông tin cá nhân' + '   '} </Text>
-                    <Icon style={{ paddingLeft: 20, marginLeft: 10 }} name="edit" onPress={() => this.setState({ edit: !edit })} size={20} color={iconColor} />
+                    <Icon style={{ paddingLeft: 20, marginLeft: 10 }} name="edit" onPress={() => this.setState({ edit: !edit })} size={20} color={'green'} />
                   </Text>
                 </View>
               </View>
