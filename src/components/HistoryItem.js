@@ -9,7 +9,11 @@ import { bindActionCreators } from 'redux';
 import * as appActions from '../actions/index';
 import { formatTime } from '../utils/functions';
 import cStyles from '../constants/common-styles';
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+  textLeft: {
+    fontSize: 20,
+  },
+});
 const iconSize = 24,
   iconColor = 'black';
 type Props = {};
@@ -34,7 +38,7 @@ class Footer extends Component<Props> {
         <Text style={styles.textLeft}>
           Sỉ số: <Text style={{ fontWeight: 'bold' }}>90/100</Text>
         </Text>
-        <Text style={{ alignSelf: 'flex-end' }}>{formatTime(session.create_date)}</Text>
+        <Text style={{ alignSelf: 'flex-end', color: 'green', fontSize: 15 }}>{formatTime(session.create_date)}</Text>
       </Card>
     );
   }

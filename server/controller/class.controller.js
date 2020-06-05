@@ -10,7 +10,7 @@ router.post('/', authorize(role.Teacher), createClass);
 router.put('/', authorize(role.Teacher), updateClass);
 router.put('/update-class-for-user', authorize(), updateClassForUser);
 router.delete('/', authorize(role.Teacher), removeClass);
-router.get('/joined', authorize(role.Student), getAllClassOfStudent);
+router.get('/joined', authorize(), getAllClassOfStudent);
 
 router.get('/:id', getOneClass);
 router.get('/', authorize(role.Teacher), getAllClassOfTeacher);

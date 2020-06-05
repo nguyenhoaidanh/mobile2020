@@ -48,7 +48,8 @@ class Home extends Component<Props> {
     const { listClass = [] } = this.props;
     this.setState({ loading: listClass.length == 0 });
     if (listClass.length == 0) {
-      AXIOS('/classes/joined', 'GET', {}, {}, this.props.userInfo.token)
+      const path = '/classes/joined';
+      AXIOS(path, 'GET', {}, {}, this.props.userInfo.token)
         .then(({ data }) => {
           console.log('123456', `found ${data.result.length} class`);
           this.props.appActions.setListClass({ listClass: data.result });
@@ -71,6 +72,9 @@ class Home extends Component<Props> {
   };
   openListRoom = (_class) => {
     this.setState({ currentClass: _class, loading: true });
+    this.props.appActions.setCurClass({
+      currentClass: _class,
+    });
     AXIOS(`/rooms/classes/${_class.id}`, 'GET', {}, {}, this.props.userInfo.token)
       .then(({ data }) => {
         console.log('123456', `found ${data.result.length} room`);
@@ -94,8 +98,9 @@ class Home extends Component<Props> {
     this.props.history.push(url);
   };
   createRoom = () => {
-    this.props.appActions.setCurScreent({ currentScreent: { title: 'Tạo phòng mới' } });
+    console.log(123456, 'aaaaaaaaaaaa');
     this.navigate('/create-room');
+    this.props.appActions.setCurScreent({ currentScreent: { title: 'Tạo phòng mới' } });
   };
 
   validate = () => {
@@ -162,7 +167,7 @@ class Home extends Component<Props> {
     let buttons = [
       {
         element: () => (
-          <View style={{ alignItems: 'center' }} onPress={() => this.navigate('/create-room')}>
+          <View style={{ alignItems: 'center' }}>
             <Text onPress={this.createRoom} style={styles.btnText}>
               <Icon style={styles.btnIcon} name={'plus'} size={iconSize} color={iconColor} />
               <Text style={{ marginLeft: 30 }}>Tạo phòng</Text>
@@ -181,7 +186,7 @@ class Home extends Component<Props> {
         ),
       },
     ];
-    if (this.props.userInfo.role !== ROLES.teacher) buttons = buttons.slice(1);
+    if (this.props.userInfo.role !== ROLES.teacher || (isListClass && this.props.userInfo.role === ROLES.teacher)) buttons = buttons.slice(1);
     return (
       <View>
         {showForm ? this.renderPopupPassword() : null}

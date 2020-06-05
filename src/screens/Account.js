@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Platform, StyleSheet, View, Text, KeyboardAvoidingView, ScrollView } from 'react-native';
+import { Platform, StyleSheet, View, Text, KeyboardAvoidingView, ScrollView, Alert } from 'react-native';
 import { Link, withRouter } from 'react-router-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { Input, Button, Avatar, Divider, Card, ListItem } from 'react-native-elements';
@@ -29,16 +29,16 @@ const styles = StyleSheet.create({
 });
 const mapKey = {
   username: 'Tên',
-  email: 'Địa chỉ email',
-  gmail: 'Địa chỉ email',
+  email: 'Email',
+  gmail: 'Email',
   male: 'Giới tính',
   birthday: 'Ngày sinh',
   faculty: 'Khoa',
-  phone: 'Số điện thọai',
+  phone: 'Điện thọai',
   mssv: 'Mssv',
   khoa: 'Khoa',
   nien_khoa: 'Niên khóa',
-  role: 'Loại tài khoản',
+  role: 'Tài khoản',
 };
 const mapIcon = {
   phone: 'phone',
@@ -56,7 +56,9 @@ const mapIcon = {
 const account_map = { teacher: 'Giáo viên', student: 'Sinh viên' };
 type Props = {};
 class Home extends Component<Props> {
-  state = {};
+  state = {
+    userInfo: this.props.userInfo,
+  };
   logout = () => {
     AsyncStorage.removeItem('@userInfo');
     this.props.appActions.logout();
@@ -64,14 +66,13 @@ class Home extends Component<Props> {
     this.props.history.push('/');
   };
   onchange = (name, value) => {
-    this.setState({ [name]: value });
+    this.setState({ userInfo: { ...this.state.userInfo, [name]: value } });
   };
   setImage = (image) => {
     console.log(123456, image);
     uploadFileToServer([image], this.props.userInfo.token, (progressEvent) => {
       const { loaded, total } = progressEvent;
       let percent = Math.floor((loaded / total) * 100);
-      console.log(123456, 'percent', percent);
     })
       .then(({ data }) => {
         console.log('123456', 11, data);
@@ -94,25 +95,55 @@ class Home extends Component<Props> {
     showImageInput({ picker: true, callback: this.setImage });
   };
   update = () => {
-    console.log('update');
+    const { userInfo = {} } = this.state;
+    const { phone = '' } = userInfo;
+    if (!phone) return;
+    if ((phone + '').length < 10) {
+      return this.setState({ errorMessage: { phone: 'Số điện thoại không hợp lệ' } });
+    }
+    const user = { phone };
+    console.log('123456', user);
+    AXIOS('/users', 'PUT', user, {}, this.props.userInfo.token)
+      .then((data) => {
+        console.log('123456', 1, data);
+        this.onchange('phone', phone);
+        this.setState({ edit: false });
+      })
+      .catch((err) => {
+        console.log('123456', 2, err.response.data);
+        this.showAlert('Có lỗi xảy ra');
+      });
+  };
+  showAlert = (msg) => {
+    Alert.alert('Thông báo', msg, [
+      {
+        text: 'Đã hiểu',
+      },
+    ]);
+  };
+  cancel = () => {
+    this.setState({ edit: false });
   };
   renderItem = (key, value) => {
     const keys = ['fullname', 'token', 'list_images', 'create_date', 'class_ids', 'id'];
     if (keys.includes(key)) return;
     value = key == 'role' ? account_map[value.toLowerCase()] : value;
+    if (key == 'male') {
+      value = value ? 'Nam' : 'Nữ';
+    }
     return (
       <ListItem
         key={key}
         chevron
         bottomDivider
-        leftIcon={<Icon name={mapIcon[key]} size={18} color={'black'} />}
+        leftIcon={<Icon name={mapIcon[key]} size={20} color={'black'} />}
         title={
           <View style={styles.row}>
             <View style={styles.start}>
-              <Text>{mapKey[key]}</Text>
+              <Text style={{ fontSize: 18 }}>{mapKey[key]}</Text>
             </View>
             <View style={styles.end}>
-              <Text style={{ fontWeight: 'bold', fontSize: 15 }}>{shorterString(value, 20)}</Text>
+              <Text style={{ fontWeight: 'bold', fontSize: 18 }}>{shorterString(value, 16)}</Text>
             </View>
           </View>
         }
@@ -120,17 +151,17 @@ class Home extends Component<Props> {
       />
     );
   };
+  componentWillReceiveProps(props) {
+    this.setState({ userInfo: props.userInfo });
+  }
   render() {
     const iconSize = 24;
     const iconColor = 'black';
-    const { errorMessage = {}, edit = false, image = {} } = this.state;
-    let { userInfo = {} } = this.props;
-    if (!userInfo.username)
-      userInfo = { username: 'Nguyễn Hoài Danh', male: 'male', birthday: '03/02/1998', faculty: 'KH & KT Máy tính', email: '1610391@hcmut.edu.vn' };
-    const { username = '', mssv = '', list_images = [] } = userInfo;
+    const { errorMessage = {}, edit = false, image = {}, userInfo = {} } = this.state;
+    const { username = '', mssv = '', list_images = [], phone } = userInfo;
     const avaSource = list_images.length ? setAvatar(list_images.slice(-1)[0], true) : setAvatar(image);
-    console.log(123456, avaSource, list_images.slice(-1)[0], list_images);
     const infos = [];
+    console.log(123456, userInfo);
     return (
       <KeyboardAvoidingView style={{ flex: 1, flexDirection: 'column' }}>
         <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
@@ -145,15 +176,15 @@ class Home extends Component<Props> {
                   source={avaSource}
                   showAccessory
                   accessory={{
-                    name: image.path ? 'mode-edit' : 'plus-circle',
-                    type: image.path ? 'material' : 'font-awesome',
+                    name: 'plus-circle',
+                    type: 'font-awesome',
                     color: 'white',
                     underlayColor: 'gray',
                     size: 30,
                   }}
                 />
               </View>
-              <Text style={{ fontSize: 30, color: 'white' }}>{username}</Text>
+              <Text style={{ fontSize: 30, color: 'white', fontWeight: 'bold' }}>{username}</Text>
             </View>
           )}
           <Card
@@ -161,8 +192,10 @@ class Home extends Component<Props> {
               <View style={{ flexDirection: 'row', paddingTop: 10, paddingBottom: 10 }}>
                 <View style={{ alignItems: 'center', width: '100%' }}>
                   <Text style={{ fontSize: 20, fontWeight: 'bold', alignSelf: 'center' }}>
-                    <Text>{'Thông tin cá nhân' + '   '} </Text>
-                    <Icon style={{ paddingLeft: 20, marginLeft: 10 }} name="edit" onPress={() => this.setState({ edit: !edit })} size={20} color={'green'} />
+                    <Text style={{ color: 'green' }}>{!edit ? 'Thông tin cá nhân   ' : 'Chỉnh sửa thông tin'} </Text>
+                    {edit ? null : (
+                      <Icon style={{ paddingLeft: 20, marginLeft: 10 }} name="edit" onPress={() => this.setState({ edit: !edit })} size={20} color={'green'} />
+                    )}
                   </Text>
                 </View>
               </View>
@@ -170,26 +203,44 @@ class Home extends Component<Props> {
             containerStyle={{ margin: 10, padding: 0, backgroundColor: '#E9EBEE' }}
           >
             {edit ? (
-              <View>
+              <View style={{ padding: 20 }}>
                 <Input
-                  label="Họ và tên (Sử dụng tên thật để điểm danh)"
+                  label="Số điện thoại"
                   errorStyle={cStyles.errorStyle}
-                  errorMessage={errorMessage.username}
-                  placeholder="Vd: Nguyễn Văn A"
-                  leftIcon={<Icon name="user" size={iconSize} color={iconColor} />}
-                  onChangeText={(value) => this.onchange('username', value)}
+                  errorMessage={errorMessage.phone}
+                  value={phone}
+                  leftIcon={<Icon name="phone" size={iconSize} color={iconColor} />}
+                  onChangeText={(value) => this.onchange('phone', value)}
+                  maxLength={10}
+                  keyboardType="numeric"
                 />
-                <Button containerStyle={cStyles.btnwrap} titleStyle={cStyles.btnText} buttonStyle={cStyles.btn} title="Lưu" onPress={this.update} />
+                <View style={{ width: '100%', flexDirection: 'row' }}>
+                  <Button
+                    containerStyle={{ width: '50%', alignSelf: 'center' }}
+                    titleStyle={cStyles.btnText}
+                    buttonStyle={{ borderRadius: 20, backgroundColor: 'brown', width: '90%' }}
+                    title="Hủy bỏ"
+                    onPress={this.cancel}
+                  />
+                  <Button
+                    containerStyle={{ width: '50%', alignSelf: 'center' }}
+                    titleStyle={cStyles.btnText}
+                    buttonStyle={{ borderRadius: 20, width: '90%' }}
+                    title="Lưu"
+                    onPress={this.update}
+                  />
+                </View>
               </View>
             ) : (
               <View>
                 {Object.keys(userInfo).map((key, i) => this.renderItem(key, userInfo[key]))}
                 <ListItem
+                  containerStyle={{ backgroundColor: '#F5F5F5' }}
                   onPress={this.logout}
                   bottomDivider
                   title={
                     <View style={{ width: '100%' }}>
-                      <Text style={{ fontWeight: 'bold', color: 'blue', fontSize: 18, alignSelf: 'center' }}>Đăng xuất</Text>
+                      <Text style={{ fontWeight: 'bold', color: 'red', fontSize: 18, alignSelf: 'center' }}>Đăng xuất</Text>
                     </View>
                   }
                   bottomDivider

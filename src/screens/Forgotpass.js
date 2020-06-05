@@ -50,10 +50,6 @@ class Login extends Component<Props> {
   setImage = (image) => {
     this.setState({ image });
   };
-  toForgot = () => {
-    this.props.history.push('/forgotpass');
-    this.props.appActions.setCurScreent({ currentScreent: list_screen_map.forgotpass });
-  };
   render() {
     const iconSize = 24;
     const iconColor = 'black';
@@ -62,12 +58,26 @@ class Login extends Component<Props> {
       return (
         <ScrollView style={cStyles.scroll}>
           <View style={{ paddingLeft: 15, paddingRight: 15, paddingTop: 10 }}>
+            <View style={{ flexDirection: 'row' }}>
+              <Input
+                label="Nhập Email"
+                errorStyle={cStyles.errorStyle}
+                containerStyle={{ width: '80%' }}
+                errorMessage={errorMessage.username}
+                leftIcon={<Icon name="user" size={iconSize} color={iconColor} />}
+                onChangeText={(value) => this.onchange('username', value)}
+              />
+              <Button containerStyle={{ marginTop: 27 }} title="Gửi OTP" />
+            </View>
             <Input
-              label="Số điện thoại hoặc Email"
+              label="Nhập otp"
               errorStyle={cStyles.errorStyle}
-              errorMessage={errorMessage.username}
-              leftIcon={<Icon name="user" size={iconSize} color={iconColor} />}
-              onChangeText={(value) => this.onchange('username', value)}
+              errorMessage={errorMessage.phone}
+              placeholder="Otp được gửi qua email"
+              maxLength={10}
+              keyboardType="numeric"
+              leftIcon={<Icon name="key" size={iconSize} color={iconColor} />}
+              onChangeText={(value) => this.onchange('phone', value)}
             />
             <Input
               label="Mật khẩu"
@@ -78,30 +88,16 @@ class Login extends Component<Props> {
               onChangeText={(value) => this.onchange('password', value)}
               secureTextEntry={true}
             />
-            <Button containerStyle={cStyles.btnwrap} titleStyle={cStyles.btnText} buttonStyle={cStyles.btnPrimary} title="Đăng nhập" onPress={this.login} />
-            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-              <View style={{ width: '100%', alignSelf: 'center' }}>
-                <Text style={{ marginTop: 15, marginBottom: 10, fontSize: 15, alignSelf: 'center', color: 'grey' }}>Hoặc đăng nhập bằng</Text>
-              </View>
-            </View>
-            <Button
-              containerStyle={cStyles.btnwrap}
-              titleStyle={cStyles.btnText}
-              buttonStyle={cStyles.btn}
-              icon={<MaterialCommunityIcons style={{ marginRight: 10 }} name="face-recognition" size={iconSize} color={'white'} />}
-              title="Gương mặt"
-              onPress={() => this.setState({ mode: 1 }, this.openCamera)}
+            <Input
+              label="Xác nhận mật khẩu"
+              errorStyle={cStyles.errorStyle}
+              errorMessage={errorMessage.password}
+              placeholder="Password"
+              leftIcon={<Icon name="key" size={iconSize} color={iconColor} />}
+              onChangeText={(value) => this.onchange('password', value)}
+              secureTextEntry={true}
             />
-            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-              <View style={{ width: '100%', alignSelf: 'center' }}>
-                <Text
-                  onPress={this.toForgot}
-                  style={{ marginTop: 15, marginBottom: 10, fontSize: 20, alignSelf: 'center', color: 'brown', fontStyle: 'italic', fontWeight: 'bold' }}
-                >
-                  Quên mật khẩu
-                </Text>
-              </View>
-            </View>
+            <Button containerStyle={cStyles.btnwrap} titleStyle={cStyles.btnText} buttonStyle={cStyles.btn} title="Lưu mật khẩu" />
           </View>
         </ScrollView>
       );

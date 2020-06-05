@@ -68,7 +68,7 @@ class Home extends Component<Props> {
     return (
       <Header containerStyle={styles.header}>
         {!lastScreent ? null : <Icon onPress={this.back} name={'keyboard-backspace'} size={iconSize} color={iconColor} />}
-        <Text style={{ color: iconColor, fontSize: 25 }}>{title}</Text>
+        <Text style={{ color: iconColor, fontSize: 25, fontWeight: 'bold' }}>{title}</Text>
         <Icon name={icon} size={iconSize} color={iconColor} />
       </Header>
     );

@@ -20,7 +20,7 @@ module.exports = {
 
 async function getAllSelf(req) {
   var collections = [];
-  var session = await Session.find({ user_create: req.user.sub });
+  var session = await Session.find({ user_create: req.user.sub }).sort({ create_date: -1 });
   for (let count = 0; count < session.length; count++) {
     if (session[count]) {
       var room = await Room.findById(session[count].room_id);

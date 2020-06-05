@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { TouchableOpacity, KeyboardAvoidingView, ScrollView, Platform, StyleSheet, Text, View } from 'react-native';
+import { TouchableOpacity, KeyboardAvoidingView, ScrollView, Platform, StyleSheet, Text, View, Image } from 'react-native';
 import { Link, withRouter } from 'react-router-native';
 import DatePicker from 'react-native-datepicker';
 import Icon from 'react-native-vector-icons/FontAwesome';
@@ -8,13 +8,21 @@ import cStyles from '../constants/common-styles';
 import { AXIOS } from '../utils/functions';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
+import { WheelPicker, TimePicker } from 'react-native-wheel-picker-android';
 import * as appActions from '../actions/index';
 const styles = StyleSheet.create({});
+const dataList = [];
+for (let index = 1; index < 20; index++) {
+  dataList.push(index);
+}
 type Props = {};
 class CreateRoom extends Component<Props> {
   state = {};
   onchange = (name, value) => {
     this.setState({ [name]: value });
+  };
+  onItemSelected = (selectedItem) => {
+    this.setState({ selectedItem });
   };
   makeRoom = () => {
     let room = {
@@ -29,15 +37,39 @@ class CreateRoom extends Component<Props> {
     AXIOS('/rooms', 'POST', room, {}, this.props.userInfo.token)
       .then(({ data }) => {
         console.log('123456', 1, data);
-        // this.props.history.push('/login');
-        //this.props.appActions.setCurScreent({ currentScreent: list_screen_map.login });
+        this.setState({ success: true });
       })
       .catch((err) => console.log('123456', 2, err.response.data));
   };
   render() {
     const iconSize = 24;
     const iconColor = 'black';
-    const { date = '2016-05-15', errorMessage = {}, password = '', repPassword = '', name = '', number = 1 } = this.state;
+    const { selectedItem = 1, success = false, date = '2016-05-15', errorMessage = {}, password = '', repPassword = '', name = '', number = 1 } = this.state;
+    if (success)
+      return (
+        <View>
+          <View style={{ backgroundColor: 'white', padding: 20, height: '100%' }}>
+            <Image style={{ width: 100, height: 100, alignSelf: 'center' }} source={require('../../img/success.png')} />
+            <Text style={{ fontSize: 20, color: 'green', alignSelf: 'center', marginBottom: 10, fontWeight: 'bold' }}>Tạo phòng thành công:</Text>
+            <Text style={{ fontSize: 20, color: 'black' }}>Môn học: </Text>
+            <Text style={{ fontSize: 20, color: 'brown', alignSelf: 'center', fontWeight: 'bold' }}>{'currentClass.name_subject'} - 20/12/2020</Text>
+            <Text style={{ fontSize: 20, color: 'black' }}>Sinh viên:</Text>
+            <Text style={{ fontSize: 20, color: 'blue', alignSelf: 'center', fontWeight: 'bold' }}>- Nguyễn Hoài Danh - 1610391</Text>
+            <Text style={{ fontSize: 20, color: 'blue', alignSelf: 'center', fontWeight: 'bold' }}>- Nguyễn Hoài Danh - 1610391</Text>
+            <Text style={{ fontSize: 20, color: 'blue', alignSelf: 'center', fontWeight: 'bold' }}>- Nguyễn Hoài Danh - 1610391</Text>
+            <Button
+              containerStyle={cStyles.btnwrap}
+              titleStyle={cStyles.btnText}
+              buttonStyle={cStyles.btnPrimary}
+              title="Về trang chủ"
+              onPress={() => {
+                this.props.history.push('/');
+                this.props.appActions.setCurScreent({ currentScreent: list_screen_map.home });
+              }}
+            />
+          </View>
+        </View>
+      );
     return (
       <KeyboardAvoidingView style={{ flex: 1, flexDirection: 'column' }}>
         <ScrollView style={cStyles.scroll}>
@@ -59,7 +91,7 @@ class CreateRoom extends Component<Props> {
             leftIcon={<Icon name="group" size={iconSize} color={iconColor} />}
             onChangeText={(value) => this.onchange('number', number)}
           />
-
+          <WheelPicker selectedItem={selectedItem} data={dataList} onItemSelected={this.onItemSelected} />
           <Input
             label="Mật khẩu"
             errorStyle={cStyles.errorStyle}

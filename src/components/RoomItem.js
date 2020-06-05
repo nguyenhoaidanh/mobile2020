@@ -29,13 +29,16 @@ class Footer extends Component<Props> {
   render() {
     const { index = 0, room = {}, currentClass = {} } = this.props;
     const isExpire = Math.floor(Math.random() * 10) % 2 == 0;
+    const isAuthor = true;
     return (
       <Card>
         <View style={styles.row}>
           <Text style={{ width: '100%', fontSize: 20, alignContent: 'center', fontWeight: 'bold' }}>{currentClass.name_subject} - 20/12/2020</Text>
           <Text style={styles.textLeft}>Sỉ số: 90/{currentClass.number_of_student}</Text>
         </View>
-        {isExpire ? (
+        {isAuthor ? (
+          <Button containerStyle={cStyles.btnwrap} titleStyle={cStyles.btnText} buttonStyle={cStyles.btnPrimary} title="Chi tiết" />
+        ) : !isExpire ? (
           <Button
             containerStyle={cStyles.btnwrap}
             titleStyle={cStyles.btnText}

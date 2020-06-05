@@ -21,6 +21,7 @@ const styles = StyleSheet.create({
   welcome: {
     fontSize: 24,
     textAlign: 'center',
+    fontWeight: 'bold',
     margin: 10,
     color: 'white',
   },
@@ -77,21 +78,21 @@ class Home extends Component<Props> {
       return (
         <View style={styles.container}>
           <Image source={require('../../img/bku.png')} style={{ width: 200, height: 200 }} />
-          <Text style={styles.welcome}>Bach khoa Attendance Application</Text>
+          <Text style={styles.welcome}>Ứng dụng điểm danh Bách Khoa</Text>
         </View>
       );
     if (!loggedIn)
       return (
         <View style={styles.container}>
           <Image source={require('../../img/bku.png')} style={{ width: 200, height: 200 }} />
-          <Text style={styles.welcome}>Bach khoa Attendance Application</Text>
-          <Button
+          <Text style={styles.welcome}>Ứng dụng điểm danh Bách Khoa</Text>
+          {/* <Button
             containerStyle={cStyles.btnwrap}
             titleStyle={cStyles.btnText}
             buttonStyle={cStyles.btn}
             title="Đăng kí"
             onPress={() => this.navigate('/register', list_screen_map.register)}
-          />
+          /> */}
           <Button
             containerStyle={cStyles.btnwrap}
             titleStyle={cStyles.btnText}

@@ -18,7 +18,6 @@ async function getAllRoleTeacher(req) {
   return await Class.find({ user_create: req.user.sub });
 }
 async function getAllRoleStudent(req) {
-  console.log(req.user.sub);
   const user = await User.findOne({ _id: req.user.sub });
   if (!user) throw 'User not found';
   var list_class = [];

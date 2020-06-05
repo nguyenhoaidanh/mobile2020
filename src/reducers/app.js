@@ -2,6 +2,7 @@ import ACTIONS from '../constants/action-types';
 const initialState = {
   currentScreent: { icon: null, title: 'BK Attendance' },
   currentRoom: {},
+  currentClass: {},
   lastScreent: null,
   loading: false,
   listClass: [],
@@ -24,6 +25,12 @@ const reducer = (state = initialState, action) => {
       return {
         ...state,
         currentRoom: { ...state.currentRoom, ...action.payload.currentRoom },
+      };
+    }
+    case ACTIONS.SET_CUR_CLASS: {
+      return {
+        ...state,
+        currentClass: { ...state.currentClass, ...action.payload.currentClass },
       };
     }
     default: {

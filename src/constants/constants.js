@@ -24,6 +24,7 @@ export const list_screen_map = {
   login: { icon: 'account', text: 'Account', title: 'Đăng nhập', to: '/account' },
   register: { icon: 'account', text: 'Account', title: 'Đăng kí tài khoản', to: '/account' },
   checkIn: { icon: 'face-recognition', text: 'Account', title: 'Điểm danh', to: '/account' },
+  forgotpass: { icon: 'account', text: 'Account', title: 'Lấy lại mật khẩu', to: '/account' },
 };
 export const facultys = [
   'KH & KT Máy Tính',

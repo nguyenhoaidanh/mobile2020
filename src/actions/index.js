@@ -23,6 +23,12 @@ export function setCurRoom(data) {
     payload: { ...data },
   };
 }
+export function setCurClass(data) {
+  return {
+    type: ACTIONS.SET_CUR_CLASS,
+    payload: { ...data },
+  };
+}
 export function logout() {
   return {
     type: ACTIONS.LOGOUT,

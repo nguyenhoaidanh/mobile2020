@@ -11,6 +11,7 @@ import CheckIn from './screens/CheckIn';
 import History from './screens/History';
 import Account from './screens/Account';
 import Footer from './components/Footer';
+import Forgotpass from './screens/Forgotpass';
 import Header from './components/Header';
 import { Provider, connect } from 'react-redux';
 import appReducer from './reducers/index';
@@ -34,6 +35,7 @@ class App extends Component<Props> {
           <Route exact path="/" component={Home} />
           <Route exact path="/login" component={Login} />
           <Route exact path="/register" component={Register} />
+          <Route exact path="/forgotpass" component={Forgotpass} />
           <Route exact path="/register-face" component={RegisterFace} />
           <Route exact path="/list-room" component={ListRoom} />
           <Route exact path="/create-room" component={CreateRoom} />
