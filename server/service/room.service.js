@@ -8,6 +8,7 @@ const Class = db.Class;
 module.exports = {
     getAll,
     getById,
+    isPassRoom,
     create,
     update,
     close
@@ -63,3 +64,14 @@ async function update(id, userParam) {
 
     await user.save();
 }
+async function isPassRoom(request) {
+    const room = await Room.findById(request.body.room_id);
+    // validate
+    if (!room) throw 'Room not found';
+    if(request.body.secret){
+        if(bcrypt.compareSync(request.body.secret,room.secret)){
+            return "Xac thuc thanh cong"
+        }
+        throw "Xac thuc khong thanh cong"
+    }
+  }

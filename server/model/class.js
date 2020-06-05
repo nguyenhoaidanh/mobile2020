@@ -8,6 +8,7 @@ const schema = new Schema({
   number_of_student: { type: Number, required: true },
   code_class: { type: String, required: true },
   user_create: { type: String },
+  teacher_id:{type:String,require},
   semester: { type: String, require: true },
   createdDate: { type: Date, default: Date.now },
 });

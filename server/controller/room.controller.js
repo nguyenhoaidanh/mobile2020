@@ -12,6 +12,8 @@ router.put('/',authorize(role.Teacher), updateRoom);
 router.delete('/',authorize(role.Teacher), closeRoom);
 router.get('/:id', getOneRoom);
 router.get('/classes/:id',getAllRoom)
+router.post('/authorize/',checkSecret)
+
 
 function createRoom(req, res, next){
     roomService.create(req)
@@ -28,6 +30,11 @@ function updateRoom(){
 }
 function getOneRoom(req,res,next){
 
+}
+function checkSecret(req,res,next){
+    roomService.isPassRoom(req)
+    .then((result)=>res.json({"result":result}))
+    .catch(err => res.status(403).json({ message: err }));
 }
 function getAllRoom(req,res,next){
     roomService.getAll(req)
