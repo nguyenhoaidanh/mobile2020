@@ -77,3 +77,4 @@ async function update(request, res) {
   // copy userParam properties to user
   await session.save();
 }
+

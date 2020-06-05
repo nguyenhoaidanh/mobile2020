@@ -4,10 +4,12 @@ var Float = require('mongoose-float').loadType(mongoose);
 
 const schema = new Schema({
   class_id: { type: String, required: true },
+  title:{type :String, required: true},
   secret: { type: String, required: true },
   location: { type: { longtitude: { type: Float }, latitude: { type: Float } } },
   user_create: { type: String },
-  isOpen: { type: Boolean, default: true },
+  start_time: { type: Date, required: true },
+  end_time:{type: Date, required: true},
   created_date: { type: Date, default: Date.now },
 });
 

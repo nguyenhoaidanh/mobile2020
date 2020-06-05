@@ -32,7 +32,7 @@ function getOneUser(req, res, next) {
   userService
     .getById(req.body.id)
     .then((result) => res.json({ result: result }))
-    .catch((err) => next(err));
+    .catch((err) => res.status(404).json({ message: err }));
 }
 // var getOneUser = function (req, res) {
 //   res.json(req.user);
