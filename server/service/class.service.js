@@ -22,12 +22,15 @@ async function getAllRoleStudent(req) {
   const user = await User.findOne({ _id: req.user.sub });
   if (!user) throw 'User not found';
   var list_class = [];
-  console.log(user.username);
-  console.log(user.class_ids[1]);
   for (let i = 0; i < user.class_ids.length; i++) {
-    console.log(i);
     var object = await Class.findOne({ _id: user.class_ids[i] });
-    if (object) list_class.push(object);
+    if (object) {
+      if (object.teacher_id) {
+        const teacher = await User.findOne({ _id: object.teacher_id });
+        object.teacher = teacher;
+      }
+      list_class.push(object);
+    }
   }
   console.log(list_class);
   return list_class;
@@ -36,16 +39,16 @@ async function getById(id) {
   return await Class.findById(id);
 }
 
-async function create(request,res) {
+async function create(request, res) {
   // validate
   console.log(request.body.code_subject);
 
   if (await Class.findOne({ code_subject: request.body.code_subject, code_class: request.body.code_class, semester: request.body.semester })) {
     throw 'Class "' + request.body.code_subject + '" is already taken';
   }
-  if(!await User.findById(request.body.teacher_id)){
+  if (!(await User.findById(request.body.teacher_id))) {
     res.status(404);
-    res.send({message:"Teacher khong ton tai"});
+    res.send({ message: 'Teacher khong ton tai' });
   }
   const class_object = new Class(request.body);
   // hash password
@@ -58,7 +61,7 @@ async function create(request,res) {
 
 async function update(class_param) {
   const class_object = await Class.findById(class_param.id);
-  
+
   // validate
   if (!class_object) throw 'User not found';
   // hash password if it was entered
@@ -81,23 +84,23 @@ async function updateManyClassForUser(request) {
   user.class_ids = [...new Set(newArray)];
   return await user.save();
 }
-async function updateClassForManyUsers(request,res){
-  var list_undifine_user=[];
-  var list_user = request.body.users.map((stu)=>stu.mssv);
-  var class_object = await Class.findOne({code_subject:request.body.code_subject,code_class:request.body.code_class,semester:request.body.semester});
-  if(!class_object) {
+async function updateClassForManyUsers(request, res) {
+  var list_undifine_user = [];
+  var list_user = request.body.users.map((stu) => stu.mssv);
+  var class_object = await Class.findOne({ code_subject: request.body.code_subject, code_class: request.body.code_class, semester: request.body.semester });
+  if (!class_object) {
     res.status(404);
-    res.send({message:'Khong tim thay lop hoc'})
-  }else{
-    for(var stu in list_user){
-      var user = await User.findOne({mssv:stu});
-      if(!user){
+    res.send({ message: 'Khong tim thay lop hoc' });
+  } else {
+    for (var stu in list_user) {
+      var user = await User.findOne({ mssv: stu });
+      if (!user) {
         list_undifine_user.push(stu);
-      }else{
-        user.class_ids =[...new Set([].concat([class_object._id],user.class_ids))];  
+      } else {
+        user.class_ids = [...new Set([].concat([class_object._id], user.class_ids))];
         await user.save();
       }
     }
-    return {"list_undifine_user":list_undifine_user}
+    return { list_undifine_user: list_undifine_user };
   }
 }

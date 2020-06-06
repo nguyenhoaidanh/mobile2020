@@ -52,6 +52,7 @@ class Home extends Component<Props> {
       AXIOS(path, 'GET', {}, {}, this.props.userInfo.token)
         .then(({ data }) => {
           console.log('123456', `found ${data.result.length} class`);
+          console.log('123456', data.result);
           this.props.appActions.setListClass({ listClass: data.result });
         })
         .catch((err) => {
@@ -91,6 +92,30 @@ class Home extends Component<Props> {
       })
       .finally(() => this.setState({ loading: false }));
   };
+  renderPicker = (key = 'faculty') => {
+    let { selectedItem = 0 } = this.state;
+    return (
+      <Overlay overlayStyle={{ width: '90%' }} isVisible={this.state.showPicker} onBackdropPress={() => this.setState({ showPicker: false })}>
+        <View>
+          <View style={{ alignSelf: 'center' }}>
+            <WheelPicker selectedItem={selectedItem} data={dataList} onItemSelected={this.onItemSelected} />
+          </View>
+          <View style={{ alignSelf: 'center', marginTop: 0, paddingTop: 0 }}>
+            <Button
+              containerStyle={{ width: '50%' }}
+              titleStyle={cStyles.btnText}
+              buttonStyle={{ alignSelf: 'center', width: '80%', borderRadius: 20 }}
+              title="Xác nhận"
+              onPress={() => {
+                this.setState({ showPicker: false, [key]: dataList[this.state.selectedItem] });
+                console.log('123123', dataList[this.state.selectedItem]);
+              }}
+            />
+          </View>
+        </View>
+      </Overlay>
+    );
+  };
   onchange = (name, value) => {
     this.setState({ [name]: value });
   };
@@ -105,13 +130,12 @@ class Home extends Component<Props> {
 
   validate = () => {
     const { currentRoom = {}, password } = this.state;
-    this.props.appActions.setCurScreent({ currentScreent: { title: 'Điểm danh' } });
-    this.props.appActions.setCurRoom({ currentRoom: { ...currentRoom, secret: password } });
-    return this.navigate('/check-in');
+    if (!password) return;
     this.setState({ loading: true });
-    AXIOS(`/rooms/validate`, 'POST', {}, {}, this.props.userInfo.token)
+    AXIOS(`/rooms/authorize`, 'POST', { room_id: currentRoom.id, secret: password }, {}, this.props.userInfo.token)
       .then(({ data }) => {
         console.log('123456', 11, data);
+        this.props.appActions.setCurRoom({ currentRoom: { ...currentRoom, secret: password } });
         this.props.appActions.setCurScreent({ currentScreent: { title: 'Điểm danh' } });
         this.navigate('/check-in');
       })

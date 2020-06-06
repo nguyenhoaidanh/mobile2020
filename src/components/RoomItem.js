@@ -27,13 +27,16 @@ class Footer extends Component<Props> {
     this.props.appActions.setCurScreent({ currentScreent: { title: 'Điểm danh' } });
   };
   render() {
-    const { index = 0, room = {}, currentClass = {} } = this.props;
-    const isExpire = Math.floor(Math.random() * 10) % 2 == 0;
-    const isAuthor = true;
+    const { index = 0, room = {}, currentClass = {}, userInfo = {} } = this.props;
+    const isExpire = false; //   !(Date.now() >= +room.start_time && Date.now() <= +room.end_time);
+    const isAuthor = room.user_create == userInfo.id;
+    //console.log(123456, room.user_create, userInfo.id);
     return (
       <Card>
         <View style={styles.row}>
-          <Text style={{ width: '100%', fontSize: 20, alignContent: 'center', fontWeight: 'bold' }}>{currentClass.name_subject} - 20/12/2020</Text>
+          <Text style={{ width: '100%', fontSize: 20, alignContent: 'center', fontWeight: 'bold' }}>
+            {currentClass.name_subject} - {room.title}
+          </Text>
           <Text style={styles.textLeft}>Sỉ số: 90/{currentClass.number_of_student}</Text>
         </View>
         {isAuthor ? (
@@ -59,7 +62,7 @@ class Footer extends Component<Props> {
 const mapStateToProps = (state) => {
   // Redux Store --> Component
   return {
-    app: state.app,
+    userInfo: state.user.userInfo,
   };
 };
 const mapDispatchToProps = (dispatch) => {

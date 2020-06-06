@@ -50,7 +50,6 @@ async function create(request) {
   console.log(request.body);
   var room = await Room.findOne({ _id: request.body.room_id });
   if (room) {
-    if (!room.isOpen) throw 'Room is closed';
     const user = await User.findById(request.user.sub);
     if (!user) throw 'User not found';
     if (!user.class_ids.filter((xid) => xid == room.class_id).length < 0) throw new Error('User not in this class ' + room.class_id);
@@ -77,4 +76,3 @@ async function update(request, res) {
   // copy userParam properties to user
   await session.save();
 }
-

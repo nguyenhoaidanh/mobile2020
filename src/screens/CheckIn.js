@@ -37,14 +37,13 @@ class Home extends Component<Props> {
       { cancelable: false }
     );
     const { currentRoom = {}, currentClass } = this.props;
-    console.log(123456, currentRoom, currentClass);
   };
-  showAlert = (msg) => {
+  showAlert = (msg, success = false) => {
     Alert.alert('Thông báo', msg, [
       {
         text: 'Đã hiểu',
         onPress: () => {
-          this.setState({ success: true });
+          this.setState({ success });
         },
       },
     ]);
@@ -61,11 +60,12 @@ class Home extends Component<Props> {
     };
     AXIOS('/sessions/authorize', 'POST', session, {}, this.props.userInfo.token)
       .then(({ data }) => {
-        this.showAlert('Điểm danh thành công');
+        console.log(123456, data);
+        this.showAlert('Điểm danh thành công', true);
       })
       .catch((err) => {
         console.log('123456', 2, err.response.data);
-        this.showAlert('Điểm danh thành công');
+        this.showAlert('Điểm danh thất bại');
       });
   };
   setImage = (image) => {
@@ -76,7 +76,7 @@ class Home extends Component<Props> {
     const iconColor = 'black';
     const { currentClass = {} } = this.props;
     const { message = '', valid = 1, image = {}, success = false } = this.state;
-    console.log(123456, 'currentClass', this.props);
+    console.log(123456, 'currentClass');
     if (success)
       return (
         <View>

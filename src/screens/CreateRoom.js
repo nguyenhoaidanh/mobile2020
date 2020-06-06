@@ -3,9 +3,9 @@ import { TouchableOpacity, KeyboardAvoidingView, ScrollView, Platform, StyleShee
 import { Link, withRouter } from 'react-router-native';
 import DatePicker from 'react-native-datepicker';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import { Input, Button, CheckBox } from 'react-native-elements';
+import { Input, Button, CheckBox, Overlay } from 'react-native-elements';
 import cStyles from '../constants/common-styles';
-import { AXIOS } from '../utils/functions';
+import { AXIOS, formatTime } from '../utils/functions';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { WheelPicker, TimePicker } from 'react-native-wheel-picker-android';
@@ -13,7 +13,7 @@ import * as appActions from '../actions/index';
 const styles = StyleSheet.create({});
 const dataList = [];
 for (let index = 1; index < 20; index++) {
-  dataList.push(index);
+  dataList.push(index + '');
 }
 type Props = {};
 class CreateRoom extends Component<Props> {
@@ -25,26 +25,66 @@ class CreateRoom extends Component<Props> {
     this.setState({ selectedItem });
   };
   makeRoom = () => {
+    const { currentClass = {} } = this.props;
+    console.log(123456);
     let room = {
-      class_id: '5ed509551c4fa731b41345f4',
+      class_id: currentClass.id,
       secret: '123456',
+      title: 'Test',
       secret_create_room: '123',
       location: {
         longtitude: 20.0,
         latitude: 20.0,
       },
+      start_time: Date.now(),
+      end_time: Date.now(),
     };
     AXIOS('/rooms', 'POST', room, {}, this.props.userInfo.token)
       .then(({ data }) => {
         console.log('123456', 1, data);
-        this.setState({ success: true });
+        this.setState({ respData: data.result, success: true });
       })
       .catch((err) => console.log('123456', 2, err.response.data));
+  };
+  renderPicker = () => {
+    let { selectedItem = 0 } = this.state;
+    return (
+      <Overlay overlayStyle={{ width: '90%' }} isVisible={this.state.showPicker} onBackdropPress={() => this.setState({ showPicker: false })}>
+        <View>
+          <View style={{ alignSelf: 'center' }}>
+            <WheelPicker selectedItem={selectedItem} data={dataList} onItemSelected={this.onItemSelected} />
+          </View>
+          <View style={{ alignSelf: 'center', marginTop: 0, paddingTop: 0 }}>
+            <Button
+              containerStyle={{ width: '50%' }}
+              titleStyle={cStyles.btnText}
+              buttonStyle={{ alignSelf: 'center', width: '80%', borderRadius: 20 }}
+              title="Xác nhận"
+              onPress={() => {
+                this.setState({ showPicker: false, number: dataList[this.state.selectedItem] });
+              }}
+            />
+          </View>
+        </View>
+      </Overlay>
+    );
   };
   render() {
     const iconSize = 24;
     const iconColor = 'black';
-    const { selectedItem = 1, success = false, date = '2016-05-15', errorMessage = {}, password = '', repPassword = '', name = '', number = 1 } = this.state;
+    const {
+      respData = {},
+      selectedItem = 1,
+      success = false,
+      date = '2016-05-15',
+      errorMessage = {},
+      password = '',
+      repPassword = '',
+      name = '',
+      number = '1',
+    } = this.state;
+    const { currentClass = {} } = this.props;
+    console.log(123456, respData);
     if (success)
       return (
         <View>
@@ -52,11 +92,17 @@ class CreateRoom extends Component<Props> {
             <Image style={{ width: 100, height: 100, alignSelf: 'center' }} source={require('../../img/success.png')} />
             <Text style={{ fontSize: 20, color: 'green', alignSelf: 'center', marginBottom: 10, fontWeight: 'bold' }}>Tạo phòng thành công:</Text>
             <Text style={{ fontSize: 20, color: 'black' }}>Môn học: </Text>
-            <Text style={{ fontSize: 20, color: 'brown', alignSelf: 'center', fontWeight: 'bold' }}>{'currentClass.name_subject'} - 20/12/2020</Text>
-            <Text style={{ fontSize: 20, color: 'black' }}>Sinh viên:</Text>
-            <Text style={{ fontSize: 20, color: 'blue', alignSelf: 'center', fontWeight: 'bold' }}>- Nguyễn Hoài Danh - 1610391</Text>
-            <Text style={{ fontSize: 20, color: 'blue', alignSelf: 'center', fontWeight: 'bold' }}>- Nguyễn Hoài Danh - 1610391</Text>
-            <Text style={{ fontSize: 20, color: 'blue', alignSelf: 'center', fontWeight: 'bold' }}>- Nguyễn Hoài Danh - 1610391</Text>
+            <Text
+              style={{ fontSize: 20, color: 'brown', alignSelf: 'center', fontWeight: 'bold' }}
+            >{`${currentClass.code_subject} - ${currentClass.name_subject}`}</Text>
+            <Text style={{ fontSize: 20, color: 'black' }}>Tên phòng: </Text>
+            <Text style={{ fontSize: 20, color: 'brown', alignSelf: 'center', fontWeight: 'bold' }}>{respData.title}</Text>
+            <Text style={{ fontSize: 20, color: 'black' }}>Thời gian cho phép điểm danh:</Text>
+            <Text style={{ fontSize: 20, color: 'blue', alignSelf: 'center', fontWeight: 'bold' }}>
+              {formatTime(+respData.start_time)}
+              <Text style={{ fontSize: 20, color: 'black' }}> đến </Text>
+              {formatTime(+respData.end_time)}
+            </Text>
             <Button
               containerStyle={cStyles.btnwrap}
               titleStyle={cStyles.btnText}
@@ -81,17 +127,21 @@ class CreateRoom extends Component<Props> {
             leftIcon={<Icon name="star" size={iconSize} color={iconColor} />}
             onChangeText={(value) => this.onchange('name', name)}
           />
-          <Input
-            label="Số lượng thành viên mỗi nhóm"
-            errorStyle={cStyles.errorStyle}
-            errorMessage={errorMessage.number}
-            maxLength={10}
-            keyboardType="numeric"
-            defaultValue={'1'}
-            leftIcon={<Icon name="group" size={iconSize} color={iconColor} />}
-            onChangeText={(value) => this.onchange('number', number)}
-          />
-          <WheelPicker selectedItem={selectedItem} data={dataList} onItemSelected={this.onItemSelected} />
+          <TouchableOpacity onPress={() => this.setState({ showPicker: true, keyPicker: 'faculty' })}>
+            <Input
+              label="Số lượng thành viên mỗi nhóm"
+              errorStyle={cStyles.number}
+              errorMessage={errorMessage.faculty}
+              maxLength={10}
+              keyboardType="numeric"
+              disabled
+              defaultValue={'1'}
+              placeholder="Chạm để chọn"
+              value={number}
+              leftIcon={<Icon name="group" size={iconSize} color={iconColor} />}
+            />
+          </TouchableOpacity>
+          {this.state.showPicker ? this.renderPicker() : null}
           <Input
             label="Mật khẩu"
             errorStyle={cStyles.errorStyle}
@@ -171,6 +221,7 @@ const mapStateToProps = (state) => {
   return {
     app: state.app,
     userInfo: state.user.userInfo,
+    currentClass: state.app.currentClass,
   };
 };
 const mapDispatchToProps = (dispatch) => {
