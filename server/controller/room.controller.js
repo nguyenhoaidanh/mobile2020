@@ -1,6 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const roomService = require('../service/room.service');
+const sessionService = require('../service/session.service');
+
 const authorize = require('../helper/authorize')
 const role = require('../helper/role');
 
@@ -13,7 +15,7 @@ router.delete('/',authorize(role.Teacher), closeRoom);
 router.get('/:id', getOneRoom);
 router.get('/classes/:id',getAllRoom)
 router.post('/authorize/',checkSecret)
-
+router.post('/:id/students',getAllStudentOfRoom)
 
 function createRoom(req, res, next){
     roomService.create(req)
@@ -30,6 +32,9 @@ function updateRoom(){
 }
 function getOneRoom(req,res,next){
 
+}
+function getAllStudentOfRoom(req,res,next){
+    sessionService.getAllStudentInRoom(req,res).then((result)=>res.status(200).send({result:result})).catch((err)=>next(err));
 }
 function checkSecret(req,res,next){
     roomService.isPassRoom(req)

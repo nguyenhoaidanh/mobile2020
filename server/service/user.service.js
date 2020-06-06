@@ -3,6 +3,8 @@ const bcrypt = require('bcryptjs');
 const db = require('../helper/db');
 const role = require('../helper/role');
 const utils = require('../utils/string');
+var multer = require('multer');
+
 const User = db.User;
 
 module.exports = {
@@ -13,8 +15,21 @@ module.exports = {
   createTeacher,
   update,
   update_password,
+  updateAvatar,
 };
-
+var storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, dirmain + 'public/store/avatar');
+  },
+  filename: async function (req, file, cb) {
+    let file_new_name = req.user.sub + '-'+uuidv4() +'-'+ Date.now()+file.originalname.split('.').pop();
+    console.log(file_new_name)
+    cb(null, file_new_name);
+    
+    //check type avatar 
+  },
+});
+var upload = multer({ storage: storage }).array('images',11);
 async function authenticate({ username, password }) {
   let user = await User.findOne({ phone: username });
   if (!user) user = await User.findOne({ gmail: username });
@@ -96,6 +111,32 @@ async function update(user_param) {
 
   // copy userParam properties to user
   return await user.save();
+}
+async function updateAvatar(req,res){
+  var user = await User.findById(req.user.sub);
+  if(!user){
+    res.status(404);
+    res.send({message:'Khong tim thay user'});
+  }else{
+    upload(req, res, async function (err) {
+    if(!req.files){
+      throw "Chon file upload";
+    }
+    var filename = req.files.map((file)=>file.filename)[0];
+    user.avatar_link="/store/avatar"+filename;
+    user.save();
+    });
+    var update_user = await User.findById(req.user.sub);
+    if(update_user){
+      console.log(update_user.avatar_link)
+      if(user.avatar_link!=update_user.avatar_link){
+        return update_user.avatar_link;
+      }else{
+        throw "Loi upload file";
+      }
+    }
+    throw "user khong duoc tim thay";
+  }
 }
 async function update_password(user_param) {
   const user = await User.findById(user_param.id);

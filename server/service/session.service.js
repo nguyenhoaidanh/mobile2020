@@ -16,8 +16,29 @@ module.exports = {
   create,
   update,
   getAllSelf,
+  getAllStudentInRoom,
 };
-
+async function getAllStudentInRoom(req,res){
+  var result=[];  
+  var session_of_students = await Session.find({room_id:req.params.id});
+  if(!session_of_students)throw "Khong tim thay phong hoc";
+  var class_obtain_room = await Class.findById(session_of_students.class_id);
+  if(!class_obtain_room)throw "Khong tim thay lop hoc";
+  var users_of_classes = await User.find({class_ids:{$all:[class_obtain_room]}});
+  for(let ind=0;ind<users_of_classes.length;ind++){
+    if(session_of_students.find(users_of_classes[ind]>0)){
+      result.push({
+        user:users_of_classes,
+        isCheckin:true
+      });
+    }else{
+      result.push({
+        user:users_of_classes,
+        isCheckin:false
+      });
+    }
+  }
+}
 async function getAllSelf(req) {
   var collections = [];
   var session = await Session.find({ user_create: req.user.sub }).sort({ create_date: -1 });

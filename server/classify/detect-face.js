@@ -1,7 +1,6 @@
 // Copyright 2016 Google LLC
 //
-const db = require('../helper/db');
-const User = db.User;
+
 const vision = require('@google-cloud/vision');
 // [END vision_face_detection_tutorial_imports]
 // [START vision_face_detection_tutorial_client]
@@ -37,8 +36,15 @@ async function highlightFaces(inputFile, faces, outputFile, PImage) {
   // Open the original image
   const stream = fs.createReadStream(inputFile);
   let promise;
+ 
   if (inputFile.match(/\.jpg$/)) {
-    promise = PImage.decodeJPEGFromStream(stream);
+    try{
+        console.log("debug_0");
+        promise = PImage.decodeJPEGFromStream(stream);
+    }catch(e){
+        console.log("LOi o day");
+    }
+    
   } else if (inputFile.match(/\.png$/)) {
     console.log("decode_lan_1");
     promise = PImage.decodePNGFromStream(stream);
@@ -87,7 +93,11 @@ async function detectFaces(inputFile, outputFile) {
   outputFile = outputFile || 'out.png';
   const faces = await _detectFaces(inputFile);
   console.log('Highlighting...');
-  await highlightFaces(inputFile, faces, outputFile, PImage);
+  try{
+    await highlightFaces(inputFile, faces, outputFile, PImage);
+  }catch(err){
+      console.log(err);
+  }
   console.log('Finished!');
   return {num_face:faces.length,out:outputFile}
 }

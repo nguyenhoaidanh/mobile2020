@@ -30,7 +30,7 @@ function updateSession(req, res, next){
 function getOneSession(req,res,next){
     sessionService.getById(req,res)
     .then((result)=>res.json({"result":result}))
-    .catch(err => res.status(400).json({message:err}));
+    .catch(err => res.status(404).json({message:err}));
 }
 function getAllSession(req,res,next){
     sessionService.getAll(req,res)
