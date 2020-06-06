@@ -44,7 +44,7 @@ const readImage = path => {
   return tfimage;
 }
 async function uploadFile(req,res){
-  var result = await upload(req,res,async function(err){
+  await upload(req,res,async function(err){
     if(!req.file){
       throw "Loi upload file";
     }
@@ -54,20 +54,19 @@ async function uploadFile(req,res){
     var faces = await detectFaces(path_in,path_out);
 
     var predict = await imageClassification(path_in);
+    console.log(predict);
     predict=predict.sort((x,y)=>-x.prob+y.prob).filter((x)=>x.label!="None");
-    predict=predict.slice(0,faces.num_face);
+    predict=predict.filter((x)=>{console.log(x.prob>=0.3); return x.prob>=0.3});
 
     for (let ind=0;ind<predict.length;ind++){
       predict[ind].label=await User.findOne({mssv:predict[ind].label.split('_').pop()});
     }
     console.log(predict);
     res.status(200);
-    res.send({predict:predict,out_image:faces.out.replace("./public","")});
+    res.send({result:{predict:predict,out_image:faces.out.replace("./public",""),num_faces:faces.num_face}});
     // console.log(faces);
   });
   // console.log(result);
-
-  return result;
 }
 async function imageClassification(path){
   const image = readImage(path);

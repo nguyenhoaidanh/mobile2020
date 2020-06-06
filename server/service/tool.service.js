@@ -29,7 +29,7 @@ const csvWriter = createCsvWriter({
 });
 var storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, dirmain + 'public/store/avatar');
+    cb(null, dirmain + 'public/store/');
   },
   filename: async function (req, file, cb) {
     let file_new_name = req.user.sub + '-'+uuidv4() +'-'+ Date.now()+file.originalname.split('.').pop();
@@ -39,42 +39,55 @@ var storage = multer.diskStorage({
     //check type avatar 
   },
 });
-var upload = multer({ storage: storage }).array('images',11);
+var upload = multer({ storage: storage }).array('images',10);
 
 module.exports = {
   updateFileExpress,
   createBucket,
   updateAvatar
 };
+
 async function updateFileExpress(req, res) {
-  console.log(11, req.body);
-  // if(!req.files || Object.keys(req.files).length==0){
-  //     return res.status(400).send('No files were uploaded.');
-  // }
-  //muller
   await upload(req, res, async function (err) {
     if(err){
       throw err;
     }
+    var records =[];
     var filenames = req.files.map((file)=>file.filename);
-    
     var user = await User.findById(req.user.sub);
     if(!user){
-      res.status(404);
-      res.send("Khong tim thay user");
+      // res.status(404);
+      // res.send("Khong tim thay user");
     }else{
-      user.list_images=[].concat(user.list_images,filenames)
-      await user.save();
-      console.log(filenames)
+      for(let ind=0;ind<filenames.length;ind++){
+        if(ind==0){
+          records.push({
+            type:"TEST",
+            link:"gs://"+process.env.BUCKET_NAME+"/"+filenames[ind],
+            label:req.user.label
+          });
+        }else if(ind==1){
+          records.push({
+            type:"VALIDATION",
+            link:"gs://"+process.env.BUCKET_NAME+"/"+filenames[ind],
+            label:req.user.label
+          });
+        }else{
+          records.push({
+            type:"TRAIN",
+            link:"gs://"+process.env.BUCKET_NAME+"/"+filenames[ind],
+            label:req.user.label
+          });
+        }
+        await tranferToBucket(filenames[ind]);
+      }
+       csvWriter.writeRecords(records);
     }
+    user.list_images=[].concat(user.list_images,filenames);
+    await user.save();
+    res.status(200);
+    res.send({result:user.list_images})
   });
-  var user = await User.findById(req.user.sub);
-  if(user){
-    console.log("user oke");
-    console.log(user.list_images);
-    return user.list_images;
-  }
-  return [];
 }
 async function createBucket(){
     // Imports the Google Cloud client library
