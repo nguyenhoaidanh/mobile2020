@@ -51,12 +51,13 @@ app.use('/rooms', require('./controller/room.controller'));
 app.use('/sessions', require('./controller/session.controller'));
 app.use('/users/classify', require('./controller/classify.controller'));
 app.get('/models', (req, res) => {
-  res.sendFile(__dirname+'/classify/model.json');
+  res.sendFile(__dirname + '/classify/model.json');
 });
 
-// app.use('/static/',express.static('store'));
-app.listen(3000, () => {
-  console.log(`app is running on port ${3000}`);
+const port = process.env.PORT || 3000;
+app.set('port', port);
+app.listen(port, () => {
+  console.log(`app is running on port ${port}`);
 });
 
 module.exports = app;
