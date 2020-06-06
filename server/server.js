@@ -38,6 +38,8 @@ app.get('/test', async (req, res) => {
 });
 //end testttt
 app.use('/static', express.static('public'));
+app.use('/', express.static('classify'));
+
 //jwt
 app.use(jwt());
 app.use(errorHandler);
@@ -47,6 +49,10 @@ app.use('/users/images', require('./controller/user.controller'));
 app.use('/classes', require('./controller/class.controller'));
 app.use('/rooms', require('./controller/room.controller'));
 app.use('/sessions', require('./controller/session.controller'));
+app.use('/users/classify', require('./controller/classify.controller'));
+app.get('/models', (req, res) => {
+  res.sendFile(__dirname+'/classify/model.json');
+});
 
 // app.use('/static/',express.static('store'));
 app.listen(3000, () => {

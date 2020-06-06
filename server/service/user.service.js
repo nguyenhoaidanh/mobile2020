@@ -55,7 +55,7 @@ async function createStudent(userParam) {
   }
   userParam.role = role.Student;
   const user = new User(userParam);
-  user.link_avatar = '5ed9e6f4ea0271b177435352-1591368306749.jpg';
+  user.avatar_link = '5ed9e6f4ea0271b177435352-1591368306749.jpg';
   // hash password
   user.hash = bcrypt.hashSync(userParam.hash, 10);
   // save user
