@@ -8,6 +8,7 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import * as appActions from '../actions/index';
 import cStyles from '../constants/common-styles';
+import { list_screen_map } from '../constants/constants';
 const styles = StyleSheet.create({
   container: {
     width: '100%',
@@ -22,14 +23,15 @@ const iconSize = 24,
 type Props = {};
 class Footer extends Component<Props> {
   state = {};
-  navigate = (url) => {
-    this.props.history.push(url);
-    this.props.appActions.setCurScreent({ currentScreent: { title: 'Điểm danh' } });
+  toStat = () => {
+    this.props.appActions.setCurRoom({ currentRoom: this.props.room });
+    this.props.appActions.setCurScreent({ currentScreent: list_screen_map.stat });
+    this.props.history.push('/stat');
   };
   render() {
     const { index = 0, room = {}, currentClass = {}, userInfo = {} } = this.props;
     const isExpire = false; //   !(Date.now() >= +room.start_time && Date.now() <= +room.end_time);
-    const isAuthor = room.user_create == userInfo.id;
+    const isAuthor = true; // room.user_create == userInfo.id;
     //console.log(123456, room.user_create, userInfo.id);
     return (
       <Card>
@@ -40,7 +42,7 @@ class Footer extends Component<Props> {
           <Text style={styles.textLeft}>Sỉ số: 90/{currentClass.number_of_student}</Text>
         </View>
         {isAuthor ? (
-          <Button containerStyle={cStyles.btnwrap} titleStyle={cStyles.btnText} buttonStyle={cStyles.btnPrimary} title="Chi tiết" />
+          <Button onPress={this.toStat} containerStyle={cStyles.btnwrap} titleStyle={cStyles.btnText} buttonStyle={cStyles.btnPrimary} title="Chi tiết" />
         ) : !isExpire ? (
           <Button
             containerStyle={cStyles.btnwrap}

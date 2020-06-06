@@ -7,6 +7,7 @@ import Register from './screens/Register';
 import RegisterFace from './screens/RegisterFace';
 import ListRoom from './screens/ListRoom';
 import CreateRoom from './screens/CreateRoom';
+import Stat from './screens/Stat';
 import CheckIn from './screens/CheckIn';
 import History from './screens/History';
 import Account from './screens/Account';
@@ -42,6 +43,7 @@ class App extends Component<Props> {
           <Route exact path="/check-in" component={CheckIn} />
           <Route exact path="/history" component={History} />
           <Route exact path="/account" component={Account} />
+          <Route exact path="/stat" component={Stat} />
           <Footer />
         </NativeRouter>
       </ImageBackground>
