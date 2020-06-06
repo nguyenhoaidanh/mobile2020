@@ -11,6 +11,7 @@ function jwt() {
             '/users/authenticate',
             '/users/register',
             '/users/teachers/register',
+            '/models'
         ]
     });
 }

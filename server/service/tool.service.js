@@ -29,28 +29,22 @@ const csvWriter = createCsvWriter({
 });
 var storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, dirmain + 'public/store/');
+    cb(null, dirmain + 'public/store/avatar');
   },
   filename: async function (req, file, cb) {
-    let file_new_name = req.user.sub + '-'+uuidv4() +'-'+ Date.now()+'.png';
+    let file_new_name = req.user.sub + '-'+uuidv4() +'-'+ Date.now()+file.originalname.split('.').pop();
+    console.log(file_new_name)
     cb(null, file_new_name);
-      try {
-        fs.appendFile(dirmain + '/cache/'+req.user.sub, file_new_name + '\n', function (err) {
-          if (err) throw err;
-          
-          console.log(file_new_name);
-        });
-      } catch (err) {
-        throw err;
-      }
     
+    //check type avatar 
   },
 });
 var upload = multer({ storage: storage }).array('images',11);
 
 module.exports = {
   updateFileExpress,
-  createBucket
+  createBucket,
+  updateAvatar
 };
 async function updateFileExpress(req, res) {
   console.log(11, req.body);
@@ -58,102 +52,30 @@ async function updateFileExpress(req, res) {
   //     return res.status(400).send('No files were uploaded.');
   // }
   //muller
-  upload(req, res, async function (err) {
+  await upload(req, res, async function (err) {
     if(err){
       throw err;
     }
-    //read bucket
-    fs.readFile(dirmain + 'cache/' + req.user.sub, 'utf8', async function (err, data) {
-      if (err) {
-        return console.log(err);
-      }
-      var list_record=[];
-      var paths = data
-          .split('\n')
-          .filter((el) => el != '');
-      //upload bucket
-      for (let ind = 0; ind<paths.length;ind++){
-        var record = {
-          type:"TRAIN",
-        link:"gs://"+process.env.BUCKET_NAME+"/"+paths[ind],
-        label:req.user.label}
-        if(ind==0){
-          record.type="TEST";
-        }else if(ind==1){
-          record.type="VALIDATION";
-        }
-        list_record.push(record);
-        await tranferToBucket(paths[ind]);
-      }
-      //save
-      csvWriter
-        .writeRecords(list_record)
-        .then(()=> console.log('The CSV file was written successfully'));
-
-      var user = await User.findById(req.user.sub);
-      user.list_images = [].concat(
-        data
-          .split('\n')
-          .filter((el) => el != ''),
-        user.list_images
-      );
-      //delete file image
-      for (var ind=0;ind<paths.length;ind++){
-        fs.unlink(dirmain + 'public/store/' +paths[ind], function (err) {
-          if (err) throw err;
-          console.log('File  '+paths[ind]+' deleted!');
-        });
-      }
-      
-      //delete cache
-      fs.unlink(dirmain + 'cache/' + req.user.sub, function (err) {
-        if (err) throw err;
-        console.log('File deleted!');
-      });
+    var filenames = req.files.map((file)=>file.filename);
+    
+    var user = await User.findById(req.user.sub);
+    if(!user){
+      res.status(404);
+      res.send("Khong tim thay user");
+    }else{
+      user.list_images=[].concat(user.list_images,filenames)
       await user.save();
-      return user.list_images;
-    });
-    if (err instanceof multer.MulterError) {
-      throw err;
-    } else if (err) {
-      throw err;
+      console.log(filenames)
     }
   });
+  var user = await User.findById(req.user.sub);
+  if(user){
+    console.log("user oke");
+    console.log(user.list_images);
+    return user.list_images;
+  }
+  return [];
 }
-// async function updateImageForUser(req, res) {
-//   var user = await User.findOne({ _id: req.user.sub });
-//   var old_list_images = [];
-//   old_list_images = user.list_images.map((x) => x);
-//   if (user) {
-//     for (let index = 0; index < req.body.length; index++) {
-//       console.log(req.body[index]);
-//       old_list_images.push(req.body[index]);
-//     }
-//     user.list_images = old_list_images;
-//     user.save();
-//     return 'Da cap nhat anh';
-//   }
-//   throw 'Not found user';
-// }
-// async function upFileToDrive(req,res){
-//   var path = dirmain+'/public/store/1591029575425.jpg'
-//   var formData = new FormData();
-//   formData.append('images',fs.createReadStream(path));
-//   formData.append('type','URL');
-//   Request.get({
-//     "headers": { "content-type": "application/json",
-//   'Authorization':"Client-ID "+"bd57330c30c13d8"},
-//     "url": "https://api.imgur.com/3/upload",
-//     "body": formData
-// }, (error, response, body) => {
-//     if(error) {
-//         return console.dir(error);
-//     }
-//     console.log(body);
-//     console.log(error);
-//     console.log("link");
-// });
-// }
 async function createBucket(){
     // Imports the Google Cloud client library
     const {Storage} = require('@google-cloud/storage');
@@ -163,7 +85,9 @@ async function createBucket(){
       projectId: process.env.PROJECT_ID,
       keyFilename: dirmain+'/resource/'+process.env.CONFIG_GOOGLE_SERVICE
   });
-    return await storage.createBucket("avatars"+"-mobileapp2020");
+    return await storage.createBucket(process.env.BUCKET_NAME,{
+      location:process.env.BUCKET_LOCATION
+    });
 }
 async function tranferToBucket(path) {
     // Imports the Google Cloud client library
@@ -177,4 +101,30 @@ async function tranferToBucket(path) {
     if(err)throw err;
     console.log("tranfer to Bucket"+path);
   });
+}
+async function updateAvatar(req,res){
+  var user = await User.findById(req.user.sub);
+  if(!user){
+    res.status(404);
+    res.send({message:'Khong tim thay user'});
+  }else{
+    upload(req, res, async function (err) {
+    if(!req.files){
+      throw "Chon file upload";
+    }
+    var filename = req.files.map((file)=>file.filename)[0];
+    user.avatar_link=filename;
+    user.save();
+    });
+    var update_user = await User.findById(req.user.sub);
+    if(update_user){
+      console.log(update_user.avatar_link)
+      if(user.avatar_link!=update_user.avatar_link){
+        return update_user.avatar_link;
+      }else{
+        throw "Loi upload file";
+      }
+    }
+    throw "user khong duoc tim thay";
+  }
 }
