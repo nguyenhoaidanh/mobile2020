@@ -5,7 +5,8 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import { Input, Button, CheckBox } from 'react-native-elements';
 import ImageInput from '../components/ImageInput';
 import cStyles from '../constants/common-styles';
-import { AXIOS } from '../utils/functions';
+import { AXIOS, checkTokenExpire, shadow, uploadFileToServer } from '../utils/functions';
+
 import { list_screen_map } from '../constants/constants';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
@@ -19,7 +20,22 @@ class Home extends Component<Props> {
     this.setState({ [name]: value });
   };
   checkin = () => {
-    this.showConfirm();
+    const { image = {} } = this.state;
+    if (!image.path) return;
+    console.log(123456, 'start upload');
+    this.setState({ loading: true });
+    uploadFileToServer([image], this.props.userInfo.token, '/users/classify')
+      .then(({ data }) => {
+        console.log(123456, data);
+        this.showConfirm();
+      })
+      .catch((err) => {
+        checkTokenExpire(err, this);
+        this.showAlert('Điểm danh thất bại');
+      })
+      .finally(() => {
+        this.setState({ loading: false });
+      });
   };
   showConfirm = () => {
     Alert.alert(
@@ -31,6 +47,7 @@ class Home extends Component<Props> {
       [
         {
           text: 'Chụp lại',
+          onPress: () => this.setState({ image: {} }),
         },
         { text: 'Điểm danh', onPress: this.saveSession },
       ],
@@ -50,8 +67,9 @@ class Home extends Component<Props> {
   };
   saveSession = () => {
     const { currentRoom = {} } = this.props;
+    const { image = {} } = this.state;
     const session = {
-      room_id: currentRoom.id,
+      room_id: currentRoom.room.id,
       secret_of_room: currentRoom.secret || 123456,
       location: {
         longtitude: 20.0,
@@ -60,13 +78,17 @@ class Home extends Component<Props> {
     };
     AXIOS('/sessions/authorize', 'POST', session, {}, this.props.userInfo.token)
       .then(({ data }) => {
-        console.log(123456, data);
         this.showAlert('Điểm danh thành công', true);
       })
       .catch((err) => {
-        console.log('123456', 2, err.response.data);
-        this.showAlert('Điểm danh thất bại');
+        checkTokenExpire(err, this);
+        this.showAlert('Có lỗi xảy ra');
       });
+  };
+  checkRespondImage = (data) => {
+    if (true) {
+      this.showAlert('Số người không đủ như quy định cần chụp ba người');
+    } else this.showConfirm();
   };
   setImage = (image) => {
     this.setState({ image });
@@ -75,7 +97,7 @@ class Home extends Component<Props> {
     const iconSize = 24;
     const iconColor = 'black';
     const { currentClass = {} } = this.props;
-    const { message = '', valid = 1, image = {}, success = false } = this.state;
+    const { message = '', valid = 1, image = {}, success = false, loading = false } = this.state;
     console.log(123456, 'currentClass');
     if (success)
       return (
@@ -104,8 +126,15 @@ class Home extends Component<Props> {
       );
     return (
       <View>
-        <ImageInput showAccessory={false} backgroundColor="white" image={image} camera={true} callback={this.setImage} />
-        <Button containerStyle={cStyles.btnwrap} titleStyle={cStyles.btnText} buttonStyle={cStyles.btn} title="Điểm danh" onPress={this.checkin} />
+        <ImageInput showAccessory={false} backgroundColor="white" image={image} picker={true} callback={this.setImage} />
+        <Button
+          loading={loading}
+          containerStyle={cStyles.btnwrap}
+          titleStyle={cStyles.btnText}
+          buttonStyle={cStyles.btn}
+          title="Điểm danh"
+          onPress={this.checkin}
+        />
         <View>
           <Text>{message}</Text>
         </View>

@@ -32,7 +32,6 @@ async function getAllRoleStudent(req) {
       list_class.push(object);
     }
   }
-  console.log(list_class);
   return list_class;
 }
 async function getById(id) {

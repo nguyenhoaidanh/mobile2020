@@ -35,9 +35,6 @@ class Footer extends Component<Props> {
         <Text style={styles.textLeft}>
           Giảng viên: <Text style={{ fontWeight: 'bold' }}>{_class.user_create}</Text>
         </Text>
-        <Text style={styles.textLeft}>
-          Sỉ số: <Text style={{ fontWeight: 'bold' }}>90/100</Text>
-        </Text>
         <Text style={{ alignSelf: 'flex-end', color: 'green', fontSize: 15 }}>{formatTime(session.create_date)}</Text>
       </Card>
     );

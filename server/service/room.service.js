@@ -3,7 +3,7 @@ const bcrypt = require('bcryptjs');
 const db = require('../helper/db');
 
 const Room = db.Room;
-
+const Session = db.Session;
 const Class = db.Class;
 module.exports = {
   getAll,
@@ -15,9 +15,14 @@ module.exports = {
 };
 
 async function getAll(req) {
-  return await Room.find({ class_id: req.params.id });
+  let rooms = await Room.find({ class_id: req.params.id });
+  let rs = [];
+  for (const room of rooms) {
+    var session_of_students = await Session.find({ room_id: room.id });
+    rs.push({ room, num_checked: session_of_students.length });
+  }
+  return rs;
 }
-
 async function getById(req) {
   return await Room.findById(req.params.id);
 }

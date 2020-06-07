@@ -7,7 +7,7 @@ import { Input, Button, Card, Avatar, Divider } from 'react-native-elements';
 import ImageInput from '../components/ImageInput';
 import cStyles from '../constants/common-styles';
 import { list_screen_map } from '../constants/constants';
-import { AXIOS } from '../utils/functions';
+import { AXIOS, checkTokenExpire, formatTime } from '../utils/functions';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import * as appActions from '../actions/index';
@@ -43,7 +43,7 @@ class Login extends Component<Props> {
         this.props.appActions.setUserInfo({ userInfo: data });
       })
       .catch((err) => {
-        console.log('123456', 2, err.response.data);
+        checkTokenExpire(err, this);
         this.setState({ errorMessage: { password: 'Thông tin đăng nhập chưa đúng' } });
       });
   };

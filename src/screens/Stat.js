@@ -9,102 +9,42 @@ import { showImageInput, setAvatar, shorterString, AXIOS, uploadFileToServer } f
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import * as appActions from '../actions/index';
-import { list_screen_map } from '../constants/constants';
+import { list_screen_map, ROLES } from '../constants/constants';
 import AsyncStorage from '@react-native-community/async-storage';
+import { checkTokenExpire } from '../utils/functions';
+import Loading from '../components/Loading';
 const styles = StyleSheet.create({
   selected: { backgroundColor: 'transparent' },
   selectedText: { color: 'green' },
   group: { marginTop: 10 },
 });
 list = [{ text: 'Tất cả' }, { text: 'Đã điểm danh' }, { text: 'Chưa điểm danh' }];
-list_default = [
-  {
-    name: 'Amy Farha',
-    avatar_url: 'https://s3.amazonaws.com/uifaces/faces/twitter/ladylexy/128.jpg',
-    subtitle: 'Vice President',
-  },
-  {
-    name: 'Chris Jackson',
-    avatar_url: 'https://s3.amazonaws.com/uifaces/faces/twitter/adhamdannaway/128.jpg',
-    subtitle: 'Vice Chairman',
-    check: true,
-  },
-  {
-    name: 'Amy Farha',
-    avatar_url: 'https://s3.amazonaws.com/uifaces/faces/twitter/ladylexy/128.jpg',
-    subtitle: 'Vice President',
-  },
-  {
-    name: 'Chris Jackson',
-    avatar_url: 'https://s3.amazonaws.com/uifaces/faces/twitter/adhamdannaway/128.jpg',
-    subtitle: 'Vice Chairman',
-    check: true,
-  },
-  {
-    name: 'Amy Farha',
-    avatar_url: 'https://s3.amazonaws.com/uifaces/faces/twitter/ladylexy/128.jpg',
-    subtitle: 'Vice President',
-  },
-  {
-    name: 'Chris Jackson',
-    avatar_url: 'https://s3.amazonaws.com/uifaces/faces/twitter/adhamdannaway/128.jpg',
-    subtitle: 'Vice Chairman',
-    check: true,
-  },
-  {
-    name: 'Amy Farha',
-    avatar_url: 'https://s3.amazonaws.com/uifaces/faces/twitter/ladylexy/128.jpg',
-    subtitle: 'Vice President',
-  },
-  {
-    name: 'Chris Jackson',
-    avatar_url: 'https://s3.amazonaws.com/uifaces/faces/twitter/adhamdannaway/128.jpg',
-    subtitle: 'Vice Chairman',
-    check: true,
-  },
-  {
-    name: 'Amy Farha',
-    avatar_url: 'https://s3.amazonaws.com/uifaces/faces/twitter/ladylexy/128.jpg',
-    subtitle: 'Vice President',
-  },
-  {
-    name: 'Chris Jackson',
-    avatar_url: 'https://s3.amazonaws.com/uifaces/faces/twitter/adhamdannaway/128.jpg',
-    subtitle: 'Vice Chairman',
-    check: true,
-  },
-  {
-    name: 'Amy Farha',
-    avatar_url: 'https://s3.amazonaws.com/uifaces/faces/twitter/ladylexy/128.jpg',
-    subtitle: 'Vice President',
-  },
-  {
-    name: 'Chris Jackson',
-    avatar_url: 'https://s3.amazonaws.com/uifaces/faces/twitter/adhamdannaway/128.jpg',
-    subtitle: 'Vice Chairman',
-    check: true,
-  },
-];
+
 const MODES = { ALL: 'Danh sách sinh viên', NOT_CHECKIN: 'Chưa điểm danh', CHECKIN: 'Đã điểm danh' };
 type Props = {};
 class Home extends Component<Props> {
   state = {};
   componentDidMount = () => {
-    AXIOS('/users', 'POST', {}, {}, this.props.userInfo.token)
-      .then((data) => {
-        console.log('123456', 1, data);
-        this.setState({ listStudent: [] });
+    const { currentRoom = {} } = this.props;
+    const { room = {} } = currentRoom;
+    this.setState({ loading: true });
+    AXIOS(`/rooms/${currentRoom.room.id}/students`, 'GET', {}, {}, this.props.userInfo.token)
+      .then(({ data }) => {
+        console.log('123456', 1, data.result);
+        this.setState({ listStudent: data.result.filter((e) => e.user.role != ROLES.teacher) });
       })
       .catch((err) => {
-        console.log('123456', 2, err.response.data);
-      });
+        checkTokenExpire(err, this);
+      })
+      .finally(() => this.setState({ loading: false }));
   };
   updateIndex = (selectedIndex) => {
     mode = selectedIndex == 0 ? MODES.ALL : selectedIndex == 1 ? MODES.CHECKIN : MODES.NOT_CHECKIN;
     this.setState({ selectedIndex, mode });
+    console.log(123456, mode);
   };
   render() {
-    let { listStudent = list_default, mode = MODES.ALL, selectedIndex = 0 } = this.state;
+    let { listStudent = [], mode = MODES.ALL, selectedIndex = 0, loading = true } = this.state;
     let buttons = list.map((el) => ({
       element: () => (
         <View style={{ width: '100%', alignItems: 'center' }}>
@@ -114,10 +54,10 @@ class Home extends Component<Props> {
     }));
     switch (mode) {
       case MODES.NOT_CHECKIN:
-        listStudent = listStudent.filter((e) => !e.check);
+        listStudent = listStudent.filter((e) => !e.isCheckin);
         break;
       case MODES.CHECKIN:
-        listStudent = listStudent.filter((e) => e.check);
+        listStudent = listStudent.filter((e) => e.isCheckin);
         break;
       default:
         break;
@@ -147,16 +87,20 @@ class Home extends Component<Props> {
             }
             containerStyle={{ margin: 10, padding: 0, backgroundColor: '#E9EBEE' }}
           >
-            {listStudent.map((l, i) => (
-              <ListItem
-                rightElement={<Icon name={l.check ? 'check-circle' : 'close'} color={l.check ? 'green' : 'red'} size={20} />}
-                key={i}
-                leftAvatar={{ source: { uri: l.avatar_url } }}
-                title={l.name}
-                subtitle={l.subtitle}
-                bottomDivider
-              />
-            ))}
+            {loading ? (
+              <Loading />
+            ) : (
+              listStudent.map((l, i) => (
+                <ListItem
+                  rightElement={<Icon name={l.isCheckin ? 'check-circle' : 'close'} color={l.isCheckin ? 'green' : 'red'} size={20} />}
+                  key={i}
+                  leftAvatar={{ source: { uri: l.avatar_url } }}
+                  title={l.user.fullname}
+                  subtitle={l.user.mssv + ''}
+                  bottomDivider
+                />
+              ))
+            )}
           </Card>
           <View style={{ height: 65 }} />
         </ScrollView>
@@ -167,7 +111,7 @@ class Home extends Component<Props> {
 const mapStateToProps = (state) => {
   // Redux Store --> Component
   return {
-    app: state.app,
+    currentRoom: state.app.currentRoom,
     userInfo: state.user.userInfo,
   };
 };

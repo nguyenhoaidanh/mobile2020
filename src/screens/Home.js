@@ -70,8 +70,8 @@ class Home extends Component<Props> {
   }
   render() {
     let { loggedIn = false, userInfo = {} } = this.props;
-    const { image = {}, mssv = '1610391', username = 'Nguyễn Hoài Danh', list_images = [] } = userInfo;
-    const avaSource = list_images.length ? setAvatar(list_images.slice(-1)[0], true) : setAvatar(image);
+    const { image = {}, mssv = '1610391', username = 'Nguyễn Hoài Danh', avatar_link } = userInfo;
+    const avaSource = setAvatar(avatar_link || image);
     const { loading = !global.firstLoad } = this.state;
     console.log(123456, loading, global.firstLoad);
     if (loading)

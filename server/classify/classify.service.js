@@ -30,7 +30,7 @@ var storage = multer.diskStorage({
     //check type avatar
   },
 });
-var upload = multer({ storage: storage }).single('img');
+var upload = multer({ storage: storage }).single('images');
 
 const readImage = (path) => {
   //reads the entire contents of a file.
@@ -40,11 +40,11 @@ const readImage = (path) => {
   //it returns a 3D or 4D tensor of the decoded image. Supports BMP, GIF, JPEG and PNG formats.
   const tfimage = tfnode.node.decodeImage(imageBuffer);
   return tfimage;
-}
-async function uploadFile(req,res){
-  await upload(req,res,async function(err){
-    if(!req.file){
-      throw "Loi upload file";
+};
+async function uploadFile(req, res) {
+  await upload(req, res, async function (err) {
+    if (!req.file) {
+      throw 'Loi upload file';
     }
     const path_in = './public/store/checkin/' + req.file.filename;
     const path_out = './public/store/out/' + req.file.filename;
@@ -53,15 +53,18 @@ async function uploadFile(req,res){
 
     var predict = await imageClassification(path_in);
     console.log(predict);
-    predict=predict.sort((x,y)=>-x.prob+y.prob).filter((x)=>x.label!="None");
-    predict=predict.filter((x)=>{console.log(x.prob>=0.3); return x.prob>=0.3});
+    predict = predict.sort((x, y) => -x.prob + y.prob).filter((x) => x.label != 'None');
+    predict = predict.filter((x) => {
+      console.log(x.prob >= 0.3);
+      return x.prob >= 0.3;
+    });
 
     for (let ind = 0; ind < predict.length; ind++) {
       predict[ind].label = await User.findOne({ mssv: predict[ind].label.split('_').pop() });
     }
     console.log(predict);
     res.status(200);
-    res.send({result:{predict:predict,out_image:faces.out.replace("./public",""),num_faces:faces.num_face}});
+    res.send({ result: { predict: predict, out_image: faces.out.replace('./public', ''), num_faces: faces.num_face } });
     // console.log(faces);
   });
   // console.log(result);

@@ -8,7 +8,7 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import * as appActions from '../actions/index';
 import cStyles from '../constants/common-styles';
-import { list_screen_map } from '../constants/constants';
+import { list_screen_map, ROLES } from '../constants/constants';
 const styles = StyleSheet.create({
   container: {
     width: '100%',
@@ -24,26 +24,31 @@ type Props = {};
 class Footer extends Component<Props> {
   state = {};
   toStat = () => {
-    this.props.appActions.setCurRoom({ currentRoom: this.props.room });
+    this.props.appActions.setCurRoom({ currentRoom: this.props.data });
     this.props.appActions.setCurScreent({ currentScreent: list_screen_map.stat });
     this.props.history.push('/stat');
   };
   render() {
-    const { index = 0, room = {}, currentClass = {}, userInfo = {} } = this.props;
+    let { index = 0, data = {}, currentClass = {}, userInfo = {} } = this.props;
+    const { room, num_checked, isCheckIn } = data;
     const isExpire = false; //   !(Date.now() >= +room.start_time && Date.now() <= +room.end_time);
-    const isAuthor = true; // room.user_create == userInfo.id;
-    //console.log(123456, room.user_create, userInfo.id);
+    const isAuthor = room.user_create == userInfo.id;
+    const isStudent = userInfo.role == ROLES.student;
+    console.log(123456, 'isCheckIn', isCheckIn);
     return (
       <Card>
         <View style={styles.row}>
           <Text style={{ width: '100%', fontSize: 20, alignContent: 'center', fontWeight: 'bold' }}>
             {currentClass.name_subject} - {room.title}
           </Text>
-          <Text style={styles.textLeft}>Sỉ số: 90/{currentClass.number_of_student}</Text>
+          <Text style={styles.textLeft}>
+            Sỉ số: {num_checked}/{currentClass.number_of_student}
+          </Text>
         </View>
         {isAuthor ? (
           <Button onPress={this.toStat} containerStyle={cStyles.btnwrap} titleStyle={cStyles.btnText} buttonStyle={cStyles.btnPrimary} title="Chi tiết" />
-        ) : !isExpire ? (
+        ) : null}
+        {!isExpire && isStudent && !isCheckIn ? (
           <Button
             containerStyle={cStyles.btnwrap}
             titleStyle={cStyles.btnText}
@@ -51,12 +56,18 @@ class Footer extends Component<Props> {
             title="Vào điểm danh"
             onPress={this.props.onClickFunc}
           />
-        ) : (
+        ) : null}
+        {isCheckIn ? (
+          <View style={{ width: '100%', flexDirection: 'row', alignItems: 'center' }}>
+            <Badge status="success" />
+            <Text style={{ marginLeft: 10, fontSize: 20, color: 'green' }}>{'Bạn đã điểm danh'}</Text>
+          </View>
+        ) : isExpire ? (
           <View style={{ width: '100%', flexDirection: 'row', alignItems: 'center' }}>
             <Badge status="warning" />
             <Text style={{ marginLeft: 10, fontSize: 20, color: 'orange' }}>{'Đã hết hạn điểm danh'}</Text>
           </View>
-        )}
+        ) : null}
       </Card>
     );
   }

@@ -8,7 +8,7 @@ import { bindActionCreators } from 'redux';
 import * as appActions from '../actions/index';
 import RoomItem from '../components/RoomItem';
 import { itemHeight, ROLES } from '../constants/constants';
-import { shadow, AXIOS } from '../utils/functions';
+import { AXIOS, checkTokenExpire, shadow } from '../utils/functions';
 import cStyles from '../constants/common-styles';
 import Loading from '../components/Loading';
 const styles = StyleSheet.create({
@@ -52,26 +52,34 @@ class Home extends Component<Props> {
       AXIOS(path, 'GET', {}, {}, this.props.userInfo.token)
         .then(({ data }) => {
           console.log('123456', `found ${data.result.length} class`);
-          console.log('123456', data.result);
           this.props.appActions.setListClass({ listClass: data.result });
         })
         .catch((err) => {
-          console.log('123456', 2, err.response.data);
+          checkTokenExpire(err, this);
         })
         .finally(() => this.setState({ loading: false }));
     } else this.setState({ listClass });
+    AXIOS('/sessions/joined', 'GET', {}, {}, this.props.userInfo.token)
+      .then(({ data }) => {
+        console.log('123456', `found ${data.result.length} session`);
+        this.setState({ history: data.result });
+      })
+      .catch((err) => {
+        checkTokenExpire(err, this);
+      });
   }
   onSort = () => {
-    const { listRoom = [], listClass = [], sort = false } = this.state;
-    const func = (x, y) => {
-      if (x.name_subject) {
-        return (sort ? -1 : 1) * x.name_subject.localeCompare(y.name_subject);
-      }
-      return 1;
-    };
-    this.setState({ sort: !sort, listRoom: listRoom.sort(func), listClass: listClass.sort(func) });
+    let { listRoom = [], listClass = [], sort = false, isListClass = true } = this.state;
+    if (isListClass) {
+      listClass = listClass.sort((x, y) => (sort ? -1 : 1) * x.name_subject.localeCompare(y.name_subject));
+    } else {
+      isExpire = (room) => !(Date.now() >= +room.start_time && Date.now() <= +room.end_time);
+      listRoom = [...listRoom.filter((e) => sort && isExpire(e)), ...listRoom.filter((e) => !sort && isExpire(e))];
+    }
+    this.setState({ sort: !sort, listRoom, listClass });
   };
   openListRoom = (_class) => {
+    const { history = [] } = this.state;
     this.setState({ currentClass: _class, loading: true });
     this.props.appActions.setCurClass({
       currentClass: _class,
@@ -79,7 +87,10 @@ class Home extends Component<Props> {
     AXIOS(`/rooms/classes/${_class.id}`, 'GET', {}, {}, this.props.userInfo.token)
       .then(({ data }) => {
         console.log('123456', `found ${data.result.length} room`);
-        this.setState({ listRoom: data.result, isListClass: false });
+        let listRoom = data.result.map((e) => {
+          return { ...e, isCheckIn: history.find((hi) => e.room.id == hi.session.room_id) !== undefined };
+        });
+        this.setState({ listRoom, isListClass: false });
         this.props.appActions.setCurScreent({
           currentScreent: {
             icon: 'view-list',
@@ -88,7 +99,7 @@ class Home extends Component<Props> {
         });
       })
       .catch((err) => {
-        console.log('123456', 2, err.response.data);
+        checkTokenExpire(err, this);
       })
       .finally(() => this.setState({ loading: false }));
   };
@@ -123,16 +134,16 @@ class Home extends Component<Props> {
     this.props.history.push(url);
   };
   createRoom = () => {
-    console.log(123456, 'aaaaaaaaaaaa');
     this.navigate('/create-room');
     this.props.appActions.setCurScreent({ currentScreent: { title: 'Tạo phòng mới' } });
   };
 
   validate = () => {
     const { currentRoom = {}, password } = this.state;
+    const { room = {} } = currentRoom;
     if (!password) return;
     this.setState({ loading: true });
-    AXIOS(`/rooms/authorize`, 'POST', { room_id: currentRoom.id, secret: password }, {}, this.props.userInfo.token)
+    AXIOS(`/rooms/authorize`, 'POST', { room_id: room.id, secret: password }, {}, this.props.userInfo.token)
       .then(({ data }) => {
         console.log('123456', 11, data);
         this.props.appActions.setCurRoom({ currentRoom: { ...currentRoom, secret: password } });
@@ -140,7 +151,7 @@ class Home extends Component<Props> {
         this.navigate('/check-in');
       })
       .catch((err) => {
-        console.log('123456', 2, err.response.data);
+        checkTokenExpire(err, this);
         this.setState({ errorMessage: { password: 'Mật khẩu chưa chính xác' } });
       })
       .finally(() => this.setState({ loading: false }));
@@ -222,7 +233,7 @@ class Home extends Component<Props> {
                 <RoomItem
                   currentClass={this.state.currentClass}
                   onClickFunc={() => this.setState({ showForm: true, currentRoom: room })}
-                  room={room}
+                  data={room}
                   key={idx}
                   index={idx}
                 />

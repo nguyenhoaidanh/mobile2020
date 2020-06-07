@@ -18,18 +18,19 @@ type Props = {};
 class Footer extends Component<Props> {
   state = {};
   showImageInput = () => {
-    let { picker, camera, callback } = this.props;
+    let { picker, camera, callback, disabled } = this.props;
+    if (disabled) return;
     showImageInput({ picker, camera, callback });
   };
   render() {
-    const { showAccessory = true, backgroundColor = 'transparent', margin = 20, image = {}, height = '80%', width = '100%', component = null } = this.props;
+    const { disabled = false, backgroundColor = 'transparent', margin = 20, image = {}, height = '80%', width = '100%', component = null } = this.props;
     return (
       <View style={{ width, height, backgroundColor, borderRadius: 10, paddingBottom: 0 }}>
         <Avatar
           avatarStyle={styles.img}
           containerStyle={styles.wrapAvatar}
           source={setAvatar(image)}
-          showAccessory={showAccessory}
+          showAccessory={!disabled}
           onAccessoryPress={this.showImageInput}
           onPress={this.showImageInput}
           accessory={{

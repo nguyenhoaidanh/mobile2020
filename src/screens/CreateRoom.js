@@ -5,7 +5,8 @@ import DatePicker from 'react-native-datepicker';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { Input, Button, CheckBox, Overlay } from 'react-native-elements';
 import cStyles from '../constants/common-styles';
-import { AXIOS, formatTime } from '../utils/functions';
+import { AXIOS, checkTokenExpire, formatTime } from '../utils/functions';
+
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { WheelPicker, TimePicker } from 'react-native-wheel-picker-android';
@@ -44,7 +45,7 @@ class CreateRoom extends Component<Props> {
         console.log('123456', 1, data);
         this.setState({ respData: data.result, success: true });
       })
-      .catch((err) => console.log('123456', 2, err.response.data));
+      .catch((err) => checkTokenExpire(err, this));
   };
   renderPicker = () => {
     let { selectedItem = 0 } = this.state;

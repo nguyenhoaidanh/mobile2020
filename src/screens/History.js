@@ -9,7 +9,7 @@ import * as appActions from '../actions/index';
 import HistoryItem from '../components/HistoryItem';
 import Loading from '../components/Loading';
 import { itemHeight } from '../constants/constants';
-import { AXIOS } from '../utils/functions';
+import { AXIOS, checkTokenExpire, shadow } from '../utils/functions';
 import cStyles from '../constants/common-styles';
 const styles = StyleSheet.create({});
 
@@ -23,7 +23,7 @@ class Home extends Component<Props> {
         this.setState({ history: data.result });
       })
       .catch((err) => {
-        console.log('123456', 2, err.response.data);
+        checkTokenExpire(err, this);
       })
       .finally(() => this.setState({ loading: false }));
   }

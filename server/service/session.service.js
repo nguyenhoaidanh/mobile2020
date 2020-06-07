@@ -18,26 +18,21 @@ module.exports = {
   getAllSelf,
   getAllStudentInRoom,
 };
-async function getAllStudentInRoom(req,res){
-  var result=[];  
-  var session_of_students = await Session.find({room_id:req.params.id});
-  if(!session_of_students)throw "Khong tim thay phong hoc";
-  var class_obtain_room = await Class.findById(session_of_students.class_id);
-  if(!class_obtain_room)throw "Khong tim thay lop hoc";
-  var users_of_classes = await User.find({class_ids:{$all:[class_obtain_room]}});
-  for(let ind=0;ind<users_of_classes.length;ind++){
-    if(session_of_students.find(users_of_classes[ind]>0)){
-      result.push({
-        user:users_of_classes,
-        isCheckin:true
-      });
-    }else{
-      result.push({
-        user:users_of_classes,
-        isCheckin:false
-      });
-    }
+async function getAllStudentInRoom(req, res) {
+  var result = [];
+  var room = await Room.findById(req.params.id);
+  if (!room) throw 'Khong tim thay phong hoc';
+  var session_of_students = await Session.find({ room_id: req.params.id });
+  var class_obtain_room = await Class.findById(room.class_id);
+  if (!class_obtain_room) throw 'Khong tim thay lop hoc';
+  var users_of_classes = await User.find({ class_ids: class_obtain_room.id });
+  for (let ind = 0; ind < users_of_classes.length; ind++) {
+    result.push({
+      user: users_of_classes[ind],
+      isCheckin: session_of_students.find((e) => users_of_classes[ind].id == e.user_create) !== undefined,
+    });
   }
+  return result;
 }
 async function getAllSelf(req) {
   var collections = [];

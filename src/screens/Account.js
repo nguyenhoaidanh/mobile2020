@@ -5,7 +5,7 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import { Input, Button, Avatar, Divider, Card, ListItem } from 'react-native-elements';
 import cStyles from '../constants/common-styles';
 import ImageInput from '../components/ImageInput';
-import { showImageInput, setAvatar, shorterString, AXIOS, uploadFileToServer } from '../utils/functions';
+import { showImageInput, setAvatar, shorterString, AXIOS, uploadFileToServer, checkTokenExpire } from '../utils/functions';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import * as appActions from '../actions/index';
@@ -69,25 +69,13 @@ class Home extends Component<Props> {
     this.setState({ userInfo: { ...this.state.userInfo, [name]: value } });
   };
   setImage = (image) => {
-    console.log(123456, image);
-    uploadFileToServer([image], this.props.userInfo.token, (progressEvent) => {
-      const { loaded, total } = progressEvent;
-      let percent = Math.floor((loaded / total) * 100);
-    })
+    uploadFileToServer([image], this.props.userInfo.token, '/users/images')
       .then(({ data }) => {
         console.log('123456', 11, data);
-        AXIOS('/users/images', 'POST', data.result, {}, this.props.userInfo.token)
-          .then((resp) => {
-            console.log('123456', 11, resp);
-            const { list_images = [] } = this.props.userInfo;
-            this.props.appActions.setUserInfo({ userInfo: { list_images: list_images.concat(data.result) } });
-          })
-          .catch((err) => {
-            console.log('123456', 2, err.response.data);
-          });
+        this.props.appActions.setUserInfo({ userInfo: { avatar_link: data.result } });
       })
       .catch((err) => {
-        console.log('123456', 2, err.response.data);
+        checkTokenExpire(err, this);
       });
     this.setState({ image });
   };
@@ -110,7 +98,7 @@ class Home extends Component<Props> {
         this.setState({ edit: false });
       })
       .catch((err) => {
-        console.log('123456', 2, err.response.data);
+        checkTokenExpire(err, this);
         this.showAlert('Có lỗi xảy ra');
       });
   };
@@ -158,10 +146,10 @@ class Home extends Component<Props> {
     const iconSize = 24;
     const iconColor = 'black';
     const { errorMessage = {}, edit = false, image = {}, userInfo = {} } = this.state;
-    const { username = '', mssv = '', list_images = [], phone } = userInfo;
-    const avaSource = list_images.length ? setAvatar(list_images.slice(-1)[0], true) : setAvatar(image);
+    const { username = '', mssv = '', list_images = [], phone, avatar_link } = userInfo;
+    console.log(123456, avatar_link);
+    const avaSource = setAvatar(avatar_link || image, true);
     const infos = [];
-    console.log(123456, userInfo);
     return (
       <KeyboardAvoidingView style={{ flex: 1, flexDirection: 'column' }}>
         <ScrollView contentContainerStyle={{ flexGrow: 1 }}>

@@ -9,7 +9,7 @@ const User = db.User;
 var multer = require('multer');
 var dirmain = path.join(__dirname, '../');
 var fs = require('fs');
-var Request = require("request");
+var Request = require('request');
 const { v4: uuidv4 } = require('uuid');
 
 const createCsvWriter = require('csv-writer').createObjectCsvWriter;
@@ -19,125 +19,117 @@ const createCsvWriter = require('csv-writer').createObjectCsvWriter;
 // Creates a client
 // const storageClould = new Storage();
 const csvWriter = createCsvWriter({
-  append:true,
-  path: dirmain+'/dataset/dataset.csv',
-  header: [
-    {id: 'type'},
-    {id: 'link'},
-    {id: 'label'},
-  ]
+  append: true,
+  path: dirmain + '/dataset/dataset.csv',
+  header: [{ id: 'type' }, { id: 'link' }, { id: 'label' }],
 });
 var storage = multer.diskStorage({
   destination: function (req, file, cb) {
     cb(null, dirmain + 'public/store/');
   },
   filename: async function (req, file, cb) {
-    let file_new_name = req.user.sub + '-'+uuidv4() +'-'+ Date.now()+file.originalname.split('.').pop();
-    console.log(file_new_name)
+    let file_new_name = req.user.sub + '-' + uuidv4() + '-' + Date.now() + '.' + file.originalname.split('.').pop();
+    console.log(file_new_name);
     cb(null, file_new_name);
-    
-    //check type avatar 
+
+    //check type avatar
   },
 });
-var upload = multer({ storage: storage }).array('images',10);
+var upload = multer({ storage: storage }).array('images', 10);
 
 module.exports = {
   updateFileExpress,
   createBucket,
-  updateAvatar
+  updateAvatar,
 };
 
 async function updateFileExpress(req, res) {
   await upload(req, res, async function (err) {
-    if(err){
+    if (err) {
       throw err;
     }
-    var records =[];
-    var filenames = req.files.map((file)=>file.filename);
+    var records = [];
+    var filenames = req.files.map((file) => file.filename);
     var user = await User.findById(req.user.sub);
-    if(!user){
+    if (!user) {
       // res.status(404);
       // res.send("Khong tim thay user");
-    }else{
-      for(let ind=0;ind<filenames.length;ind++){
-        if(ind==0){
+    } else {
+      for (let ind = 0; ind < filenames.length; ind++) {
+        if (ind == 0) {
           records.push({
-            type:"TEST",
-            link:"gs://"+process.env.BUCKET_NAME+"/"+filenames[ind],
-            label:req.user.label
+            type: 'TEST',
+            link: 'gs://' + process.env.BUCKET_NAME + '/' + filenames[ind],
+            label: req.user.label,
           });
-        }else if(ind==1){
+        } else if (ind == 1) {
           records.push({
-            type:"VALIDATION",
-            link:"gs://"+process.env.BUCKET_NAME+"/"+filenames[ind],
-            label:req.user.label
+            type: 'VALIDATION',
+            link: 'gs://' + process.env.BUCKET_NAME + '/' + filenames[ind],
+            label: req.user.label,
           });
-        }else{
+        } else {
           records.push({
-            type:"TRAIN",
-            link:"gs://"+process.env.BUCKET_NAME+"/"+filenames[ind],
-            label:req.user.label
+            type: 'TRAIN',
+            link: 'gs://' + process.env.BUCKET_NAME + '/' + filenames[ind],
+            label: req.user.label,
           });
         }
         await tranferToBucket(filenames[ind]);
       }
-       csvWriter.writeRecords(records);
+      csvWriter.writeRecords(records);
     }
-    user.list_images=[].concat(user.list_images,filenames);
+    filenames = filenames.map((e) => '/static/store/' + e);
+    user.list_images = [].concat(user.list_images, filenames);
     await user.save();
     res.status(200);
-    res.send({result:user.list_images})
+    res.send({ result: user.list_images });
   });
 }
-async function createBucket(){
-    // Imports the Google Cloud client library
-    const {Storage} = require('@google-cloud/storage');
+async function createBucket() {
+  // Imports the Google Cloud client library
+  const { Storage } = require('@google-cloud/storage');
 
-    // Creates a client
-    const storage = new Storage({
-      projectId: process.env.PROJECT_ID,
-      keyFilename: dirmain+'/resource/'+process.env.CONFIG_GOOGLE_SERVICE
+  // Creates a client
+  const storage = new Storage({
+    projectId: process.env.PROJECT_ID,
+    keyFilename: dirmain + '/resource/' + process.env.CONFIG_GOOGLE_SERVICE,
   });
-    return await storage.createBucket(process.env.BUCKET_NAME,{
-      location:process.env.BUCKET_LOCATION
-    });
+  return await storage.createBucket(process.env.BUCKET_NAME, {
+    location: process.env.BUCKET_LOCATION,
+  });
 }
 async function tranferToBucket(path) {
-    // Imports the Google Cloud client library
-    const {Storage} = require('@google-cloud/storage');
-    // Creates a client
-    const storage = new Storage({
-      projectId: process.env.PROJECT_ID,
-      keyFilename: dirmain+'/resource/'+process.env.CONFIG_GOOGLE_SERVICE
+  // Imports the Google Cloud client library
+  const { Storage } = require('@google-cloud/storage');
+  // Creates a client
+  const storage = new Storage({
+    projectId: process.env.PROJECT_ID,
+    keyFilename: dirmain + '/resource/' + process.env.CONFIG_GOOGLE_SERVICE,
   });
-  await storage.bucket(process.env.BUCKET_NAME).upload(dirmain+'public/store/'+path,function(err,file){
-    if(err)throw err;
-    console.log("tranfer to Bucket"+path);
+  await storage.bucket(process.env.BUCKET_NAME).upload(dirmain + 'public/store/' + path, function (err, file) {
+    if (err) throw err;
+    console.log('tranfer to Bucket' + path);
   });
 }
-async function updateAvatar(req,res){
+async function updateAvatar(req, res) {
   var user = await User.findById(req.user.sub);
-  if(!user){
+  if (!user) {
     res.status(404);
-    res.send({message:'Khong tim thay user'});
-  }else{
+    res.send({ message: 'Khong tim thay user' });
+  } else {
     upload(req, res, async function (err) {
-    if(!req.files){
-      throw "Chon file upload";
-    }
-    var filename = req.files.map((file)=>file.filename)[0];
-    user.avatar_link=filename;
-    user.save();
+      if (!req.files) {
+        throw 'Chon file upload';
+      }
+      var filename = '/static/store/' + req.files.map((file) => file.filename)[0];
+      user.avatar_link = filename;
+      await user.save();
     });
     var update_user = await User.findById(req.user.sub);
-    if(update_user){
-      console.log(update_user.avatar_link)
-      if(user.avatar_link!=update_user.avatar_link){
-        return update_user.avatar_link;
-      }else{
-        throw "Loi upload file";
-      }
+    if (update_user) {
+      return update_user.avatar_link;
     }
-    throw "user khong duoc tim thay";
+    throw 'user khong duoc tim thay';
   }
 }
