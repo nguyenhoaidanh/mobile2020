@@ -22,7 +22,8 @@ class Home extends Component<Props> {
   checkin = () => {
     const { image = {} } = this.state;
     if (!image.path) return;
-    console.log(123456, 'start upload');
+    if (!image.path.includes('.jpg') && !image.path.includes('.jpeg')) return this.showAlert('Định dạng file không được hỗ trợ');
+    console.log(123456, 'start upload 233');
     this.setState({ loading: true });
     uploadFileToServer([image], this.props.userInfo.token, '/users/classify')
       .then(({ data }) => {
@@ -126,7 +127,7 @@ class Home extends Component<Props> {
       );
     return (
       <View>
-        <ImageInput showAccessory={false} backgroundColor="white" image={image} picker={true} callback={this.setImage} />
+        <ImageInput showAccessory={false} backgroundColor="white" image={image} camera={true} callback={this.setImage} />
         <Button
           loading={loading}
           containerStyle={cStyles.btnwrap}

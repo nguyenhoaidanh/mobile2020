@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { ScrollView, Platform, StyleSheet, Text, View } from 'react-native';
+import { ScrollView, Platform, StyleSheet, Text, View, BackHandler, Dimensions } from 'react-native';
 import { NativeRouter, Route, Link } from 'react-router-native';
 import { Divider, Card, Avatar, Button, Image } from 'react-native-elements';
 import Icon from 'react-native-vector-icons/FontAwesome';
@@ -7,7 +7,7 @@ import { withRouter } from 'react-router';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import * as appActions from '../actions/index';
-import { setAvatar } from '../utils/functions';
+import { setAvatar, shadow } from '../utils/functions';
 import { list_screen_map, ROLES } from '../constants/constants';
 import cStyles from '../constants/common-styles';
 import AsyncStorage from '@react-native-community/async-storage';
@@ -46,6 +46,13 @@ class Home extends Component<Props> {
   componentWillReceiveProps(props) {
     this.setState({ loggedIn: props.loggedIn });
   }
+  componentDidMount() {
+    const backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
+      this.props.history.goBack();
+      this.props.appActions.setCurScreent({ currentScreent: this.props.app.lastScreent });
+      return true;
+    });
+  }
   componentWillMount() {
     (async () => {
       try {
@@ -73,7 +80,11 @@ class Home extends Component<Props> {
     const { image = {}, mssv = '1610391', username = 'Nguyễn Hoài Danh', avatar_link } = userInfo;
     const avaSource = setAvatar(avatar_link || image);
     const { loading = !global.firstLoad } = this.state;
-    console.log(123456, loading, global.firstLoad);
+    const screenWidth = Math.round(Dimensions.get('window').width);
+    console.log(123456, loading, global.firstLoad, screenWidth);
+    const padding = 5;
+    const numperrow = 3;
+    const width = screenWidth / numperrow - numperrow * padding;
     if (loading)
       return (
         <View style={styles.container}>
@@ -118,17 +129,18 @@ class Home extends Component<Props> {
           <Divider style={{ backgroundColor: 'white' }} />
           <Text style={{ fontStyle: 'italic', fontWeight: 'bold', paddingTop: 10, paddingLeft: 10, fontSize: 20, color: 'white' }}>Danh mục</Text>
         </View>
-        <View style={{ flexDirection: 'row', padding: 5, flexWrap: 'wrap', alignItems: 'center', alignContent: 'center' }}>
+        <View style={{ flexDirection: 'row', padding, flexWrap: 'wrap', alignItems: 'center', alignContent: 'center' }}>
           {list.map((e, i) => {
             if (!e.showRole.includes(userInfo.role)) return null;
+            const imageWidth = width - 40;
             return (
-              <View key={i} style={{ margin: 5, alignItems: 'center', backgroundColor: 'white', borderRadius: 10, height: 120, width: 120 }}>
+              <View key={i} style={{ ...shadow(), margin: 5, alignItems: 'center', backgroundColor: 'white', borderRadius: 10, height: width, width: width }}>
                 <Avatar
                   onPress={() => this.navigate(e.to, list_screen_map[e.name])}
                   size="xlarge"
                   source={e.image}
-                  containerStyle={{ marginTop: 10, alignSelf: 'center', width: 80, height: 80 }}
-                  avatarStyle={{ alignSelf: 'center', width: 80, height: 80 }}
+                  containerStyle={{ marginTop: 10, alignSelf: 'center', width: imageWidth, height: imageWidth }}
+                  avatarStyle={{ alignSelf: 'center', width: imageWidth, height: imageWidth }}
                 />
                 <Text style={{ fontWeight: 'bold', fontSize: 15, color: 'black' }}>{e.text}</Text>
               </View>
@@ -145,6 +157,7 @@ const mapStateToProps = (state) => {
   return {
     userInfo: state.user.userInfo,
     loggedIn: state.user.loggedIn,
+    app: state.app,
   };
 };
 const mapDispatchToProps = (dispatch) => {

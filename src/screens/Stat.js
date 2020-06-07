@@ -45,10 +45,10 @@ class Home extends Component<Props> {
   };
   render() {
     let { listStudent = [], mode = MODES.ALL, selectedIndex = 0, loading = true } = this.state;
-    let buttons = list.map((el) => ({
+    let buttons = list.map((el, i) => ({
       element: () => (
         <View style={{ width: '100%', alignItems: 'center' }}>
-          <Text style={{ color: 'black' }}>{el.text}</Text>
+          <Text style={{ color: i == selectedIndex ? 'brown' : 'black' }}>{el.text}</Text>
         </View>
       ),
     }));

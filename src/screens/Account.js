@@ -5,7 +5,7 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import { Input, Button, Avatar, Divider, Card, ListItem } from 'react-native-elements';
 import cStyles from '../constants/common-styles';
 import ImageInput from '../components/ImageInput';
-import { showImageInput, setAvatar, shorterString, AXIOS, uploadFileToServer, checkTokenExpire } from '../utils/functions';
+import { showImageInput, setAvatar, shorterString, AXIOS, uploadFileToServer, checkTokenExpire, shadow } from '../utils/functions';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import * as appActions from '../actions/index';
@@ -17,6 +17,7 @@ const styles = StyleSheet.create({
   },
   hr: { backgroundColor: 'blue' },
   ava: {
+    ...shadow(),
     backgroundColor: 'transparent',
     height: 220,
     alignItems: 'center',
@@ -113,7 +114,7 @@ class Home extends Component<Props> {
     this.setState({ edit: false });
   };
   renderItem = (key, value) => {
-    const keys = ['fullname', 'token', 'list_images', 'create_date', 'class_ids', 'id'];
+    const keys = ['fullname', 'token', 'list_images', 'create_date', 'class_ids', 'id', 'avatar_link'];
     if (keys.includes(key)) return;
     value = key == 'role' ? account_map[value.toLowerCase()] : value;
     if (key == 'male') {
@@ -122,16 +123,15 @@ class Home extends Component<Props> {
     return (
       <ListItem
         key={key}
-        chevron
         bottomDivider
         leftIcon={<Icon name={mapIcon[key]} size={20} color={'black'} />}
         title={
           <View style={styles.row}>
             <View style={styles.start}>
-              <Text style={{ fontSize: 18 }}>{mapKey[key]}</Text>
+              <Text style={{ fontSize: 15 }}>{mapKey[key]}</Text>
             </View>
             <View style={styles.end}>
-              <Text style={{ fontWeight: 'bold', fontSize: 18 }}>{shorterString(value, 16)}</Text>
+              <Text style={{ fontWeight: 'bold', fontSize: 15 }}>{shorterString(value, 20)}</Text>
             </View>
           </View>
         }
@@ -180,7 +180,7 @@ class Home extends Component<Props> {
               <View style={{ flexDirection: 'row', paddingTop: 10, paddingBottom: 10 }}>
                 <View style={{ alignItems: 'center', width: '100%' }}>
                   <Text style={{ fontSize: 20, fontWeight: 'bold', alignSelf: 'center' }}>
-                    <Text style={{ color: 'green' }}>{!edit ? 'Thông tin cá nhân   ' : 'Chỉnh sửa thông tin'} </Text>
+                    <Text>{!edit ? 'Thông tin cá nhân   ' : 'Chỉnh sửa thông tin'} </Text>
                     {edit ? null : (
                       <Icon style={{ paddingLeft: 20, marginLeft: 10 }} name="edit" onPress={() => this.setState({ edit: !edit })} size={20} color={'green'} />
                     )}
@@ -228,7 +228,7 @@ class Home extends Component<Props> {
                   bottomDivider
                   title={
                     <View style={{ width: '100%' }}>
-                      <Text style={{ fontWeight: 'bold', color: 'red', fontSize: 18, alignSelf: 'center' }}>Đăng xuất</Text>
+                      <Text style={{ fontWeight: 'bold', color: 'brown', fontSize: 18, alignSelf: 'center' }}>Đăng xuất</Text>
                     </View>
                   }
                   bottomDivider

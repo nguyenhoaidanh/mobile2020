@@ -12,27 +12,15 @@ import { AXIOS, checkTokenExpire, shadow } from '../utils/functions';
 import cStyles from '../constants/common-styles';
 import Loading from '../components/Loading';
 const styles = StyleSheet.create({
-  group: {
-    ...shadow(),
-    borderColor: 'transparent',
-    width: '100%',
-    height: 50,
-    marginLeft: 0,
-    marginTop: 0,
-    padding: 0,
-    backgroundColor: 'transparent',
-  },
   btn: {
+    ...shadow(),
+    width: '50%',
     alignSelf: 'center',
-    width: 130,
-    borderRightColor: 'transparent',
-    borderLeftColor: 'transparent',
+    alignItems: 'center',
     borderRadius: 30,
     backgroundColor: '#F4F4F4',
-    marginLeft: 10,
-    marginRight: 10,
-    marginBottom: 5,
-    marginTop: 5,
+    paddingBottom: 10,
+    paddingTop: 10,
   },
   btnText: { fontSize: 18, color: 'black' },
   btnIcon: { marginRight: 20, paddingRight: 10 },
@@ -59,14 +47,15 @@ class Home extends Component<Props> {
         })
         .finally(() => this.setState({ loading: false }));
     } else this.setState({ listClass });
-    AXIOS('/sessions/joined', 'GET', {}, {}, this.props.userInfo.token)
-      .then(({ data }) => {
-        console.log('123456', `found ${data.result.length} session`);
-        this.setState({ history: data.result });
-      })
-      .catch((err) => {
-        checkTokenExpire(err, this);
-      });
+    if (this.props.userInfo.role == ROLES.student)
+      AXIOS('/sessions/joined', 'GET', {}, {}, this.props.userInfo.token)
+        .then(({ data }) => {
+          console.log('123456', `found ${data.result.length} session`);
+          this.setState({ history: data.result });
+        })
+        .catch((err) => {
+          checkTokenExpire(err, this);
+        });
   }
   onSort = () => {
     let { listRoom = [], listClass = [], sort = false, isListClass = true } = this.state;
@@ -197,36 +186,23 @@ class Home extends Component<Props> {
     const iconColor = 'black';
     let { listClass = [], showForm = false, loading = true, errorMessage = {}, isListClass = true, listRoom = [] } = this.state;
     const itemHeight = 195;
-    // if (listClass.length == 0) listClass = listClassDefault;
-    //if (listRoom.length == 0) listRoom = listClassDefault;
-    let buttons = [
-      {
-        element: () => (
-          <View style={{ alignItems: 'center' }}>
+    return (
+      <View>
+        {showForm ? this.renderPopupPassword() : null}
+        <View style={{ flexDirection: 'row', width: '100%', marginTop: 10, padding: 10 }}>
+          <View style={styles.btn}>
             <Text onPress={this.createRoom} style={styles.btnText}>
               <Icon style={styles.btnIcon} name={'plus'} size={iconSize} color={iconColor} />
               <Text style={{ marginLeft: 30 }}>Tạo phòng</Text>
             </Text>
           </View>
-        ),
-      },
-      {
-        element: () => (
-          <View style={{ alignItems: 'center' }}>
+          <View style={styles.btn}>
             <Text style={styles.btnText} onPress={this.onSort}>
               <Icon style={styles.btnIcon} name={'sort'} size={iconSize} color={iconColor} />
               <Text style={{ marginLeft: 30 }}> Sắp xếp</Text>
             </Text>
           </View>
-        ),
-      },
-    ];
-    if (this.props.userInfo.role !== ROLES.teacher || (isListClass && this.props.userInfo.role === ROLES.teacher)) buttons = buttons.slice(1);
-    return (
-      <View>
-        {showForm ? this.renderPopupPassword() : null}
-        <ButtonGroup buttonStyle={styles.btn} containerStyle={styles.group} onPress={this.updateIndex} buttons={buttons} />
-
+        </View>
         <ScrollView contentContainerStyle={{ flexGrow: 1, paddingLeft: 15, paddingRight: 15, marginTop: 10, paddingTop: 0 }}>
           {!isListClass
             ? listRoom.map((room, idx) => (

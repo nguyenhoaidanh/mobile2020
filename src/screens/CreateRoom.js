@@ -5,12 +5,13 @@ import DatePicker from 'react-native-datepicker';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { Input, Button, CheckBox, Overlay } from 'react-native-elements';
 import cStyles from '../constants/common-styles';
-import { AXIOS, checkTokenExpire, formatTime } from '../utils/functions';
+import { AXIOS, checkTokenExpire, formatTime, changeTime } from '../utils/functions';
 
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { WheelPicker, TimePicker } from 'react-native-wheel-picker-android';
 import * as appActions from '../actions/index';
+import dayjs from 'dayjs';
 const styles = StyleSheet.create({});
 const dataList = [];
 for (let index = 1; index < 20; index++) {
@@ -27,7 +28,22 @@ class CreateRoom extends Component<Props> {
   };
   makeRoom = () => {
     const { currentClass = {} } = this.props;
-    console.log(123456);
+    let { start_time, end_time, title, password, repPassword } = this.state;
+    let valid = true;
+    console.log(123456, this.state);
+
+    if (!title) return this.setState({ errorMessage: { title: 'Trường ngày là bắt buộc' } });
+    if (!password) return this.setState({ errorMessage: { password: 'Trường ngày là bắt buộc' } });
+    if (!repPassword) return this.setState({ errorMessage: { repPassword: 'Trường ngày là bắt buộc' } });
+    if (!start_time) return this.setState({ errorMessage: { start_time: 'Trường ngày là bắt buộc' } });
+    if (!end_time) return this.setState({ errorMessage: { end_time: 'Trường ngày là bắt buộc' } });
+    start_time = changeTime(start_time);
+    end_time = changeTime(end_time);
+    if (password != repPassword) return this.setState({ errorMessage: { password: 'Hai password không khớp' } });
+    if (Date.now() > end_time) return this.setState({ errorMessage: { end_time: 'Thời gian không hợp lệ' } });
+    if (Date.now() > start_time) return this.setState({ errorMessage: { start_time: 'Thời gian không hợp lệ' } });
+    if (start_time > end_time) return this.setState({ errorMessage: { start_time: 'Thời gian không hợp lệ' } });
+
     let room = {
       class_id: currentClass.id,
       secret: '123456',
@@ -40,6 +56,7 @@ class CreateRoom extends Component<Props> {
       start_time: Date.now(),
       end_time: Date.now(),
     };
+    return;
     AXIOS('/rooms', 'POST', room, {}, this.props.userInfo.token)
       .then(({ data }) => {
         console.log('123456', 1, data);
@@ -85,7 +102,7 @@ class CreateRoom extends Component<Props> {
       number = '1',
     } = this.state;
     const { currentClass = {} } = this.props;
-    console.log(123456, respData);
+    console.log(123456, errorMessage);
     if (success)
       return (
         <View>
@@ -120,98 +137,101 @@ class CreateRoom extends Component<Props> {
     return (
       <KeyboardAvoidingView style={{ flex: 1, flexDirection: 'column' }}>
         <ScrollView style={cStyles.scroll}>
-          <Input
-            label="Tên phòng"
-            errorStyle={cStyles.errorStyle}
-            errorMessage={errorMessage.name}
-            placeholder="Cơ sở dữ liệu - 11/2/2020"
-            leftIcon={<Icon name="star" size={iconSize} color={iconColor} />}
-            onChangeText={(value) => this.onchange('name', name)}
-          />
-          <TouchableOpacity onPress={() => this.setState({ showPicker: true, keyPicker: 'faculty' })}>
+          <View>
             <Input
-              label="Số lượng thành viên mỗi nhóm"
-              errorStyle={cStyles.number}
-              errorMessage={errorMessage.faculty}
-              maxLength={10}
-              keyboardType="numeric"
-              disabled
-              defaultValue={'1'}
-              placeholder="Chạm để chọn"
-              value={number}
-              leftIcon={<Icon name="group" size={iconSize} color={iconColor} />}
+              label="Tên phòng"
+              errorStyle={cStyles.errorStyle}
+              errorMessage={errorMessage.title}
+              placeholder="Vd: Cơ sở dữ liệu - 11/2/2020"
+              leftIcon={<Icon name="star" size={iconSize} color={iconColor} />}
+              onChangeText={(value) => this.onchange('title', value)}
             />
-          </TouchableOpacity>
-          {this.state.showPicker ? this.renderPicker() : null}
-          <Input
-            label="Mật khẩu"
-            errorStyle={cStyles.errorStyle}
-            errorMessage={errorMessage.password}
-            placeholder="Password"
-            leftIcon={<Icon name="key" size={iconSize} color={iconColor} />}
-            onChangeText={(value) => this.onchange('password', value)}
-            secureTextEntry={true}
-          />
-          <Input
-            label="Nhập lại Mật khẩu"
-            errorStyle={cStyles.errorStyle}
-            errorMessage={errorMessage.repPassword}
-            placeholder="Password"
-            leftIcon={<Icon name="key" size={iconSize} color={iconColor} />}
-            onChangeText={(value) => this.onchange('repPassword', value)}
-            secureTextEntry={true}
-          />
-          <Text style={cStyles.label}>Thời gian bắt đầu </Text>
-          <DatePicker
-            style={{ width: '100%' }}
-            mode="datetime"
-            format="hh:mm DD-MM-YYYY"
-            placeholder="Thời gian bắt đầu"
-            onDateChange={(startTime) => {
-              this.setState({ startTime });
-            }}
-            iconComponent={
+            <TouchableOpacity onPress={() => this.setState({ showPicker: true, keyPicker: 'faculty' })}>
               <Input
+                label="Số lượng thành viên mỗi nhóm"
                 errorStyle={cStyles.errorStyle}
-                errorMessage={errorMessage.startTime}
-                placeholder="Thời gian bắt đầu"
+                errorMessage={errorMessage.number}
+                maxLength={10}
+                keyboardType="numeric"
                 disabled
-                defaultValue={this.state.startTime}
-                leftIcon={<Icon name="calendar" size={iconSize} color={iconColor} />}
+                defaultValue={'1'}
+                placeholder="Chạm để chọn"
+                value={number}
+                leftIcon={<Icon name="group" size={iconSize} color={iconColor} />}
               />
-            }
-            customStyles={{
-              dateInput: {
-                display: 'none',
-              },
-            }}
-          />
-          <Text style={cStyles.label}> Thời gian kết thúc</Text>
-          <DatePicker
-            style={{ width: '100%' }}
-            mode="datetime"
-            format="hh:mm DD-MM-YYYY"
-            placeholder="Thời gian kết thúc"
-            onDateChange={(endTime) => {
-              this.setState({ endTime });
-            }}
-            iconComponent={
-              <Input
-                errorStyle={cStyles.errorStyle}
-                errorMessage={errorMessage.endTime}
-                placeholder="Thời gian bắt đầu"
-                disabled
-                defaultValue={this.state.endTime}
-                leftIcon={<Icon name="calendar" size={iconSize} color={iconColor} />}
-              />
-            }
-            customStyles={{
-              dateInput: {
-                display: 'none',
-              },
-            }}
-          />
-          <Button containerStyle={cStyles.btnwrap} titleStyle={cStyles.btnText} buttonStyle={cStyles.btnPrimary} title="Tạo phòng" onPress={this.makeRoom} />
+            </TouchableOpacity>
+            {this.state.showPicker ? this.renderPicker() : null}
+            <Input
+              label="Mật khẩu"
+              errorStyle={cStyles.errorStyle}
+              errorMessage={errorMessage.password}
+              placeholder="Password"
+              leftIcon={<Icon name="key" size={iconSize} color={iconColor} />}
+              onChangeText={(value) => this.onchange('password', value)}
+              secureTextEntry={true}
+            />
+            <Input
+              label="Nhập lại Mật khẩu"
+              errorStyle={cStyles.errorStyle}
+              errorMessage={errorMessage.repPassword}
+              placeholder="Password"
+              leftIcon={<Icon name="key" size={iconSize} color={iconColor} />}
+              onChangeText={(value) => this.onchange('repPassword', value)}
+              secureTextEntry={true}
+            />
+            <Text style={cStyles.label}>Thời gian bắt đầu điểm danh</Text>
+            <DatePicker
+              style={{ width: '100%' }}
+              mode="datetime"
+              format="hh:mm DD-MM-YYYY"
+              placeholder="Chạm để chọn thời gian"
+              onDateChange={(start_time) => {
+                this.setState({ start_time });
+              }}
+              iconComponent={
+                <Input
+                  errorStyle={cStyles.errorStyle}
+                  errorMessage={errorMessage.start_time}
+                  placeholder="Chạm để chọn thời gian"
+                  defaultValue={this.state.start_time}
+                  disabled
+                  leftIcon={<Icon name="calendar" size={iconSize} color={iconColor} />}
+                />
+              }
+              customStyles={{
+                dateInput: {
+                  display: 'none',
+                },
+              }}
+            />
+            <Text style={cStyles.label}> Thời gian kết thúc điểm danh</Text>
+            <DatePicker
+              style={{ width: '100%' }}
+              mode="datetime"
+              format="hh:mm DD-MM-YYYY"
+              placeholder="Chạm để chọn thời gian"
+              onDateChange={(end_time) => {
+                this.setState({ end_time });
+              }}
+              iconComponent={
+                <Input
+                  errorStyle={cStyles.errorStyle}
+                  errorMessage={errorMessage.end_time}
+                  placeholder="Chạm để chọn thời gian"
+                  disabled
+                  defaultValue={this.state.end_time}
+                  leftIcon={<Icon name="calendar" size={iconSize} color={iconColor} />}
+                />
+              }
+              customStyles={{
+                dateInput: {
+                  display: 'none',
+                },
+              }}
+            />
+            <Button containerStyle={cStyles.btnwrap} titleStyle={cStyles.btnText} buttonStyle={cStyles.btnPrimary} title="Tạo phòng" onPress={this.makeRoom} />
+            <View style={{ height: 265 }} />
+          </View>
         </ScrollView>
       </KeyboardAvoidingView>
     );

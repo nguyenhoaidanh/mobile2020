@@ -3,7 +3,7 @@ const initialState = {
   currentScreent: { icon: null, title: 'BK Attendance' },
   currentRoom: {},
   currentClass: {},
-  lastScreent: null,
+  lastScreent: {},
   loading: false,
   listClass: [],
 };

@@ -4,12 +4,10 @@ import appConfig from '../constants/config';
 import dayjs from 'dayjs';
 import AsyncStorage from '@react-native-community/async-storage';
 import { list_screen_map } from '../constants/constants';
-export const showImageInput = ({ picker, camera, width = 300, height = 400, cropping = false, callback = () => {} }) => {
+export const showImageInput = ({ picker, camera, cropping = false, callback = () => {} }) => {
   let func = ImagePicker.openPicker;
   if (camera) func = ImagePicker.openCamera;
   func({
-    width,
-    height,
     cropping,
   })
     .then((image) => {
@@ -44,8 +42,19 @@ export const shadow = () => ({
   shadowRadius: 12.35,
   elevation: 19,
 });
-
+export const changeTime = (str = '') => {
+  //05:01 26-06-2020 => 1231231232312
+  const hm = str.split(' ')[0];
+  const dmy = str.split(' ')[1];
+  const hour = +hm.split(':')[0];
+  const min = +hm.split(':')[1];
+  const day = +dmy.split('-')[0];
+  const mon = +dmy.split('-')[1];
+  const year = +dmy.split('-')[2];
+  return new Date(year, mon, day, hour, min, 0, 0).getTime();
+};
 export const setAvatar = (image, fromUrl = false) => {
+  console.log(123456, image);
   if (typeof image == 'string') return { uri: appConfig.api_domain + image };
   return image.path ? { uri: image.path } : require('../../img/default-avatar.jpg');
 };

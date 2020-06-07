@@ -20,7 +20,8 @@ const styles = StyleSheet.create({
     padding: 0,
   },
   group: { width: '100%', height: '100%' },
-  selected: { backgroundColor: 'transparent' },
+  selected: { backgroundColor: 'lightblue' },
+  selectedText: { color: 'green' },
 });
 const iconSize = 24,
   iconColor = 'white';
@@ -51,13 +52,16 @@ class Footer extends Component<Props> {
       list = list.filter((e) => {
         return e.showRole.includes(userInfo.role);
       });
-    let buttons = list.map((el) => ({
-      element: () => (
-        <View style={{ width: '100%', alignItems: 'center' }}>
-          <Icon name={el.icon} size={iconSize} color={'black'} />
-          <Text style={{ color: 'black' }}>{el.text}</Text>
-        </View>
-      ),
+    let buttons = list.map((el, i) => ({
+      element: () => {
+        const color = i == selectedIndex ? 'brown' : 'black';
+        return (
+          <View style={{ width: '100%', alignItems: 'center' }}>
+            <Icon name={el.icon} size={iconSize} color={color} />
+            <Text style={{ color }}>{el.text}</Text>
+          </View>
+        );
+      },
     }));
 
     if (hideFooter || !loggedIn) return null;

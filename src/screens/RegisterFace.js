@@ -1,12 +1,12 @@
 import React, { Component } from 'react';
-import { Platform, StyleSheet, Text, View, SafeAreaView, ScrollView, Alert } from 'react-native';
+import { Platform, StyleSheet, Text, View, SafeAreaView, ScrollView, Alert, Image } from 'react-native';
 import { Link, withRouter } from 'react-router-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { ButtonGroup, Card, Button, CheckBox, Avatar } from 'react-native-elements';
 import ImageInput from '../components/ImageInput';
 import cStyles from '../constants/common-styles';
-import { AXIOS, checkTokenExpire, uploadFileToServer } from '../utils/functions';
+import { AXIOS, checkTokenExpire, uploadFileToServer, setAvatar } from '../utils/functions';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import * as appActions from '../actions/index';
@@ -89,9 +89,18 @@ class Home extends Component<Props> {
       <ButtonGroup
         key={rowNum}
         buttons={row.map((el, idx) => ({
-          element: () => (
-            <ImageInput disabled={success} key={idx} image={el.image} picker={true} callback={(img) => this.setImage(img, rowNum * 2 + idx)} height={'100%'} />
-          ),
+          element: () => {
+            return (
+              <ImageInput
+                disabled={success}
+                key={idx}
+                image={el.image}
+                picker={true}
+                callback={(img) => this.setImage(img, rowNum * 2 + idx)}
+                height={'100%'}
+              />
+            );
+          },
         }))}
         buttonStyle={{ marginLeft: 15, marginRight: 15 }}
         containerStyle={{ height: 200, marginBottom: 10, marginTop: 10 }}
@@ -117,7 +126,8 @@ class Home extends Component<Props> {
       <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
         <View style={{ width: '100%', alignItems: 'center' }}>
           <Text style={{ paddingLeft: 10, paddingRight: 10, marginBottom: 10, marginTop: 10, alignSelf: 'center', fontSize: 25, color: 'white' }}>
-            {success ? 'Bạn đã đăng kí gương mặt thành công' : `Chọn ít nhất ${min_image} ảnh chân dung khác nhau có mặt của bạn`}
+            {success ? <Icon name="check-circle" color="green" size={25} /> : null}
+            {success ? 'Đã đăng kí gương mặt ' : `Chọn ít nhất ${min_image} ảnh chân dung khác nhau có mặt của bạn`}
           </Text>
         </View>
         {list.map((row, idx) => this.renderRow(row, idx, success))}
