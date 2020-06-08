@@ -80,25 +80,29 @@ async function updateFileExpress(req, res) {
         if(ind==0){
           records.push({
             type:"TEST",
-            link:"gs://"+process.env.BUCKET_NAME+"/"+filenames[ind],
+            link:"gs://"+process.env.BUCKET_IMAGE_NAME+"/"+filenames[ind],
             label:req.user.label
           });
         }else if(ind==1){
           records.push({
             type:"VALIDATION",
-            link:"gs://"+process.env.BUCKET_NAME+"/"+filenames[ind],
+            link:"gs://"+process.env.BUCKET_IMAGE_NAME+"/"+filenames[ind],
             label:req.user.label
           });
         }else{
           records.push({
             type:"TRAIN",
-            link:"gs://"+process.env.BUCKET_NAME+"/"+filenames[ind],
+            link:"gs://"+process.env.BUCKET_IMAGE_NAME+"/"+filenames[ind],
             label:req.user.label
           });
         }
-        await tranferToBucket(filenames[ind]);
+        await tranferToBucket('./public/store/'+filenames[ind],process.env.BUCKET_IMAGE_NAME);
+        console.log("upload image to bucket: "+filenames[ind]);
       }
        csvWriter.writeRecords(records);
+       //
+      await tranferToBucket('./dataset/dataset.csv',process.env.BUCKET_CSV_NAME);
+      console.log("upload dataset to bucket");
     }
     user.list_images=[].concat(user.list_images,filenames);
     await user.save();
@@ -122,11 +126,11 @@ async function createBucket(){
       projectId: process.env.PROJECT_ID,
       keyFilename: dirmain+'/resource/'+process.env.CONFIG_GOOGLE_SERVICE
   });
-    return await storage.createBucket(process.env.BUCKET_NAME,{
+    return await storage.createBucket(process.env.BUCKET_IMAGE_NAME,{
       location:process.env.BUCKET_LOCATION
     });
 }
-async function tranferToBucket(path) {
+async function tranferToBucket(path,BUCKET_IMAGE_NAME) {
     // Imports the Google Cloud client library
     const {Storage} = require('@google-cloud/storage');
     // Creates a client
@@ -134,7 +138,7 @@ async function tranferToBucket(path) {
       projectId: process.env.PROJECT_ID,
       keyFilename: dirmain+'/resource/'+process.env.CONFIG_GOOGLE_SERVICE
   });
-  await storage.bucket(process.env.BUCKET_NAME).upload(dirmain+'public/store/'+path,function(err,file){
+  await storage.bucket(BUCKET_IMAGE_NAME).upload(path,function(err,file){
     if(err)throw err;
     console.log("tranfer to Bucket"+path);
   });
