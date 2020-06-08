@@ -15,11 +15,11 @@ module.exports = {
 };
 
 async function getAll(req) {
-  return await Room.find({ class_id: req.params.id });
+  return {object:await Room.find({ class_id: req.params.id }),message:"Tất cả phòng học"};
 }
 
-async function getById(req) {
-  return await Room.findById(req.params.id);
+async function getById(id) {
+  return {object:await Room.findById(id),message:"Thông tin phòng học"};
 }
 
 async function create(request) {
@@ -33,44 +33,35 @@ async function create(request) {
       room.user_create = request.user.sub;
       return await room.save();
     }
-    throw 'Secret of class incorrect';
+    throw {code:400,message:"Xác thực không thành công"};;
   } else {
-    throw 'Class not found';
+    throw {code:404,message:"Không tìm thấy lớp học"};;
   }
 }
 async function close(request) {
-  const room = await Room.findById(request.query.id);
-  if (!room) throw 'Room not found';
-  room.isOpen = false;
-  return room.save();
+  var room = await Room.findOne({_id:request.body.room_id,isClosed:false});
+  
+  if(!room)throw {code:404,message:"Không tìm thấy phòng"};
+  
+  if(bcrypt.compareSync(request.body.room_secret,room.secret)){
+    room.isClosed=true;
+    console.log("debug close room 1");
+    await room.save();
+    
+  }
+  return {message:"Đã đóng lớp học",object:room}
 }
 async function update(id, userParam) {
-  const user = await User.findById(id);
-
-  // validate
-  if (!user) throw 'User not found';
-  if (user.username !== userParam.username && (await User.findOne({ username: userParam.username }))) {
-    throw 'Username "' + userParam.username + '" is already taken';
-  }
-
-  // hash password if it was entered
-  if (userParam.password) {
-    userParam.hash = bcrypt.hashSync(userParam.password, 10);
-  }
-
-  // copy userParam properties to user
-  Object.assign(user, userParam);
-
-  await user.save();
+ 
 }
 async function isPassRoom(request) {
-  const room = await Room.findById(request.body.room_id);
+  const room = await Room.findOne({_id:request.body.room_id,isClosed:false,start_time:{$lte: new Date.now()},end_time:{$gte:new Date.now()}});
   // validate
-  if (!room) throw 'Room not found';
+  if (!room) throw {code:404,message:"Phòng này không còn khả dụng"};
   if (request.body.secret) {
     if (bcrypt.compareSync(request.body.secret, room.secret)) {
-      return 'Xac thuc thanh cong';
+      return {object:"",message:"Xác thực thành công"};;
     }
-    throw 'Xac thuc khong thanh cong';
+    throw {code:400,message:"Xác thực không thành công"};
   }
 }

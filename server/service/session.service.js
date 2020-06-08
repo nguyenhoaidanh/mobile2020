@@ -14,30 +14,34 @@ module.exports = {
   getAll,
   getById,
   create,
-  update,
   getAllSelf,
   getAllStudentInRoom,
 };
 async function getAllStudentInRoom(req,res){
   var result=[];  
   var session_of_students = await Session.find({room_id:req.params.id});
-  if(!session_of_students)throw "Khong tim thay phong hoc";
-  var class_obtain_room = await Class.findById(session_of_students.class_id);
-  if(!class_obtain_room)throw "Khong tim thay lop hoc";
-  var users_of_classes = await User.find({class_ids:{$all:[class_obtain_room]}});
+  // if(!session_of_students)throw {code:404,message:"Không tìm thấy phòng"};;
+  var room = await Room.findById(req.params.id);
+  if(!room)throw {code:404,message:"Không tìm thấy phòng"};;
+  var class_obtain_room = await Class.findById(room.class_id);
+  if(!class_obtain_room)throw {code:404,message:"Không tìm thấy lớp học"};
+  console.log(class_obtain_room._id);
+  var users_of_classes = await User.find({class_ids:{$all:[class_obtain_room._id]}},{list_images:0});
+  console.log(users_of_classes);
   for(let ind=0;ind<users_of_classes.length;ind++){
-    if(session_of_students.find(users_of_classes[ind]>0)){
+    if(session_of_students.length>0 && session_of_students.includes(users_of_classes[ind])){
       result.push({
-        user:users_of_classes,
+        user:users_of_classes[ind],
         isCheckin:true
       });
     }else{
       result.push({
-        user:users_of_classes,
+        user:users_of_classes[ind],
         isCheckin:false
       });
     }
   }
+  return {message:"Danh sách sinh viên trong phòng",object:result};
 }
 async function getAllSelf(req) {
   var collections = [];
@@ -56,45 +60,33 @@ async function getAllSelf(req) {
       }
     }
   }
-  return collections;
+  return {object:collections,message:"Danh sách các phiên điểm danh"};
 }
 async function getAll(req) {
-  return await Session.find({ room_id: req.params.id, isAccept: true });
+  return {message:"Danh sách điểm danh",object:await Session.find({ room_id: req.params.id})}
 }
 
 async function getById(req) {
-  return await Session.findById(req.params.id);
+  return {message:"Thông tin chi tiết về điểm danh",object:await Session.findById(req.params.id)}
 }
 
 async function create(request) {
   // validate
   console.log(request.body);
-  var room = await Room.findOne({ _id: request.body.room_id });
-  if (room) {
+  const room = await Room.findOne({_id:request.body.room_id,isClosed:false,start_time:{$lte: new Date.now()},end_time:{$gte:new Date.now()}});
+  if (!room) throw {code:404,message:"Phòng không còn khả dụng"};
     //if (!room.isOpen) throw 'Room is closed';
-    const user = await User.findById(request.user.sub);
-    if (!user) throw 'User not found';
-    if (!user.class_ids.filter((xid) => xid == room.class_id).length < 0) throw new Error('User not in this class ' + room.class_id);
-    var session = await Session.findOne({ user_create: request.user.sub, room_id: request.body.room_id });
-    //if (session && session.isAccept) throw 'Session exist';
-    if (bcrypt.compareSync(request.body.secret_of_room + '', room.secret)) {
-      if (!session) session = new Session(request.body);
-      session.user_create = request.user.sub;
-      return await session.save();
-    }
-    throw new Error('Secret of room incorrect');
-  } else {
-    throw new Error('Room not found');
+  if(req.body.list_users)throw {message:"Không có thông tin sinh viên",code:400};
+  if (!bcrypt.compareSync(request.body.secret_of_room, room.secret)) throw {message:"Xác thực mã phòng học thất bại",code:400};
+  for(let ind=0;ind<req.body.list_user.length;ind++){
+    let user = await User.findById(req.body.list_user[ind]);
+    if(!user)throw {code:404,message:"Không tìm thấy sinh viên"};
+    if (!user.class_ids.filter((xid) => xid == room.class_id).length < 0) throw {message:"Phát hiện sinh viên "+user.fullname +" không nằm trong lớp học này",code:404};
+    if(!await Session.findOne({ user_create: user._id, room_id: request.body.room_id }))throw {message:"Phát hiện sinh viên "+user.fullname +" đã điểm danh trước đó ",code:404};
+    var session = new Session(request.body.session);
+    session.user_create=req.user.sub;
+    session.user_checkin_id=user._id;
+    await session.save();
   }
-}
-
-async function update(request, res) {
-  const session = await Session.findById(request.body.session_id);
-  // validate
-  if (!session) throw 'Session not found';
-  if (session.isAccept) throw 'Session exist';
-  session.isAccept = true;
-  session.user_create = request.user.sub;
-  // copy userParam properties to user
-  await session.save();
+  return {message:"Điểm danh thành công",object:null}
 }

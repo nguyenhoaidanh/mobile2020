@@ -1,5 +1,25 @@
 module.exports = errorHandler;
 
+/**
+ * @typedef Error_404
+ * @property {string} message.required
+ */
+/**
+ * @typedef Error_400
+ * @property {string} message.required
+ */
+/**
+ * @typedef Error_500
+ * @property {string} message.required
+ */
+/**
+ * @typedef Error_401
+ * @property {string} message.required
+ */
+/**
+ * @typedef Error_403
+ * @property {string} message.required
+ */
 function errorHandler(err, req, res, next) {
     if (typeof (err) === 'string') {
         // custom application error

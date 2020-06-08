@@ -19,7 +19,7 @@ module.exports={
   uploadFile
 }
 const fs = require('fs');
-const model_url = "http://localhost:3000/models";
+const model_url = process.env.HOST+"/models";
 // const model_url = "http://localhost:9000/test";
 var storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -32,7 +32,7 @@ var storage = multer.diskStorage({
     //check type avatar
   },
 });
-var upload = multer({ storage: storage }).single('img');
+var upload = multer({ storage: storage }).single('image');
 
 const readImage = path => {
   //reads the entire contents of a file.
@@ -46,7 +46,8 @@ const readImage = path => {
 async function uploadFile(req,res){
   await upload(req,res,async function(err){
     if(!req.file){
-      throw "Loi upload file";
+      res.status(400);
+      res.send({message:"Lỗi upload file"});
     }
     const path_in = './public/store/checkin/'+req.file.filename;
     const path_out= './public/store/out/'+req.file.filename;
@@ -59,7 +60,8 @@ async function uploadFile(req,res){
     predict=predict.filter((x)=>{console.log(x.prob>=0.3); return x.prob>=0.3});
 
     for (let ind=0;ind<predict.length;ind++){
-      predict[ind].label=await User.findOne({mssv:predict[ind].label.split('_').pop()});
+      var user = await User.findOne({mssv:predict[ind].label.split('_').pop()});
+      if(user)predict[ind].label=user;
     }
     console.log(predict);
     res.status(200);
