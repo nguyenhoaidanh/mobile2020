@@ -25,14 +25,25 @@ const styles = StyleSheet.create({
 });
 const iconSize = 24,
   iconColor = 'white';
-const list = list_screen;
-
 type Props = {};
 class Footer extends Component<Props> {
-  state = {};
+  constructor(props) {
+    super(props);
+    this.state = { list: list_screen };
+  }
   componentDidMount() {
     this.keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', this._keyboardDidShow.bind(this));
     this.keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', this._keyboardDidHide.bind(this));
+    this.props.history.listen((location, action) => {
+      const { list = [] } = this.state;
+      const indx = Object.values(list).findIndex((e) => {
+        return e.to == location.pathname;
+      });
+      if (indx != -1) {
+        this.setState({ selectedIndex: indx });
+        this.props.appActions.setCurScreent({ currentScreent: list[indx] });
+      }
+    });
   }
   _keyboardDidShow(e) {
     this.setState({ hideFooter: 1 });
@@ -41,22 +52,27 @@ class Footer extends Component<Props> {
     this.setState({ hideFooter: 0 });
   }
   updateIndex = (selectedIndex) => {
+    const { list = [] } = this.state;
     this.setState({ selectedIndex });
     this.props.history.push(list[selectedIndex].to);
     this.props.appActions.setCurScreent({ currentScreent: list[selectedIndex] });
   };
+  componentWillReceiveProps(props) {}
   render() {
-    const { selectedIndex = 0, hideFooter = 0 } = this.state;
-    const { userInfo = {}, loggedIn = false } = this.props;
-    if (userInfo.role)
+    let { selectedIndex = 0, hideFooter = 0, list = [] } = this.state;
+    const { userInfo = {}, loggedIn = false, app = {} } = this.props;
+    const { currentScreent = {} } = app;
+    if (userInfo.role) {
       list = list.filter((e) => {
         return e.showRole.includes(userInfo.role);
       });
+    }
     let buttons = list.map((el, i) => ({
       element: () => {
-        const color = i == selectedIndex ? 'brown' : 'black';
+        const isActive = i == selectedIndex || currentScreent.to == el.to;
+        const color = isActive ? 'brown' : 'black';
         return (
-          <View style={{ width: '100%', alignItems: 'center' }}>
+          <View style={{ width: '100%', alignItems: 'center', backgroundColor: isActive ? 'lightblue' : 'white' }}>
             <Icon name={el.icon} size={iconSize} color={color} />
             <Text style={{ color }}>{el.text}</Text>
           </View>
@@ -83,6 +99,7 @@ const mapStateToProps = (state) => {
   // Redux Store --> Component
   return {
     userInfo: state.user.userInfo,
+    app: state.app,
     loggedIn: state.user.loggedIn,
   };
 };

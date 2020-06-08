@@ -17,7 +17,7 @@ type Props = {};
 class Home extends Component<Props> {
   state = {};
   componentDidMount() {
-    AXIOS('/sessions/joined', 'GET', {}, {}, this.props.userInfo.token)
+    AXIOS('/sessions/checkins', 'GET', {}, {}, this.props.userInfo.token)
       .then(({ data }) => {
         console.log('123456', `found ${data.result.length} session`);
         this.setState({ history: data.result });

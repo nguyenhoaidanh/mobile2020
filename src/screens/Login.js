@@ -7,7 +7,7 @@ import { Input, Button, Card, Avatar, Divider } from 'react-native-elements';
 import ImageInput from '../components/ImageInput';
 import cStyles from '../constants/common-styles';
 import { list_screen_map } from '../constants/constants';
-import { AXIOS } from '../utils/functions';
+import { AXIOS, uploadFileToServer } from '../utils/functions';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import * as appActions from '../actions/index';
@@ -29,7 +29,23 @@ class Login extends Component<Props> {
   login = () => {
     const { username, password, errorMessage = {}, image = {} } = this.state;
     if (image.path) {
-      console.log('ok login by face', user);
+      let msg;
+      this.setState({ loading: true });
+      uploadFileToServer([image], '', '/users/classify', 'POST')
+        .then(({ data }) => {
+          console.log('123456', 1, data);
+          msg = 'Đăng nhập thành công';
+          this.setState({ success: true });
+        })
+        .catch((err) => {
+          msg = 'Đăng nhập thất bại';
+          console.log(123456, err.toString());
+          checkTokenExpire(err, this);
+        })
+        .finally(() => {
+          this.setState({ loading: false });
+          this.showAlert(msg);
+        });
       return;
     }
     console.log('123456', 1, username, password);
@@ -40,7 +56,7 @@ class Login extends Component<Props> {
         console.log('123456', 1, data);
         this.props.history.push('/');
         this.props.appActions.setCurScreent({ currentScreent: list_screen_map.home });
-        this.props.appActions.setUserInfo({ userInfo: data });
+        this.props.appActions.setUserInfo({ userInfo: data.object });
       })
       .catch((err) => {
         console.log('123456', 2, err.response.data);
@@ -50,6 +66,13 @@ class Login extends Component<Props> {
   setImage = (image) => {
     this.setState({ image });
   };
+  showAlert = (msg) => {
+    Alert.alert('Thông báo', msg, [
+      {
+        text: 'Đã hiểu',
+      },
+    ]);
+  };
   toForgot = () => {
     this.props.history.push('/forgotpass');
     this.props.appActions.setCurScreent({ currentScreent: list_screen_map.forgotpass });
@@ -57,7 +80,7 @@ class Login extends Component<Props> {
   render() {
     const iconSize = 24;
     const iconColor = 'black';
-    const { errorMessage = {}, mode = 0, image = {} } = this.state;
+    const { errorMessage = {}, mode = 0, image = {}, loading = false } = this.state;
     if (!mode)
       return (
         <ScrollView style={cStyles.scroll}>
@@ -109,8 +132,15 @@ class Login extends Component<Props> {
       // face id
       <View>
         {/* <Text style={{ alignSelf: 'center', color: 'white', margin: 10, fontSize: 20 }}>Chạm để bật camera</Text> */}
-        <ImageInput showAccessory={false} backgroundColor="white" image={image} camera={true} callback={this.setImage} />
-        <Button containerStyle={cStyles.btnwrap} titleStyle={cStyles.btnText} buttonStyle={cStyles.btn} title="Đăng nhập" onPress={this.login} />
+        <ImageInput showAccessory={false} backgroundColor="white" image={image} picker={true} callback={this.setImage} />
+        <Button
+          loading={loading}
+          containerStyle={cStyles.btnwrap}
+          titleStyle={cStyles.btnText}
+          buttonStyle={cStyles.btn}
+          title="Đăng nhập"
+          onPress={this.login}
+        />
       </View>
     );
   }

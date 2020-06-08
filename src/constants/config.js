@@ -1,3 +1,3 @@
 export default appConfig = {
-  api_domain: 'http://192.168.5.111:3000',
+  api_domain: 'http://35.230.165.172:3000',
 };

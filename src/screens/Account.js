@@ -70,10 +70,10 @@ class Home extends Component<Props> {
     this.setState({ userInfo: { ...this.state.userInfo, [name]: value } });
   };
   setImage = (image) => {
-    uploadFileToServer([image], this.props.userInfo.token, '/users/images')
+    uploadFileToServer([image], this.props.userInfo.token, '/users/images/avatars', 'PUT')
       .then(({ data }) => {
-        console.log('123456', 11, data);
-        this.props.appActions.setUserInfo({ userInfo: { avatar_link: data.result } });
+        console.log('123456', 121, data);
+        this.props.appActions.setUserInfo({ userInfo: { avatar_link: data.object } });
       })
       .catch((err) => {
         checkTokenExpire(err, this);

@@ -15,6 +15,7 @@ export const list_screen = [
   { showRole: [ROLES.student], icon: 'history', text: 'History', title: 'Lịch sử điểm danh', to: '/history' },
   { showRole: [ROLES.student, ROLES.teacher], icon: 'account', text: 'Account', title: 'Tài khoản', to: '/account' },
 ];
+export const goolge_url = 'https://storage.cloud.google.com/avatars-mobileapp2020/';
 export const list_screen_map = {
   home: { icon: 'home', text: 'Bach khoa Attendance Application', title: 'BK Attendance', to: '/' },
   listRoom: { icon: 'view-list', customIcon: 'sort', customText: 'sort', text: 'Rooms', title: 'Danh sách phòng', to: '/list-room', showSearch: true },

@@ -3,7 +3,7 @@ import axios from 'axios';
 import appConfig from '../constants/config';
 import dayjs from 'dayjs';
 import AsyncStorage from '@react-native-community/async-storage';
-import { list_screen_map } from '../constants/constants';
+import { list_screen_map, goolge_url } from '../constants/constants';
 export const showImageInput = ({ picker, camera, cropping = false, callback = () => {} }) => {
   let func = ImagePicker.openPicker;
   if (camera) func = ImagePicker.openCamera;
@@ -18,13 +18,13 @@ export const showImageInput = ({ picker, camera, cropping = false, callback = ()
     });
 };
 export const AXIOS = function (path, method = 'GET', data = {}, option = {}, token = '', isFile = false) {
-  console.log('123456', 'call api', path);
+  console.log('123456', 'call api', method, path);
   let url = appConfig.api_domain + path;
   let config = {
     method,
     url,
     data,
-    timeout: 2 * 60 * 1000,
+    timeout: 10 * 1000,
     headers: {
       Authorization: 'bearer ' + token,
     },
@@ -54,8 +54,10 @@ export const changeTime = (str = '') => {
   return new Date(year, mon, day, hour, min, 0, 0).getTime();
 };
 export const setAvatar = (image, fromUrl = false) => {
-  console.log(123456, image);
-  if (typeof image == 'string') return { uri: appConfig.api_domain + image };
+  if (typeof image == 'string') {
+    if (image.includes(goolge_url)) return { uri: image };
+    return { uri: appConfig.api_domain + '/static' + image };
+  }
   return image.path ? { uri: image.path } : require('../../img/default-avatar.jpg');
 };
 export const shorterString = (str = '', maxlength) => {
@@ -74,26 +76,28 @@ export const formatTime = (time, strFormat = 'hh:mm DD-MM-YYYY') => {
   if (day < 2) return `Hôm qua lúc ${dayjs(time).format('hh:mm')}`;
   return dayjs(time).format(strFormat);
 };
-export const uploadFileToServer = (listFile, token, path, onUploadProgress = () => {}) => {
+export const uploadFileToServer = (listFile, token, path, method = 'POST', onUploadProgress = () => {}) => {
   var formData = new FormData();
   for (var i = 0; i < listFile.length; i++) {
     var file = listFile[i];
     const fileName = file.path.split('/').pop();
-    console.log(123456, 'hi', file);
-    formData.append('images', {
+    formData.append(listFile.length > 1 ? 'images' : 'image', {
       uri: file.path,
       type: `image/${file.path.split('.').pop()}`,
       name: fileName,
     });
   }
-  return AXIOS(path || '/users/images/uploadfile', 'POST', formData, { onUploadProgress }, token, true);
+  return AXIOS(path || '/users/images/uploadfile', method, formData, { onUploadProgress, timeout: 1000 * 60 }, token, true);
 };
 export const checkTokenExpire = (err, that) => {
-  console.log('123456', 'errror axios', err.response.data);
-  if (err.response.data.includes('token')) {
-    AsyncStorage.removeItem('@userInfo');
-    that.props.appActions.logout();
-    that.props.appActions.setCurScreent({ currentScreent: list_screen_map.home });
-    that.props.history.push('/');
-  }
+  console.log('123456', 'errror axios');
+  if (err.response && err.response.data) {
+    console.log(123456, err.response.data);
+    if (err.response.data.includes('token')) {
+      AsyncStorage.removeItem('@userInfo');
+      that.props.appActions.logout();
+      that.props.appActions.setCurScreent({ currentScreent: list_screen_map.home });
+      that.props.history.push('/');
+    }
+  } else console.log(123456, err.toString());
 };

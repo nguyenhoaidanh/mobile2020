@@ -10,11 +10,13 @@ import { AXIOS, checkTokenExpire, uploadFileToServer, setAvatar } from '../utils
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import * as appActions from '../actions/index';
+import { goolge_url } from '../constants/constants';
 const styles = StyleSheet.create({});
 const iconSize = 24;
 const iconColor = 'black';
 type Props = {};
 const min_image = 10;
+
 class Home extends Component<Props> {
   constructor(props) {
     super(props);
@@ -23,7 +25,7 @@ class Home extends Component<Props> {
     const { list_images = [] } = userInfo;
     const n = list_images.length > min_image ? list_images.length : min_image;
     for (let i = 0; i < n; i++) {
-      list.push({ index: i, image: list_images[i] || {} });
+      list.push({ index: i, image: goolge_url + list_images[i] || {} });
     }
     this.state = { userInfo, list };
   }
@@ -43,19 +45,21 @@ class Home extends Component<Props> {
     // if (list.length < min_image) return this.showAlert(`Hãy chọn ít nhất ${min_image} ảnh bạn nhé`);
     this.setState({ loading: true });
     let msg = '';
-    uploadFileToServer(list, this.props.userInfo.token, '/users/images/uploadfile', (progressEvent) => {
+    uploadFileToServer(list, this.props.userInfo.token, '/users/images/uploadfile', 'POST', (progressEvent) => {
       const { loaded, total } = progressEvent;
       let percent = Math.floor((loaded / total) * 100);
       console.log(123456, percent);
     })
       .then(({ data }) => {
         console.log('123456', 1, data);
-        this.props.appActions.setUserInfo({ userInfo: { list_images: data.result } });
+        this.props.appActions.setUserInfo({ userInfo: { list_images: data.object } });
+        this.setState({ list: data.object.map((e, i) => ({ index: i, image: goolge_url + e })) });
         msg = 'Đăng kí gương mặt thành công';
+        this.setState({ success: true });
       })
       .catch((err) => {
         checkTokenExpire(err, this);
-        msg = 'Có lỗi xảy ra';
+        msg = 'Ảnh không rõ hoặc số lượng gương mặt mỗi bức ảnh không đúng. Vui lòng chụp lại.';
       })
       .finally(() => {
         this.setState({ loading: false });
@@ -118,8 +122,8 @@ class Home extends Component<Props> {
   render() {
     let { errorMessage = {}, list = [], loading = false, userInfo = {}, success = false } = this.state;
     const { list_images = [] } = userInfo;
-    console.log(123456, 'found image', list_images);
-    success = list_images.length >= min_image;
+    console.log(123456, 'found image', list_images.length);
+    if (!success) success = list_images.length >= min_image;
     const rowHeight = 200;
     list = this.parseList(list);
     return (

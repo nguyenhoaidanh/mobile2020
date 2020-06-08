@@ -36,11 +36,12 @@ class Home extends Component<Props> {
     const { listClass = [] } = this.props;
     this.setState({ loading: listClass.length == 0 });
     if (listClass.length == 0) {
-      const path = '/classes/joined';
-      AXIOS(path, 'GET', {}, {}, this.props.userInfo.token)
+      const { role, token, id } = this.props.userInfo || {};
+      const path = role == ROLES.teacher ? '/classes/teachers/' + id : '/classes/students/' + id;
+      AXIOS(path, 'GET', {}, {}, token)
         .then(({ data }) => {
-          console.log('123456', `found ${data.result.length} class`);
-          this.props.appActions.setListClass({ listClass: data.result });
+          console.log('123456', `found ${data.object.length} class`);
+          this.props.appActions.setListClass({ listClass: data.object });
         })
         .catch((err) => {
           checkTokenExpire(err, this);
@@ -48,10 +49,10 @@ class Home extends Component<Props> {
         .finally(() => this.setState({ loading: false }));
     } else this.setState({ listClass });
     if (this.props.userInfo.role == ROLES.student)
-      AXIOS('/sessions/joined', 'GET', {}, {}, this.props.userInfo.token)
+      AXIOS('/sessions/checkins', 'GET', {}, {}, this.props.userInfo.token)
         .then(({ data }) => {
-          console.log('123456', `found ${data.result.length} session`);
-          this.setState({ history: data.result });
+          console.log('123456', `found ${data.object.length} session`);
+          this.setState({ history: data.object });
         })
         .catch((err) => {
           checkTokenExpire(err, this);

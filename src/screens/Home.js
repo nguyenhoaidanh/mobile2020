@@ -44,12 +44,12 @@ class Home extends Component<Props> {
     creent && this.props.appActions.setCurScreent({ currentScreent: creent });
   };
   componentWillReceiveProps(props) {
-    this.setState({ loggedIn: props.loggedIn });
+    this.setState({ loggedIn: props.loggedIn, userInfo: props.userInfo });
   }
   componentDidMount() {
     const backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
+      if (this.props.history.location.pathname == '/') return false;
       this.props.history.goBack();
-      this.props.appActions.setCurScreent({ currentScreent: this.props.app.lastScreent });
       return true;
     });
   }
@@ -81,10 +81,11 @@ class Home extends Component<Props> {
     const avaSource = setAvatar(avatar_link || image);
     const { loading = !global.firstLoad } = this.state;
     const screenWidth = Math.round(Dimensions.get('window').width);
-    console.log(123456, loading, global.firstLoad, screenWidth);
     const padding = 5;
     const numperrow = 3;
     const width = screenWidth / numperrow - numperrow * padding;
+    console.log(123456, 'home', userInfo.avatar_link);
+    //AsyncStorage.removeItem('@userInfo');
     if (loading)
       return (
         <View style={styles.container}>
