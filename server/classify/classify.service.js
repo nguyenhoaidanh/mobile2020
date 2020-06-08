@@ -49,8 +49,8 @@ async function uploadFile(req,res){
       res.status(400);
       res.send({message:"Lỗi upload file"});
     }
-    const path_in = './public/store/checkin/' + req.file.filename;
-    const path_out = './public/store/out/' + req.file.filename;
+    const path_in = './public/store/checkin/'+req.file.filename;
+    const path_out= './public/store/output/'+req.file.filename;
     console.log(req.file.filename);
     var faces = await detectFaces(path_in, path_out);
 
