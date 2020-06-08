@@ -19,7 +19,7 @@ module.exports = {
   createTeacher,
   createAdmin,
   update,
-  update_password,
+  updatePassword,
   updateAvatar,
   getSelf
 };
@@ -28,7 +28,7 @@ var storage = multer.diskStorage({
     cb(null, dirmain + 'public/store/avatar');
   },
   filename: async function (req, file, cb) {
-    let file_new_name = req.user.sub + '-'+uuidv4() +'-'+ Date.now()+file.originalname.split('.').pop();
+    let file_new_name = req.user.sub + '-'+uuidv4() +'-'+ Date.now()+'.'+file.originalname.split('.').pop();
     console.log(file_new_name)
     cb(null, file_new_name);
     
@@ -51,6 +51,8 @@ async function authenticate({ username, password }) {
       ...user.toJSON(),
       token,
     }};
+  }else{
+    throw {code:400,message:"username hoặc password sai"};
   }
 }
 async function getAll() {
@@ -167,11 +169,20 @@ async function updateAvatar(req,res){
     });
   }
 }
-async function update_password(user_param) {
-  const user = await User.findById(user_param.id);
+async function updatePassword(req) {
+  const user = await User.findById(req.user.sub);
   if (!user) throw {code:404,message:'Không tìm thấy user'};
-  if (bcrypt.compareSync(user_param.old_password, user.hash)) {
-    user.hash = bcrypt.hashSync(user_param.new_password, 10);
+  if (bcrypt.compareSync(req.body.old_password, user.hash)) {
+    user.hash = bcrypt.hashSync(req.body.new_password, 10);
+  }
+  await user.save();
+  return {message:'Đổi mật khẩu thành công',object:""};
+}
+async function forgotPassword(req) {
+  const user = await User.findById(req.user.sub);
+  if (!user) throw {code:404,message:'Không tìm thấy user'};
+  if (bcrypt.compareSync(req.body.old_password, user.hash)) {
+    user.hash = bcrypt.hashSync(req.body.new_password, 10);
   }
   await user.save();
   return {message:'Đổi mật khẩu thành công',object:""};

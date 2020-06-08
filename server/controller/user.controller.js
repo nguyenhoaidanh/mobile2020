@@ -11,6 +11,7 @@ module.exports = router;
 router.post('/uploadfile', authorize(), upload_file);
 // router.post('/', authorize(role.Student), update_image_for_user);
 router.put('/avatars', update_avatar);
+router.get('/password', update_password);
 router.post('/bucket', authorize(role.Admin), create_bucket);
 router.get('/infor', get_self);
 /**
@@ -84,8 +85,8 @@ function get_self(req, res, next) {
 function update_avatar(req, res, next) {
   userService.updateAvatar(req,res);
 }
-// function upload_file(req,res,next){
-//     toolService.updateFileExpress(req,res)
-//     .then((result)=>res.json({"result":result}))
-//     .catch(err => next(err));
-// }
+function update_password(req,res,next){
+    userService.updatePassword(req)
+    .then((result) => res.json(result))
+    .catch((err) => res.status(err.code==null?500:err.code).send({message:err.message}));
+}
