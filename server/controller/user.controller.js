@@ -26,7 +26,7 @@ router.get('/infor', get_self);
  * Update image to training
  * @route POST /users/uploadfile
  * @group User - API information user
- * @param  {images} - a file jpg amount minimum = 10
+ * @param  {images} - a file jpg, minimum = 10
  * @returns {Response_Image.model} 200 - Update success
  * @returns {Error_401.model} 401 - Invalid Token
  * @security JWT
