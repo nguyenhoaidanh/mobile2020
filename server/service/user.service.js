@@ -155,11 +155,11 @@ async function updateAvatar(req,res){
     res.send({message:'Không tìm thấy user'});
   }else{
     upload(req, res, async function (err) {
-    if(!req.files){
+    if(!req.file){
       res.status(400);
       res.send({message:'Chọn file upload'});
     }
-    var filename = req.files.map((file)=>file.filename)[0];
+    var filename = req.file.filename;
     user.avatar_link="/store/avatar"+filename;
     await user.save();
     res.status(200);
