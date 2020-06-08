@@ -40,7 +40,7 @@ var upload = multer({ storage: storage }).array('images', 10);
 module.exports = {
   updateFileExpress,
   createBucket,
-  updateAvatar,
+  // updateAvatar
 };
 
 async function updateFileExpress(req, res) {
@@ -51,12 +51,12 @@ async function updateFileExpress(req, res) {
     var records = [];
     var filenames = req.files.map((file) => file.filename);
     var user = await User.findById(req.user.sub);
-    if (!user) {
-      // res.status(404);
-      // res.send("Khong tim thay user");
-    } else {
-      for (let ind = 0; ind < filenames.length; ind++) {
-        if (ind == 0) {
+    if(!user){
+      res.status(404);
+      res.send({message:"Không tìm thấy user"});
+    }else{
+      for(let ind=0;ind<filenames.length;ind++){
+        if(ind==0){
           records.push({
             type: 'TEST',
             link: 'gs://' + process.env.BUCKET_NAME + '/' + filenames[ind],
@@ -83,7 +83,7 @@ async function updateFileExpress(req, res) {
     user.list_images = [].concat(user.list_images, filenames);
     await user.save();
     res.status(200);
-    res.send({ result: user.list_images });
+    res.send({message:"Danh sách datataset",object:user.list_images})
   });
 }
 async function createBucket() {
@@ -112,24 +112,29 @@ async function tranferToBucket(path) {
     console.log('tranfer to Bucket' + path);
   });
 }
-async function updateAvatar(req, res) {
-  var user = await User.findById(req.user.sub);
-  if (!user) {
-    res.status(404);
-    res.send({ message: 'Khong tim thay user' });
-  } else {
-    upload(req, res, async function (err) {
-      if (!req.files) {
-        throw 'Chon file upload';
-      }
-      var filename = '/static/store/' + req.files.map((file) => file.filename)[0];
-      user.avatar_link = filename;
-      await user.save();
-    });
-    var update_user = await User.findById(req.user.sub);
-    if (update_user) {
-      return update_user.avatar_link;
-    }
-    throw 'user khong duoc tim thay';
-  }
-}
+// async function updateAvatar(req,res){
+//   var user = await User.findById(req.user.sub);
+//   if(!user){
+//     res.status(404);
+//     res.send({message:'Khong tim thay user'});
+//   }else{
+//     upload(req, res, async function (err) {
+//     if(!req.files){
+//       throw "Chon file upload";
+//     }
+//     var filename = req.files.map((file)=>file.filename)[0];
+//     user.avatar_link=filename;
+//     user.save();
+//     });
+//     var update_user = await User.findById(req.user.sub);
+//     if(update_user){
+//       console.log(update_user.avatar_link)
+//       if(user.avatar_link!=update_user.avatar_link){
+//         return update_user.avatar_link;
+//       }else{
+//         throw "Loi upload file";
+//       }
+//     }
+//     throw "user khong duoc tim thay";
+//   }
+// }

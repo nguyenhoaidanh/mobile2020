@@ -3,7 +3,11 @@ const bcrypt = require('bcryptjs');
 const db = require('../helper/db');
 const role = require('../helper/role');
 const utils = require('../utils/string');
+path = require('path');
+const { v4: uuidv4 } = require('uuid');
+
 var multer = require('multer');
+var dirmain = path.join(__dirname, '../');
 
 const User = db.User;
 
@@ -13,9 +17,11 @@ module.exports = {
   getById,
   createStudent,
   createTeacher,
+  createAdmin,
   update,
   update_password,
   updateAvatar,
+  getSelf
 };
 var storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -29,21 +35,22 @@ var storage = multer.diskStorage({
     //check type avatar
   },
 });
-var upload = multer({ storage: storage }).array('images', 11);
+var upload = multer({ storage: storage }).single("image");
 async function authenticate({ username, password }) {
   let user = await User.findOne({ phone: username });
   if (!user) user = await User.findOne({ gmail: username });
   console.log(132, user);
+  if(!user)throw {code:400,message:"username hoặc password sai"};
   var label = utils.removeAccents(user.fullname.split(' ')[user.fullname.split(' ').length - 1]) + '_' + user.mssv;
   if (user && bcrypt.compareSync(password, user.hash)) {
     const token = jwt.sign(
       { sub: user.id, username: user.fullname, mssv: user.mssv, role: user.role, label: label, link_avatar: user.link_avatar },
       process.env.SECRET
     );
-    return {
+    return {message:"Đăng nhập thành công",object:{
       ...user.toJSON(),
       token,
-    };
+    }};
   }
 }
 async function getAll() {
@@ -51,7 +58,18 @@ async function getAll() {
 }
 
 async function getById(id) {
-  return await User.findById(id);
+  var user = await User.findById(id);
+  if(user){
+    return {message:"Thông tin cá nhân",object:user};
+  }
+  throw {code:404,message:"Không tìm thấy user"} 
+}
+async function getSelf(req) {
+  var user = await User.findById(req.user.sub);
+  if(user){
+    return {message:"Thông tin cá nhân",object:user};
+  }
+  throw {code:404,message:"Không tìm thấy user"} 
 }
 
 async function createStudent(userParam) {
@@ -60,13 +78,13 @@ async function createStudent(userParam) {
   //   throw 'Tên đăng nhập đã được sử dụng';
   // }
   if (await User.findOne({ phone: userParam.phone })) {
-    throw 'Số điện thoại đã được sử dụng';
+    throw {code:400,message:'Số điện thoại đã được sử dụng'};
   }
   if (await User.findOne({ gmail: userParam.gmail })) {
-    throw 'Địa chỉ email đã được sử dụng';
+    throw {code:400,message:'Địa chỉ email đã được sử dụng'};
   }
   if (await User.findOne({ mssv: userParam.mssv })) {
-    throw 'Mssv đã được sử dụng';
+    throw {code:400,message:'Mssv đã được sử dụng'};
   }
   userParam.role = role.Student;
   const user = new User(userParam);
@@ -74,14 +92,32 @@ async function createStudent(userParam) {
   // hash password
   user.hash = bcrypt.hashSync(userParam.hash, 10);
   // save user
-  await user.save();
+  return  { object:await user.save(),message: 'Tạo người dùng thành công' };
+}
+async function createAdmin(userParam) {
+  // validate
+  // if (await User.findOne({ username: userParam.username })) {
+  //   throw 'Tên đăng nhập đã được sử dụng';
+  // }
+  var user = new User();
+  user.gmail='admin';
+  user.hash=bcrypt.hashSync("123456", 10);
+  user.role=role.Admin;
+  // save user
+  return  { object:await user.save(),message: 'Tạo người dùng thành công' };
 }
 async function createTeacher(userParam) {
   // validate
   console.log(userParam.username);
 
-  if (await User.findOne({ username: userParam.username })) {
-    throw 'Username "' + userParam.username + '" is already taken';
+  if (await User.findOne({ phone: userParam.phone })) {
+    throw {code:400,message:'Số điện thoại đã được sử dụng'};
+  }
+  if (await User.findOne({ gmail: userParam.gmail })) {
+    throw {code:400,message:'Địa chỉ email đã được sử dụng'};
+  }
+  if (await User.findOne({ mssv: userParam.mssv })) {
+    throw {code:400,message:'MSVC đã được sử dụng'};
   }
   console.log('username not find-create');
   userParam.role = role.Teacher;
@@ -92,13 +128,13 @@ async function createTeacher(userParam) {
 
   user.hash = bcrypt.hashSync(userParam.hash, 10);
   // save user
-  await user.save();
+  return  { object:await user.save(),message: 'Tạo người dùng thành công' };
 }
 async function update(user_param) {
   const user = await User.findById(user_param.id);
   var user_clone = user;
   // validate
-  if (!user) throw 'User not found';
+  if (!user) throw {code:404,message:'Không tìm thấy user'};
   Object.assign(user, userParam);
   user.hash = user_clone.hash;
   user.gmail = user_clone.gmail;
@@ -110,40 +146,33 @@ async function update(user_param) {
   // hash password if it was entered
 
   // copy userParam properties to user
-  return await user.save();
+  return {message:"Cập nhật thông tin thành công",object:await user.save()};
 }
 async function updateAvatar(req, res) {
   var user = await User.findById(req.user.sub);
   if (!user) {
     res.status(404);
-    res.send({ message: 'Khong tim thay user' });
-  } else {
+    res.send({message:'Không tìm thấy user'});
+  }else{
     upload(req, res, async function (err) {
-      if (!req.files) {
-        throw 'Chon file upload';
-      }
-      var filename = req.files.map((file) => file.filename)[0];
-      user.avatar_link = '/store/avatar' + filename;
-      user.save();
-    });
-    var update_user = await User.findById(req.user.sub);
-    if (update_user) {
-      console.log(update_user.avatar_link);
-      if (user.avatar_link != update_user.avatar_link) {
-        return { req }; //update_user.avatar_link;
-      } else {
-        throw 'Loi upload file';
-      }
+    if(!req.file){
+      res.status(400);
+      res.send({message:'Chọn file upload'});
     }
-    throw 'user khong duoc tim thay';
+    var filename = req.file.filename;
+    user.avatar_link="/store/avatar"+filename;
+    await user.save();
+    res.status(200);
+    res.send({message:'Đổi avatar thành công',object:user.avatar_link});
+    });
   }
 }
 async function update_password(user_param) {
   const user = await User.findById(user_param.id);
-  if (!user) throw 'User not found';
+  if (!user) throw {code:404,message:'Không tìm thấy user'};
   if (bcrypt.compareSync(user_param.old_password, user.hash)) {
     user.hash = bcrypt.hashSync(user_param.new_password, 10);
   }
   await user.save();
-  return 'Doi mat khau thanh cong';
+  return {message:'Đổi mật khẩu thành công',object:""};
 }

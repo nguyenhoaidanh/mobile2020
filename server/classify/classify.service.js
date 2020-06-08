@@ -19,6 +19,8 @@ module.exports = {
   uploadFile,
 };
 const fs = require('fs');
+const model_url = process.env.HOST+"/models";
+// const model_url = "http://localhost:9000/test";
 var storage = multer.diskStorage({
   destination: function (req, file, cb) {
     cb(null, './public/store/checkin');
@@ -30,7 +32,7 @@ var storage = multer.diskStorage({
     //check type avatar
   },
 });
-var upload = multer({ storage: storage }).single('images');
+var upload = multer({ storage: storage }).single('image');
 
 const readImage = (path) => {
   //reads the entire contents of a file.
@@ -40,11 +42,12 @@ const readImage = (path) => {
   //it returns a 3D or 4D tensor of the decoded image. Supports BMP, GIF, JPEG and PNG formats.
   const tfimage = tfnode.node.decodeImage(imageBuffer);
   return tfimage;
-};
-async function uploadFile(req, res) {
-  await upload(req, res, async function (err) {
-    if (!req.file) {
-      throw 'Loi upload file';
+}
+async function uploadFile(req,res){
+  await upload(req,res,async function(err){
+    if(!req.file){
+      res.status(400);
+      res.send({message:"Lỗi upload file"});
     }
     const path_in = './public/store/checkin/' + req.file.filename;
     const path_out = './public/store/out/' + req.file.filename;
@@ -59,8 +62,9 @@ async function uploadFile(req, res) {
       return x.prob >= 0.3;
     });
 
-    for (let ind = 0; ind < predict.length; ind++) {
-      predict[ind].label = await User.findOne({ mssv: predict[ind].label.split('_').pop() });
+    for (let ind=0;ind<predict.length;ind++){
+      var user = await User.findOne({mssv:predict[ind].label.split('_').pop()});
+      if(user)predict[ind].label=user;
     }
     console.log(predict);
     res.status(200);

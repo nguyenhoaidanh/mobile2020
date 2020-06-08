@@ -8,38 +8,71 @@ module.exports = router;
 
 
 router.post('/authorize',authorize(role.Student),createSession);
-router.get('/joined',authorize(role.Student),getAllSelfSession);
-router.put('/',authorize(role.Student), updateSession);
+router.get('/checkins',authorize(role.Student),getAllSelfSession);
+// router.put('/',authorize(role.Student), updateSession);
 // router.delete('/',authorize(role.Teacher), removeSession);
 router.get('/:id',authorize(role.Teacher), getOneSession);
-router.get('/rooms/:id',authorize(role.Teacher),getAllSession);
-
+// router.get('/rooms/:id',authorize(role.Teacher),getAllSessionInRoom);
+/**
+ * @typedef Response_checkin
+ * @property {string} message
+ * @property {Array.<Session>} object
+ */
+/**
+ * Checkin
+ * @route POST /session/authorize
+ * @group Session - API session user
+ * @returns {Response_checkin.model} 200 - Information User
+ * @returns {Error_401.model} 401 - Invalid Token
+ * @security JWT
+ */
 function createSession(req, res, next){
     sessionService.create(req)
-    .then((result)=>res.json({"result":result}))
-    .catch(err => res.status(400).json({message:err}));
+    .then((result) => res.json({message:"Điểm danh thành công",object:result }))
+    .catch((err) => res.status(err.code==null?500:err.code).send({message:err.message}));
 }
-function removeSession(){
+// function removeSession(){
 
-}
-function updateSession(req, res, next){
-    sessionService.update(req,res)
-    .then((result)=>res.json({"result":result}))
-    .catch(err => res.status(400).json({message:err}));
-}
+// }
+// function updateSession(req, res, next){
+//     sessionService.update(req,res)
+//     .then((result) => res.json(result))
+//     .catch((err) => res.status(err.code==null?500:err.code).send({message:err.message}));
+// }
+/**
+ * @typedef Response_session
+ * @property {string} message
+ * @property {Session.model} object
+ */
+/**
+ * Get session user
+ * @route GET /sessions/:id
+ * @group Session - API session user
+ * @returns {Response_session.model} 200 - Information User
+ * @returns {Error_401.model} 401 - Invalid Token
+ * @security JWT
+ */
 function getOneSession(req,res,next){
     sessionService.getById(req,res)
-    .then((result)=>res.json({"result":result}))
-    .catch(err => res.status(404).json({message:err}));
+    .then((result) => res.json(result))
+    .catch((err) => res.status(err.code==null?500:err.code).send({message:err.message}));
 }
-function getAllSession(req,res,next){
-    sessionService.getAll(req,res)
-    .then((result)=>res.json({"result":result}))
-    .catch(err => res.status(400).json({message:err}));
-}
+/**
+ * @typedef Response_sessions
+ * @property {string} message
+ * @property {Array.<Session>} object
+ */
+/**
+ * Get All session of a user
+ * @route GET /sessions/checkins
+ * @group Session - API session user
+ * @returns {Response_sessions.model} 200 - Information User
+ * @returns {Error_401.model} 401 - Invalid Token
+ * @security JWT
+ */
 function getAllSelfSession(req,res,next){
     console.log("debug here");
     sessionService.getAllSelf(req,res)
-    .then((result)=>res.json({"result":result}))
-    .catch(err => res.status(400).json({message:err}));
+    .then((result) => res.json(result))
+    .catch((err) => res.status(err.code==null?500:err.code).send({message:err.message}));
 }
