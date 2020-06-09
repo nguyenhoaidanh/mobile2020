@@ -67,7 +67,7 @@ async function updateFileExpress(req, res) {
     }
     if(image_errs.length>0){
         res.status(400);
-        res.send({message:"Ảnh không rõ, Vui lòng chụp lại ảnh",object:image_errs});
+        res.send({message:"Ảnh không rõ, Vui lòng chụp lại ảnh",object:null});
         return;
     }
     var user = await User.findById(req.user.sub);
@@ -104,6 +104,7 @@ async function updateFileExpress(req, res) {
       await tranferToBucket('./dataset/dataset.csv',process.env.BUCKET_CSV_NAME);
       console.log("upload dataset to bucket");
     }
+    
     user.list_images=[].concat(user.list_images,filenames);
     await user.save();
     for(let ind=0;ind<filenames.length;ind++){

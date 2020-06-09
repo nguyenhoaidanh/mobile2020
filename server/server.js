@@ -70,6 +70,8 @@ app.get('/test', async (req, res) => {
 //end testttt
 app.use('/static', express.static('public'));
 app.use('/', express.static('classify'));
+//mail public api
+app.use('/mails/', require('./controller/mail.controller'));
 
 //jwt
 app.use(jwt());

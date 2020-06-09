@@ -11,9 +11,7 @@ module.exports = router;
 router.post('/uploadfile', authorize(), upload_file);
 // router.post('/', authorize(role.Student), update_image_for_user);
 router.put('/avatars', update_avatar);
-router.get('/password', update_password);
 router.post('/bucket', authorize(role.Admin), create_bucket);
-router.get('/infor', get_self);
 /**
  * @typedef Response_Image
  * @property {string} message
@@ -49,25 +47,7 @@ function create_bucket(req, res, next) {
     .then((result) => res.json(result))
     .catch((err) => res.status(err.code==null?500:err.code).send({message:err.message}));
 }
-/**
- * @typedef Response_UserInfo
- * @property {string} message
- * @property {User.model} object
- */
-/**
- * Get information user
- * @route GET /users/infor
- * @group User - API information user
- * @returns {Response_UserInfo.model} 200 - Information User
- * @returns {Error_401.model} 401 - Invalid Token
- * @security JWT
- */
-function get_self(req, res, next) {
-  userService
-    .getSelf(req)
-    .then((result) => res.json(result))
-    .catch((err) => res.status(err.code==null?500:err.code).send({message:err.message}));
-}
+
 /**
  * @typedef Response_avatar
  * @property {string} message
@@ -84,9 +64,4 @@ function get_self(req, res, next) {
  */
 function update_avatar(req, res, next) {
   userService.updateAvatar(req,res);
-}
-function update_password(req,res,next){
-    userService.updatePassword(req)
-    .then((result) => res.json(result))
-    .catch((err) => res.status(err.code==null?500:err.code).send({message:err.message}));
 }

@@ -10,7 +10,7 @@ var multer = require('multer');
 var dirmain = path.join(__dirname, '../');
 
 const User = db.User;
-
+const Token = db.Token;
 module.exports = {
   authenticate,
   getAll,
@@ -21,7 +21,9 @@ module.exports = {
   update,
   updatePassword,
   updateAvatar,
-  getSelf
+  getSelf,
+  changePassword,
+  checkOTP
 };
 var storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -162,7 +164,7 @@ async function updateAvatar(req,res){
       res.send({message:'Chọn file upload'});
     }
     var filename = req.file.filename;
-    user.avatar_link="/store/avatar"+filename;
+    user.avatar_link="/store/avatar/"+filename;
     await user.save();
     res.status(200);
     res.send({message:'Đổi avatar thành công',object:user.avatar_link});
@@ -178,12 +180,25 @@ async function updatePassword(req) {
   await user.save();
   return {message:'Đổi mật khẩu thành công',object:""};
 }
-async function forgotPassword(req) {
-  const user = await User.findById(req.user.sub);
+async function changePassword(req) {
+  const user = await User.findOne({gmail:req.body.gmail});
   if (!user) throw {code:404,message:'Không tìm thấy user'};
-  if (bcrypt.compareSync(req.body.old_password, user.hash)) {
-    user.hash = bcrypt.hashSync(req.body.new_password, 10);
-  }
+  var token = await Token.findOne({gmail:req.body.gmail,code:req.body.token});
+  if(!token)throw{code:404,message:"Token không khả dụng"};
+  if((Date.now()-token.create_date)>5*60*1000)throw{code:400,message:"Hết hạn đổi mật khẩu"};
+  if(token.isUsed)throw{code:400,message:"Token đã được sử dụng"};
+  token.isUsed=true;
+  user.hash = bcrypt.hashSync(req.body.new_password, 10);
   await user.save();
+  await token.save();
   return {message:'Đổi mật khẩu thành công',object:""};
+}
+async function checkOTP(req){
+  const user = await User.findOne({gmail:req.body.gmail});
+  if (!user) throw {code:404,message:'Không tìm thấy user'};
+  var token = await Token.findOne({gmail:req.body.gmail,code:req.body.token});
+  if(!token)throw{code:404,message:"Phiên không được tìm thấy"};
+  if((Date.now()-token.create_date)>5*60*1000)throw{code:400,message:"Hết hạn đổi mật khẩu"};
+  if(token.isUsed)throw{code:400,message:"Token đã được sử dụng"};
+  return {message:"Xác thực thành công",object:""}
 }

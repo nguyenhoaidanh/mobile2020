@@ -8,4 +8,5 @@ module.exports = {
     Class:require('../model/class'),
     Room:require('../model/room'),
     Session:require('../model/session'),
+    Token:require('../model/token'),
 };
