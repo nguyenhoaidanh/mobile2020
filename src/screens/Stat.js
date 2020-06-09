@@ -28,10 +28,10 @@ class Home extends Component<Props> {
     const { currentRoom = {} } = this.props;
     const { room = {} } = currentRoom;
     this.setState({ loading: true });
-    AXIOS(`/rooms/${currentRoom.room.id}/students`, 'GET', {}, {}, this.props.userInfo.token)
+    AXIOS(`/rooms/${currentRoom.id}/students`, 'GET', {}, {}, this.props.userInfo.token)
       .then(({ data }) => {
-        console.log('123456', 1, data.result);
-        this.setState({ listStudent: data.result.filter((e) => e.user.role != ROLES.teacher) });
+        console.log('123456', 1, data.object);
+        this.setState({ listStudent: data.object.filter((e) => e.user.role != ROLES.teacher) });
       })
       .catch((err) => {
         checkTokenExpire(err, this);

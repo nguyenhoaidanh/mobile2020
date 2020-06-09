@@ -11,6 +11,7 @@ import { itemHeight, ROLES } from '../constants/constants';
 import { AXIOS, checkTokenExpire, shadow } from '../utils/functions';
 import cStyles from '../constants/common-styles';
 import Loading from '../components/Loading';
+import ClassItem from '../components/ClassItem';
 const styles = StyleSheet.create({
   btn: {
     ...shadow(),
@@ -41,6 +42,7 @@ class Home extends Component<Props> {
       AXIOS(path, 'GET', {}, {}, token)
         .then(({ data }) => {
           console.log('123456', `found ${data.object.length} class`);
+          //console.log('123456', data.object);
           this.props.appActions.setListClass({ listClass: data.object });
         })
         .catch((err) => {
@@ -70,16 +72,20 @@ class Home extends Component<Props> {
   };
   openListRoom = (_class) => {
     const { history = [] } = this.state;
+    const { userInfo = {} } = this.props;
+    if (userInfo.role !== ROLES.teacher) _class = _class.class;
     this.setState({ currentClass: _class, loading: true });
     this.props.appActions.setCurClass({
       currentClass: _class,
     });
     AXIOS(`/rooms/classes/${_class.id}`, 'GET', {}, {}, this.props.userInfo.token)
       .then(({ data }) => {
-        console.log('123456', `found ${data.result.length} room`);
-        let listRoom = data.result.map((e) => {
-          return { ...e, isCheckIn: history.find((hi) => e.room.id == hi.session.room_id) !== undefined };
+        console.log('123456', `found ${data.object.length} room`);
+        //console.log('123456', data.object);
+        let listRoom = data.object.map((e) => {
+          return { ...e, isCheckIn: history.find((hi) => e.id == hi.session.room_id) !== undefined };
         });
+        // console.log('123456', listRoom);
         this.setState({ listRoom, isListClass: false });
         this.props.appActions.setCurScreent({
           currentScreent: {
@@ -130,10 +136,13 @@ class Home extends Component<Props> {
 
   validate = () => {
     const { currentRoom = {}, password } = this.state;
-    const { room = {} } = currentRoom;
+    this.props.appActions.setCurRoom({ currentRoom: { ...currentRoom, secret: password } });
+    return this.navigate('/check-in');
     if (!password) return;
     this.setState({ loading: true });
-    AXIOS(`/rooms/authorize`, 'POST', { room_id: room.id, secret: password }, {}, this.props.userInfo.token)
+    let data = { room_id: currentRoom.id, secret: password };
+    console.log(123456, currentRoom, data);
+    AXIOS(`/rooms/authorize`, 'POST', data, {}, this.props.userInfo.token)
       .then(({ data }) => {
         console.log('123456', 11, data);
         this.props.appActions.setCurRoom({ currentRoom: { ...currentRoom, secret: password } });
@@ -190,13 +199,17 @@ class Home extends Component<Props> {
     return (
       <View>
         {showForm ? this.renderPopupPassword() : null}
-        <View style={{ flexDirection: 'row', width: '100%', marginTop: 10, padding: 10 }}>
-          <View style={styles.btn}>
-            <Text onPress={this.createRoom} style={styles.btnText}>
-              <Icon style={styles.btnIcon} name={'plus'} size={iconSize} color={iconColor} />
-              <Text style={{ marginLeft: 30 }}>Tạo phòng</Text>
-            </Text>
-          </View>
+        <View style={{ flexDirection: 'row', width: '100%', marginTop: 10, padding: 10, alignItems: 'center', alignContent: 'center' }}>
+          {isListClass ? (
+            <View style={{ width: '25%' }}></View>
+          ) : (
+            <View style={styles.btn}>
+              <Text onPress={this.createRoom} style={styles.btnText}>
+                <Icon style={styles.btnIcon} name={'plus'} size={iconSize} color={iconColor} />
+                <Text style={{ marginLeft: 30 }}>Tạo phòng</Text>
+              </Text>
+            </View>
+          )}
           <View style={styles.btn}>
             <Text style={styles.btnText} onPress={this.onSort}>
               <Icon style={styles.btnIcon} name={'sort'} size={iconSize} color={iconColor} />
@@ -209,25 +222,15 @@ class Home extends Component<Props> {
             ? listRoom.map((room, idx) => (
                 <RoomItem
                   currentClass={this.state.currentClass}
-                  onClickFunc={() => this.setState({ showForm: true, currentRoom: room })}
+                  onClickFunc={() => {
+                    this.setState({ showForm: true, currentRoom: room });
+                  }}
                   data={room}
                   key={idx}
                   index={idx}
                 />
               ))
-            : listClass.map((l, i) => (
-                <ListItem
-                  onPress={() => this.openListRoom(l)}
-                  key={i}
-                  chevron
-                  bottomDivider
-                  leftIcon={<Icon name={'graduation-cap'} size={30} color={'black'} />}
-                  title={`${l.code_subject} - ${l.name_subject}`}
-                  titleStyle={{ fontWeight: 'bold' }}
-                  subtitle={l.code_class}
-                  bottomDivider
-                />
-              ))}
+            : listClass.map((l, i) => <ClassItem key={i} clickFunc={() => this.openListRoom(l)} data={l} />)}
           {loading ? (
             <Loading />
           ) : listClass.length === 0 || listRoom.length == 0 ? (

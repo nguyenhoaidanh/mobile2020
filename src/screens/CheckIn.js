@@ -5,12 +5,13 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import { Input, Button, CheckBox } from 'react-native-elements';
 import ImageInput from '../components/ImageInput';
 import cStyles from '../constants/common-styles';
-import { AXIOS, checkTokenExpire, shadow, uploadFileToServer } from '../utils/functions';
+import { AXIOS, checkTokenExpire, shadow, uploadFileToServer, setAvatar } from '../utils/functions';
 
 import { list_screen_map } from '../constants/constants';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import * as appActions from '../actions/index';
+import config from '../constants/config';
 const styles = StyleSheet.create({});
 
 type Props = {};
@@ -23,12 +24,11 @@ class Home extends Component<Props> {
     const { image = {} } = this.state;
     if (!image.path) return;
     if (!image.path.includes('.jpg') && !image.path.includes('.jpeg')) return this.showAlert('Định dạng file không được hỗ trợ');
-    console.log(123456, 'start upload 233');
+    console.log(123456, 'start upload');
     this.setState({ loading: true });
     uploadFileToServer([image], this.props.userInfo.token, '/users/classify')
       .then(({ data }) => {
-        console.log(123456, data);
-        this.showConfirm();
+        this.showConfirm(data.result);
       })
       .catch((err) => {
         checkTokenExpire(err, this);
@@ -38,46 +38,77 @@ class Home extends Component<Props> {
         this.setState({ loading: false });
       });
   };
-  showConfirm = () => {
-    Alert.alert(
-      '',
-      `Phát hiện 3 người:
-      - Nguyễn Văn A - 1610391
-      - Nguyễn Văn A - 1610391
-      - Nguyễn Văn A - 1610391`,
-      [
+  showConfirm = (data) => {
+    const { num_faces, out_image, predict } = data;
+    const { currentRoom = {} } = this.props;
+    let { number: number_required } = currentRoom;
+    if (!number_required) number_required = 1;
+    if (num_faces == 0) return this.showAlert('Không có gương mặt nào trong ảnh, chụp lại');
+    if (num_faces < number_required) return this.showAlert(`Số người cho phép là ${number_required}, chụp lại`);
+    console.log(123456, 'num_faces', num_faces, 'predict', predict.length);
+    console.log(123456, currentRoom, predict.length, out_image);
+    predict.forEach((element) => {
+      console.log(123456, element.label.fullname, element.prob);
+    });
+    let canCheckin = false;
+    this.setState({ image: out_image });
+    let str = predict.map((e) => `- ${e.label.fullname} - ${e.label.mssv}`);
+    str = str.length ? str.join('\n') : '';
+    if (num_faces > predict.length) {
+      if (predict.length != 0) {
+        str += `\nVà ${num_faces - predict.length} người chưa xác định`;
+      } else {
+        str += `\nHệ thống chưa nhận diện được họ.`;
+      }
+    } else {
+      canCheckin = true;
+    }
+    let arrbtn;
+    if (!canCheckin) {
+      arrbtn = [
         {
           text: 'Chụp lại',
           onPress: () => this.setState({ image: {} }),
         },
-        { text: 'Điểm danh', onPress: this.saveSession },
-      ],
-      { cancelable: false }
-    );
-    const { currentRoom = {}, currentClass } = this.props;
+      ];
+    } else
+      arrbtn = [
+        {
+          text: 'Chụp lại',
+          onPress: () => this.setState({ image: {} }),
+        },
+        { text: 'Điểm danh', onPress: () => this.saveSession(predict) },
+      ];
+    Alert.alert('', `Phát hiện ${num_faces} người:\n${str}`, arrbtn);
   };
-  showAlert = (msg, success = false) => {
+  showAlert = (msg, success = false, btnText = 'Đã hiểu') => {
     Alert.alert('Thông báo', msg, [
       {
-        text: 'Đã hiểu',
+        text: btnText,
         onPress: () => {
           this.setState({ success });
         },
       },
     ]);
   };
-  saveSession = () => {
+  saveSession = (predict = []) => {
     const { currentRoom = {} } = this.props;
+    this.setState({ predict });
     const { image = {} } = this.state;
-    const session = {
-      room_id: currentRoom.room.id,
-      secret_of_room: currentRoom.secret || 123456,
-      location: {
-        longtitude: 20.0,
-        lattitude: 20.0,
+    const sessions = {
+      session: {
+        room_id: currentRoom.id,
+        link_face: image,
+        secret_of_room: currentRoom.secret || 123456,
+        location: {
+          longtitude: 20.0,
+          lattitude: 20.0,
+        },
       },
+      list_users: predict.map((e) => e.label.id),
     };
-    AXIOS('/sessions/authorize', 'POST', session, {}, this.props.userInfo.token)
+    console.log(123456, sessions);
+    AXIOS('/sessions/authorize', 'POST', sessions, {}, this.props.userInfo.token)
       .then(({ data }) => {
         this.showAlert('Điểm danh thành công', true);
       })
@@ -99,7 +130,6 @@ class Home extends Component<Props> {
     const iconColor = 'black';
     const { currentClass = {} } = this.props;
     const { message = '', valid = 1, image = {}, success = false, loading = false } = this.state;
-    console.log(123456, 'currentClass');
     if (success)
       return (
         <View>
@@ -109,9 +139,11 @@ class Home extends Component<Props> {
             <Text style={{ fontSize: 20, color: 'black' }}>Môn học: </Text>
             <Text style={{ fontSize: 20, color: 'brown', alignSelf: 'center', fontWeight: 'bold' }}>{currentClass.name_subject} - 20/12/2020</Text>
             <Text style={{ fontSize: 20, color: 'black' }}>Sinh viên:</Text>
-            <Text style={{ fontSize: 20, color: 'blue', alignSelf: 'center', fontWeight: 'bold' }}>- Nguyễn Hoài Danh - 1610391</Text>
-            <Text style={{ fontSize: 20, color: 'blue', alignSelf: 'center', fontWeight: 'bold' }}>- Nguyễn Hoài Danh - 1610391</Text>
-            <Text style={{ fontSize: 20, color: 'blue', alignSelf: 'center', fontWeight: 'bold' }}>- Nguyễn Hoài Danh - 1610391</Text>
+            {predict.map((e, i) => (
+              <Text style={{ fontSize: 20, color: 'blue', alignSelf: 'center', fontWeight: 'bold' }}>
+                - {e.label.fullname} - {e.label.mssv}
+              </Text>
+            ))}
             <Button
               containerStyle={cStyles.btnwrap}
               titleStyle={cStyles.btnText}
@@ -127,7 +159,7 @@ class Home extends Component<Props> {
       );
     return (
       <View>
-        <ImageInput showAccessory={false} backgroundColor="white" image={image} camera={true} callback={this.setImage} />
+        <ImageInput showAccessory={false} backgroundColor="white" image={image} picker={true} callback={this.setImage} />
         <Button
           loading={loading}
           containerStyle={cStyles.btnwrap}

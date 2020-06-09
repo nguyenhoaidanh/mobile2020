@@ -29,6 +29,7 @@ type Props = {};
 class Footer extends Component<Props> {
   constructor(props) {
     super(props);
+
     this.state = { list: list_screen };
   }
   componentDidMount() {
@@ -52,24 +53,29 @@ class Footer extends Component<Props> {
     this.setState({ hideFooter: 0 });
   }
   updateIndex = (selectedIndex) => {
-    const { list = [] } = this.state;
+    let { list = [] } = this.state;
+    const { userInfo = {}, loggedIn = false, app = {} } = this.props;
     this.setState({ selectedIndex });
     this.props.history.push(list[selectedIndex].to);
     this.props.appActions.setCurScreent({ currentScreent: list[selectedIndex] });
   };
-  componentWillReceiveProps(props) {}
+  componentWillReceiveProps(props) {
+    const { userInfo = {} } = props;
+    let list = [];
+    if (userInfo.role) {
+      list = list_screen.filter((e) => {
+        return e.showRole.includes(userInfo.role);
+      });
+    }
+    this.setState({ list });
+  }
   render() {
     let { selectedIndex = 0, hideFooter = 0, list = [] } = this.state;
     const { userInfo = {}, loggedIn = false, app = {} } = this.props;
     const { currentScreent = {} } = app;
-    if (userInfo.role) {
-      list = list.filter((e) => {
-        return e.showRole.includes(userInfo.role);
-      });
-    }
     let buttons = list.map((el, i) => ({
       element: () => {
-        const isActive = i == selectedIndex || currentScreent.to == el.to;
+        const isActive = i == selectedIndex;
         const color = isActive ? 'brown' : 'black';
         return (
           <View style={{ width: '100%', alignItems: 'center', backgroundColor: isActive ? 'lightblue' : 'white' }}>

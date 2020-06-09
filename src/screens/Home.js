@@ -72,19 +72,16 @@ class Home extends Component<Props> {
       }
     })();
   }
-  componentWillUnmount() {
-    global.firstLoad = true;
-  }
   render() {
     let { loggedIn = false, userInfo = {} } = this.props;
     const { image = {}, mssv = '1610391', username = 'Nguyễn Hoài Danh', avatar_link } = userInfo;
     const avaSource = setAvatar(avatar_link || image);
-    const { loading = !global.firstLoad } = this.state;
+    const { loading = true } = this.state;
     const screenWidth = Math.round(Dimensions.get('window').width);
     const padding = 5;
     const numperrow = 3;
     const width = screenWidth / numperrow - numperrow * padding;
-    console.log(123456, 'home', userInfo.avatar_link);
+    // console.log(123456, 'home', userInfo.avatar_link);
     //AsyncStorage.removeItem('@userInfo');
     if (loading)
       return (

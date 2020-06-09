@@ -30,16 +30,16 @@ class Footer extends Component<Props> {
   };
   render() {
     let { index = 0, data = {}, currentClass = {}, userInfo = {} } = this.props;
-    const { room, num_checked, isCheckIn } = data;
+    const { title, user_create, num_checked, isCheckIn } = data;
     const isExpire = false; //   !(Date.now() >= +room.start_time && Date.now() <= +room.end_time);
-    const isAuthor = room.user_create == userInfo.id;
+    const isAuthor = user_create == userInfo.id;
     const isStudent = userInfo.role == ROLES.student;
-    console.log(123456, 'isCheckIn', isCheckIn);
+    //  console.log(123456, 'isCheckIn', data);
     return (
       <Card>
         <View style={styles.row}>
           <Text style={{ width: '100%', fontSize: 20, alignContent: 'center', fontWeight: 'bold' }}>
-            {currentClass.name_subject} - {room.title}
+            {currentClass.name_subject} - {title}
           </Text>
           <Text style={styles.textLeft}>
             Sỉ số: {num_checked}/{currentClass.number_of_student}

@@ -25,7 +25,7 @@ class Home extends Component<Props> {
     const { list_images = [] } = userInfo;
     const n = list_images.length > min_image ? list_images.length : min_image;
     for (let i = 0; i < n; i++) {
-      list.push({ index: i, image: goolge_url + list_images[i] || {} });
+      list.push({ index: i, image: list_images[i] ? goolge_url + list_images[i] : {} });
     }
     this.state = { userInfo, list };
   }

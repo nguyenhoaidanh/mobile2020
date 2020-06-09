@@ -53,7 +53,7 @@ export const changeTime = (str = '') => {
   const year = +dmy.split('-')[2];
   return new Date(year, mon, day, hour, min, 0, 0).getTime();
 };
-export const setAvatar = (image, fromUrl = false) => {
+export const setAvatar = (image) => {
   if (typeof image == 'string') {
     if (image.includes(goolge_url)) return { uri: image };
     return { uri: appConfig.api_domain + '/static' + image };

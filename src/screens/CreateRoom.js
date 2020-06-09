@@ -28,11 +28,11 @@ class CreateRoom extends Component<Props> {
   };
   makeRoom = () => {
     const { currentClass = {} } = this.props;
-    let { start_time, end_time, title, password, repPassword } = this.state;
+    let { start_time, end_time, title, password, repPassword, secret_create_room, number } = this.state;
     let valid = true;
     console.log(123456, this.state);
-
     if (!title) return this.setState({ errorMessage: { title: 'Trường ngày là bắt buộc' } });
+    if (!secret_create_room) return this.setState({ errorMessage: { secret_create_room: 'Trường ngày là bắt buộc' } });
     if (!password) return this.setState({ errorMessage: { password: 'Trường ngày là bắt buộc' } });
     if (!repPassword) return this.setState({ errorMessage: { repPassword: 'Trường ngày là bắt buộc' } });
     if (!start_time) return this.setState({ errorMessage: { start_time: 'Trường ngày là bắt buộc' } });
@@ -46,17 +46,17 @@ class CreateRoom extends Component<Props> {
 
     let room = {
       class_id: currentClass.id,
-      secret: '123456',
-      title: 'Test',
-      secret_create_room: '123',
+      secret: password,
+      title,
+      number,
+      secret_create_room,
       location: {
         longtitude: 20.0,
         latitude: 20.0,
       },
-      start_time: Date.now(),
-      end_time: Date.now(),
+      start_time: new Date(start_time),
+      end_time: new Date(end_time),
     };
-    return;
     AXIOS('/rooms', 'POST', room, {}, this.props.userInfo.token)
       .then(({ data }) => {
         console.log('123456', 1, data);
@@ -98,6 +98,7 @@ class CreateRoom extends Component<Props> {
       errorMessage = {},
       password = '',
       repPassword = '',
+      secret_create_room = '',
       name = '',
       number = '1',
     } = this.state;
@@ -162,7 +163,16 @@ class CreateRoom extends Component<Props> {
             </TouchableOpacity>
             {this.state.showPicker ? this.renderPicker() : null}
             <Input
-              label="Mật khẩu"
+              label="Mật khẩu tạo phòng"
+              errorStyle={cStyles.errorStyle}
+              errorMessage={errorMessage.secret_create_room}
+              placeholder="Password"
+              leftIcon={<Icon name="key" size={iconSize} color={iconColor} />}
+              onChangeText={(value) => this.onchange('secret_create_room', value)}
+              secureTextEntry={true}
+            />
+            <Input
+              label="Mật khẩu phòng"
               errorStyle={cStyles.errorStyle}
               errorMessage={errorMessage.password}
               placeholder="Password"
@@ -171,7 +181,7 @@ class CreateRoom extends Component<Props> {
               secureTextEntry={true}
             />
             <Input
-              label="Nhập lại Mật khẩu"
+              label="Nhập lại Mật khẩu phòng"
               errorStyle={cStyles.errorStyle}
               errorMessage={errorMessage.repPassword}
               placeholder="Password"

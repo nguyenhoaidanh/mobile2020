@@ -102,19 +102,19 @@ class Login extends Component<Props> {
               secureTextEntry={true}
             />
             <Button containerStyle={cStyles.btnwrap} titleStyle={cStyles.btnText} buttonStyle={cStyles.btnPrimary} title="Đăng nhập" onPress={this.login} />
-            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            {/* <View style={{ flexDirection: 'row', alignItems: 'center' }}>
               <View style={{ width: '100%', alignSelf: 'center' }}>
                 <Text style={{ marginTop: 15, marginBottom: 10, fontSize: 15, alignSelf: 'center', color: 'grey' }}>Hoặc đăng nhập bằng</Text>
               </View>
-            </View>
-            <Button
+            </View> */}
+            {/* <Button
               containerStyle={cStyles.btnwrap}
               titleStyle={cStyles.btnText}
               buttonStyle={cStyles.btn}
               icon={<MaterialCommunityIcons style={{ marginRight: 10 }} name="face-recognition" size={iconSize} color={'white'} />}
               title="Gương mặt"
               onPress={() => this.setState({ mode: 1 }, this.openCamera)}
-            />
+            /> */}
             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
               <View style={{ width: '100%', alignSelf: 'center' }}>
                 <Text
