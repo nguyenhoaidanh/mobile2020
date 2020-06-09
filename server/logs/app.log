@@ -1,0 +1,23 @@
+
+> swagger-to-existing-nodejs-project@0.0.1 start /home/thuc/Documents/PT_UNG_DUNG/mobile2020/server
+> node server.js
+
+node-pre-gyp info This Node instance does not support builds for N-API version 6
+node-pre-gyp info This Node instance does not support builds for N-API version 6
+2020-06-09 14:07:05.226239: I tensorflow/core/platform/cpu_feature_guard.cc:142] Your CPU supports instructions that this TensorFlow binary was not compiled to use: AVX2 FMA
+2020-06-09 14:07:05.278458: I tensorflow/core/platform/profile_utils/cpu_utils.cc:94] CPU Frequency: 2400000000 Hz
+2020-06-09 14:07:05.278910: I tensorflow/compiler/xla/service/service.cc:168] XLA service 0xfbd240 initialized for platform Host (this does not guarantee that XLA will be used). Devices:
+2020-06-09 14:07:05.278941: I tensorflow/compiler/xla/service/service.cc:176]   StreamExecutor device (0): Host, Default Version
+(node:1083522) DeprecationWarning: `open()` is deprecated in mongoose >= 4.11.0, use `openUri()` instead, or set the `useMongoClient` option if using `connect()` or `createConnection()`. See http://mongoosejs.com/docs/connections.html#use-mongo-client
+app is running on port 3000
+Admin Exist
+[POST] /users/passwords/restore
+[Query] {}
+[Body] {"gmail":"huynhthuchct@gmail.com","token":"633723","new_password":"123456"}
+[Authorization] undefined
+
+[POST] /users/passwords/restore
+[Query] {}
+[Body] {"gmail":"huynhthuchct@gmail.com","token":"633723","new_password":"123456"}
+[Authorization] undefined
+
