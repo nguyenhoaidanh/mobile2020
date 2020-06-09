@@ -12,7 +12,7 @@ var transporter = nodemailer.createTransport({
 module.exports ={
     send
 }
-async function send(req){
+async function send(req,res){
     var user  =  await User.findOne({gmail:req.body.email});    
     if(!user) throw {code:404,message:"Địa chỉ mail không tồn tại"};
     var token  = new Token();
@@ -31,11 +31,16 @@ async function send(req){
     transporter.sendMail(mailOptions, async function(error, info){
         if (error) {
           console.log(error);
+          res.status(500);
+          res.send({message:"Lỗi server mail"});
           throw({code:500,message:"Lỗi server mail"})
         } else {
           await token.save();
-          return ({mesage:"Mail đã được gửi tới hòm thư của bạn",object:info.response});
+          res.status(200);
+          res.send({mesage:"Mail đã được gửi tới hòm thư của bạn",object:info.response});
           console.log('Email sent: ' + info.response);
+          return;
+          
         }
       });
 }
