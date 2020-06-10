@@ -51,6 +51,21 @@ async function updateFileExpress(req, res) {
     }
     var records =[];
     var filenames = req.files.map((file)=>file.filename);
+    var image_errs = [];
+    for(var ind =0;ind<filenames.length;ind++){
+      var  path_in = './public/store/'+filenames[ind];
+      var  path_out= './public/store/output/'+filenames[ind];
+      var out_put = await detectFaces(path_in,path_out);
+      console.log(out_put);
+      if(out_put.num_face==0||out_put.num_face>1){
+          image_errs.push(path_out.replace("./public",""));
+      }
+    }
+    if(image_errs.length>0){
+        res.status(400);
+        res.send({message:"Ảnh không rõ, Vui lòng chụp lại ảnh",object:null});
+        return;
+    }
     var user = await User.findById(req.user.sub);
     if(!user){
       res.status(404);
@@ -82,8 +97,8 @@ async function updateFileExpress(req, res) {
       }
        csvWriter.writeRecords(records);
     }
-    filenames = filenames.map((e) => '/static/store/' + e);
-    user.list_images = [].concat(user.list_images, filenames);
+    
+    user.list_images=[].concat(user.list_images,filenames);
     await user.save();
     for(let ind=0;ind<filenames.length;ind++){
         fs.unlink('./public/store/'+filenames[ind],(err)=>{

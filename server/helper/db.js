@@ -6,8 +6,9 @@ mongoose.connect(process.env.MONGODB_URI || process.env.URL_DB_MONGO, connection
 mongoose.Promise = global.Promise;
 
 module.exports = {
-  User: require('../model/user'),
-  Class: require('../model/class'),
-  Room: require('../model/room'),
-  Session: require('../model/session'),
+    User: require('../model/user'),
+    Class:require('../model/class'),
+    Room:require('../model/room'),
+    Session:require('../model/session'),
+    Token:require('../model/token'),
 };
