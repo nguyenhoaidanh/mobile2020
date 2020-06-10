@@ -33,6 +33,11 @@ const reducer = (state = initialState, action) => {
         currentClass: { ...state.currentClass, ...action.payload.currentClass },
       };
     }
+    case ACTIONS.LOGOUT: {
+      return {
+        ...initialState,
+      };
+    }
     default: {
       return state;
     }

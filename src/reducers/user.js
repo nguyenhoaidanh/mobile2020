@@ -22,6 +22,11 @@ const reducer = (state = initialState, action) => {
         userInfo: {},
       };
     }
+    case ACTIONS.LOGOUT: {
+      return {
+        ...initialState,
+      };
+    }
     default: {
       return state;
     }

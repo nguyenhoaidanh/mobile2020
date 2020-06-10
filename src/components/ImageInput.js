@@ -24,7 +24,6 @@ class Footer extends Component<Props> {
   };
   render() {
     const { disabled = false, backgroundColor = 'transparent', margin = 20, image = {}, height = '80%', width = '100%', component = null } = this.props;
-    console.log(123456, 'imageinput', setAvatar(image));
     return (
       <View style={{ width, height, backgroundColor, borderRadius: 10, paddingBottom: 0 }}>
         <Avatar

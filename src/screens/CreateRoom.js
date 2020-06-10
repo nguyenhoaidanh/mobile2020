@@ -54,15 +54,19 @@ class CreateRoom extends Component<Props> {
         longtitude: 20.0,
         latitude: 20.0,
       },
-      start_time: new Date(start_time),
-      end_time: new Date(end_time),
+      start_time,
+      end_time,
     };
+    this.setState({ loading: true });
     AXIOS('/rooms', 'POST', room, {}, this.props.userInfo.token)
       .then(({ data }) => {
         console.log('123456', 1, data);
-        this.setState({ respData: data.result, success: true });
+        this.setState({ respData: data, success: true });
       })
-      .catch((err) => checkTokenExpire(err, this));
+      .catch((err) => checkTokenExpire(err, this))
+      .finally(() => {
+        this.setState({ loading: false });
+      });
   };
   renderPicker = () => {
     let { selectedItem = 0 } = this.state;
@@ -103,7 +107,7 @@ class CreateRoom extends Component<Props> {
       number = '1',
     } = this.state;
     const { currentClass = {} } = this.props;
-    console.log(123456, errorMessage);
+    console.log(123456, respData);
     if (success)
       return (
         <View>
@@ -239,7 +243,14 @@ class CreateRoom extends Component<Props> {
                 },
               }}
             />
-            <Button containerStyle={cStyles.btnwrap} titleStyle={cStyles.btnText} buttonStyle={cStyles.btnPrimary} title="Tạo phòng" onPress={this.makeRoom} />
+            <Button
+              loading={this.state.loading}
+              containerStyle={cStyles.btnwrap}
+              titleStyle={cStyles.btnText}
+              buttonStyle={cStyles.btnPrimary}
+              title="Tạo phòng"
+              onPress={this.makeRoom}
+            />
             <View style={{ height: 265 }} />
           </View>
         </ScrollView>

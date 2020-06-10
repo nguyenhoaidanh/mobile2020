@@ -65,6 +65,8 @@ class Home extends Component<Props> {
     this.props.appActions.logout();
     this.props.appActions.setCurScreent({ currentScreent: list_screen_map.home });
     this.props.history.push('/');
+    global.loaded = false;
+    this.props.appActions.logout({});
   };
   onchange = (name, value) => {
     this.setState({ userInfo: { ...this.state.userInfo, [name]: value } });

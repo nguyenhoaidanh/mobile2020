@@ -137,7 +137,6 @@ class Home extends Component<Props> {
   validate = () => {
     const { currentRoom = {}, password } = this.state;
     this.props.appActions.setCurRoom({ currentRoom: { ...currentRoom, secret: password } });
-    return this.navigate('/check-in');
     if (!password) return;
     this.setState({ loading: true });
     let data = { room_id: currentRoom.id, secret: password };

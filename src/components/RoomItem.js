@@ -9,6 +9,7 @@ import { bindActionCreators } from 'redux';
 import * as appActions from '../actions/index';
 import cStyles from '../constants/common-styles';
 import { list_screen_map, ROLES } from '../constants/constants';
+import { formatTime } from '../utils/functions';
 const styles = StyleSheet.create({
   container: {
     width: '100%',
@@ -31,10 +32,10 @@ class Footer extends Component<Props> {
   render() {
     let { index = 0, data = {}, currentClass = {}, userInfo = {} } = this.props;
     const { title, user_create, num_checked, isCheckIn } = data;
-    const isExpire = false; //   !(Date.now() >= +room.start_time && Date.now() <= +room.end_time);
+    const curTime = Date.now();
+    const canCheckin = true || (curTime >= +data.start_time && curTime <= +data.end_time);
     const isAuthor = user_create == userInfo.id;
     const isStudent = userInfo.role == ROLES.student;
-    //  console.log(123456, 'isCheckIn', data);
     return (
       <Card>
         <View style={styles.row}>
@@ -42,13 +43,13 @@ class Footer extends Component<Props> {
             {currentClass.name_subject} - {title}
           </Text>
           <Text style={styles.textLeft}>
-            Sỉ số: {num_checked}/{currentClass.number_of_student}
+            Thời gian điểm danh: {formatTime(data.start_time)} đến {formatTime(data.end_time)}
           </Text>
         </View>
         {isAuthor ? (
           <Button onPress={this.toStat} containerStyle={cStyles.btnwrap} titleStyle={cStyles.btnText} buttonStyle={cStyles.btnPrimary} title="Chi tiết" />
         ) : null}
-        {!isExpire && isStudent && !isCheckIn ? (
+        {canCheckin && isStudent && !isCheckIn ? (
           <Button
             containerStyle={cStyles.btnwrap}
             titleStyle={cStyles.btnText}
@@ -62,10 +63,12 @@ class Footer extends Component<Props> {
             <Badge status="success" />
             <Text style={{ marginLeft: 10, fontSize: 20, color: 'green' }}>{'Bạn đã điểm danh'}</Text>
           </View>
-        ) : isExpire ? (
+        ) : !canCheckin ? (
           <View style={{ width: '100%', flexDirection: 'row', alignItems: 'center' }}>
             <Badge status="warning" />
-            <Text style={{ marginLeft: 10, fontSize: 20, color: 'orange' }}>{'Đã hết hạn điểm danh'}</Text>
+            <Text style={{ marginLeft: 10, fontSize: 20, color: curTime < +data.start_time ? '#24a7cc' : 'orange' }}>
+              {curTime < +data.start_time ? 'Chưa đến hạn điểm danh' : 'Đã hết hạn điểm danh'}
+            </Text>
           </View>
         ) : null}
       </Card>

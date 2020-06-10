@@ -11,7 +11,8 @@ import { setAvatar, shadow } from '../utils/functions';
 import { list_screen_map, ROLES } from '../constants/constants';
 import cStyles from '../constants/common-styles';
 import AsyncStorage from '@react-native-community/async-storage';
-
+import { YellowBox } from 'react-native';
+YellowBox.ignoreWarnings(['Warning: ReactNative.createElement']);
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -72,11 +73,14 @@ class Home extends Component<Props> {
       }
     })();
   }
+  componentWillUnmount() {
+    global.loaded = true;
+  }
   render() {
     let { loggedIn = false, userInfo = {} } = this.props;
     const { image = {}, mssv = '1610391', username = 'Nguyễn Hoài Danh', avatar_link } = userInfo;
     const avaSource = setAvatar(avatar_link || image);
-    const { loading = true } = this.state;
+    const { loading = !global.loaded } = this.state;
     const screenWidth = Math.round(Dimensions.get('window').width);
     const padding = 5;
     const numperrow = 3;

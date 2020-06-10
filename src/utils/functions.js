@@ -64,6 +64,7 @@ export const shorterString = (str = '', maxlength) => {
   return str.length > maxlength ? str.substring(0, maxlength) + '...' : str;
 };
 export const formatTime = (time, strFormat = 'hh:mm DD-MM-YYYY') => {
+  time = +time;
   let denta = Date.parse(new Date()) - Date.parse(time);
   denta /= 1000;
   let min = Math.floor(denta / 60);
@@ -93,7 +94,7 @@ export const checkTokenExpire = (err, that) => {
   console.log('123456', 'errror axios');
   if (err.response && err.response.data) {
     console.log(123456, err.response.data);
-    if (err.response.data.includes('token')) {
+    if (JSON.stringify(err.response.data).includes('token')) {
       AsyncStorage.removeItem('@userInfo');
       that.props.appActions.logout();
       that.props.appActions.setCurScreent({ currentScreent: list_screen_map.home });

@@ -94,7 +94,7 @@ class Home extends Component<Props> {
                 <ListItem
                   rightElement={<Icon name={l.isCheckin ? 'check-circle' : 'close'} color={l.isCheckin ? 'green' : 'red'} size={20} />}
                   key={i}
-                  leftAvatar={{ source: { uri: l.avatar_url } }}
+                  leftAvatar={{ source: setAvatar(l.user.avatar_link || {}) }}
                   title={l.user.fullname}
                   subtitle={l.user.mssv + ''}
                   bottomDivider
