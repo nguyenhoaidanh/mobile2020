@@ -78,8 +78,8 @@ async function create(request) {
     //if (!room.isOpen) throw 'Room is closed';
   if(req.body.list_users)throw {message:"Không có thông tin sinh viên",code:400};
   if (!bcrypt.compareSync(request.body.secret_of_room, room.secret)) throw {message:"Xác thực mã phòng học thất bại",code:400};
-  for(let ind=0;ind<req.body.list_user.length;ind++){
-    let user = await User.findById(req.body.list_user[ind]);
+  for(let ind=0;ind<req.body.list_users.length;ind++){
+    let user = await User.findById(req.body.list_users[ind]);
     if(!user)throw {code:404,message:"Không tìm thấy sinh viên"};
     if (!user.class_ids.filter((xid) => xid == room.class_id).length < 0) throw {message:"Phát hiện sinh viên "+user.fullname +" không nằm trong lớp học này",code:404};
     if(!await Session.findOne({ user_create: user._id, room_id: request.body.room_id }))throw {message:"Phát hiện sinh viên "+user.fullname +" đã điểm danh trước đó ",code:404};
