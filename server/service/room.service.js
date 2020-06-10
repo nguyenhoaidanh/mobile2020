@@ -59,7 +59,8 @@ async function update(id, userParam) {
 async function isPassRoom(request) {
   const room = await Room.findOne({_id:request.body.room_id,isClosed:false});
   // validate
-  if (!room||Number(room.start_time)>Date.now()||Number(room.end_time)<Date.now()) throw {code:404,message:"Phòng này không còn khả dụng"};
+  //||Number(room.start_time)>Date.now()||Number(room.end_time)<Date.now()
+  if (!room) throw {code:404,message:"Phòng này không còn khả dụng"};
   if (request.body.secret) {
     if (bcrypt.compareSync(request.body.secret, room.secret)) {
       return {object:"",message:"Xác thực thành công"};;

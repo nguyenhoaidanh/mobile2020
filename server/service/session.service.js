@@ -73,7 +73,7 @@ async function getById(req) {
 async function create(request) {
   // validate
   console.log(request.body);
-  const room = await Room.findOne({_id:request.body.room_id,isClosed:false,start_time:{$lte: new Date.now()},end_time:{$gte:new Date.now()}});
+  const room = await Room.findOne({_id:request.body.room_id,isClosed:false,});
   if (!room) throw {code:404,message:"Phòng không còn khả dụng"};
     //if (!room.isOpen) throw 'Room is closed';
   if(req.body.list_users)throw {message:"Không có thông tin sinh viên",code:400};
