@@ -76,7 +76,7 @@ async function create(request) {
   const room = await Room.findOne({_id:request.body.room_id,isClosed:false,});
   if (!room) throw {code:404,message:"Phòng không còn khả dụng"};
     //if (!room.isOpen) throw 'Room is closed';
-  if(req.body.list_users)throw {message:"Không có thông tin sinh viên",code:400};
+  if(req.body.list_users.length==0)throw {message:"Không có thông tin sinh viên",code:400};
   if (!bcrypt.compareSync(request.body.secret_of_room, room.secret)) throw {message:"Xác thực mã phòng học thất bại",code:400};
   for(let ind=0;ind<req.body.list_users.length;ind++){
     let user = await User.findById(req.body.list_users[ind]);
