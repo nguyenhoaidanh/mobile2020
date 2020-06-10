@@ -36,9 +36,10 @@ async function send(req,res){
           throw({code:500,message:"Lỗi server mail"})
         } else {
           await token.save();
+          console.log('Email sent: ' + info.response);
           res.status(200);
           res.send({mesage:"Mail đã được gửi tới hòm thư của bạn",object:info.response});
-          console.log('Email sent: ' + info.response);
+          
           return;
           
         }

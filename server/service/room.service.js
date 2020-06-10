@@ -30,6 +30,8 @@ async function create(request) {
     if (bcrypt.compareSync(request.body.secret_create_room, class_object.secret)) {
       const room = new Room(request.body);
       room.secret = bcrypt.hashSync(request.body.secret, 10);
+      room.start_time=request.body.start_time;
+      room.end_time=request.body.end_time;
       room.user_create = request.user.sub;
       return await room.save();
     }
@@ -55,9 +57,9 @@ async function update(id, userParam) {
  
 }
 async function isPassRoom(request) {
-  const room = await Room.findOne({_id:request.body.room_id,isClosed:false,start_time:{$lte: new Date.now()},end_time:{$gte:new Date.now()}});
+  const room = await Room.findOne({_id:request.body.room_id,isClosed:false});
   // validate
-  if (!room) throw {code:404,message:"Phòng này không còn khả dụng"};
+  if (!room||Number(room.start_time)>Date.now()||Number(room.end_time)<Date.now()) throw {code:404,message:"Phòng này không còn khả dụng"};
   if (request.body.secret) {
     if (bcrypt.compareSync(request.body.secret, room.secret)) {
       return {object:"",message:"Xác thực thành công"};;

@@ -38,6 +38,7 @@ var storage = multer.diskStorage({
   },
 });
 var upload = multer({ storage: storage }).single("image");
+
 async function authenticate({ username, password }) {
   let user = await User.findOne({ phone: username });
   if (!user) user = await User.findOne({ gmail: username });
