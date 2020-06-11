@@ -33,6 +33,7 @@ class Login extends Component<Props> {
     const { email } = this.state;
     console.log(123456, 'email', email);
     if (!email) return;
+    if (!`${email}`.includes('@') || !`${email}`.includes('.')) return this.setState({ errorMessage: { email: 'Địa chỉ mail không hợp lệ' } });
     const data = { email };
     console.log(123456, data);
     this.setState({ otpLoading: true });

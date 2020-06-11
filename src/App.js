@@ -18,19 +18,14 @@ import { Provider, connect } from 'react-redux';
 import appReducer from './reducers/index';
 import { createStore, bindActionCreators } from 'redux';
 import * as appActions from './actions/index';
-
+console.disableYellowBox = true;
 type Props = {};
 class App extends Component<Props> {
   state = { loading: true };
   componentWillMount() {}
   render() {
     return (
-      <ImageBackground
-        source={{
-          uri: 'https://www.desktopbackground.org/download/720x1280/2011/02/01/150988_church-hill-middle-school-blue-abstract-backgrounds_2543x1553_h.jpg',
-        }}
-        style={{ flex: 1 }}
-      >
+      <ImageBackground source={require('../img/bg.jpg')} style={{ flex: 1 }}>
         <NativeRouter>
           {true ? <Header /> : null}
           <Route exact path="/" component={Home} />

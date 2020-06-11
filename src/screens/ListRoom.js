@@ -138,7 +138,7 @@ class Home extends Component<Props> {
     const { currentRoom = {}, password } = this.state;
     this.props.appActions.setCurRoom({ currentRoom: { ...currentRoom, secret: password } });
     if (!password) return;
-    this.setState({ loading: true });
+    this.setState({ smallLoading: true });
     let data = { room_id: currentRoom.id, secret: password };
     console.log(123456, currentRoom, data);
     AXIOS(`/rooms/authorize`, 'POST', data, {}, this.props.userInfo.token)
@@ -152,7 +152,7 @@ class Home extends Component<Props> {
         checkTokenExpire(err, this);
         this.setState({ errorMessage: { password: 'Mật khẩu chưa chính xác' } });
       })
-      .finally(() => this.setState({ loading: false }));
+      .finally(() => this.setState({ smallLoading: false }));
   };
   renderPopupPassword = () => {
     const { errorMessage = {}, password = '' } = this.state;
@@ -174,11 +174,13 @@ class Home extends Component<Props> {
             <Button
               containerStyle={{ width: '50%' }}
               titleStyle={cStyles.btnText}
+              loading={this.state.smallLoading}
               buttonStyle={{ alignSelf: 'center', width: '80%', borderRadius: 20, backgroundColor: '#f99a34' }}
               title="Hủy bỏ"
               onPress={() => this.setState({ showForm: false })}
             />
             <Button
+              loading={this.state.smallLoading}
               containerStyle={{ width: '50%' }}
               titleStyle={cStyles.btnText}
               buttonStyle={{ alignSelf: 'center', width: '80%', borderRadius: 20 }}
@@ -193,13 +195,16 @@ class Home extends Component<Props> {
   render() {
     const iconSize = 15;
     const iconColor = 'black';
+    const { userInfo = {} } = this.props;
     let { listClass = [], showForm = false, loading = true, errorMessage = {}, isListClass = true, listRoom = [] } = this.state;
     const itemHeight = 195;
+    console.log(123456, userInfo.role, ROLES.student);
+
     return (
       <View>
         {showForm ? this.renderPopupPassword() : null}
-        <View style={{ flexDirection: 'row', width: '100%', marginTop: 10, padding: 10, alignItems: 'center', alignContent: 'center' }}>
-          {isListClass ? (
+        <View style={{ flexDirection: 'row', width: '100%', padding: 10, alignItems: 'center', alignContent: 'center' }}>
+          {isListClass || userInfo.role == ROLES.student ? (
             <View style={{ width: '25%' }}></View>
           ) : (
             <View style={styles.btn}>

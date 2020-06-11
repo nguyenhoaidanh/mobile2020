@@ -11,8 +11,7 @@ import { setAvatar, shadow } from '../utils/functions';
 import { list_screen_map, ROLES } from '../constants/constants';
 import cStyles from '../constants/common-styles';
 import AsyncStorage from '@react-native-community/async-storage';
-import { YellowBox } from 'react-native';
-YellowBox.ignoreWarnings(['Warning: ReactNative.createElement']);
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -20,7 +19,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   welcome: {
-    fontSize: 24,
+    fontSize: 30,
     textAlign: 'center',
     fontWeight: 'bold',
     margin: 10,
@@ -51,6 +50,7 @@ class Home extends Component<Props> {
     const backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
       if (this.props.history.location.pathname == '/') return false;
       this.props.history.goBack();
+      this.props.appActions.goBack({});
       return true;
     });
   }
@@ -91,14 +91,14 @@ class Home extends Component<Props> {
       return (
         <View style={styles.container}>
           <Image source={require('../../img/bku.png')} style={{ width: 200, height: 200 }} />
-          <Text style={styles.welcome}>Ứng dụng điểm danh Bách Khoa</Text>
+          <Text style={styles.welcome}>{`Ứng dụng điểm danh Bách Khoa`}</Text>
         </View>
       );
     if (!loggedIn)
       return (
         <View style={styles.container}>
           <Image source={require('../../img/bku.png')} style={{ width: 200, height: 200 }} />
-          <Text style={styles.welcome}>Ứng dụng điểm danh Bách Khoa</Text>
+          <Text style={styles.welcome}>{`Ứng dụng điểm danh Bách Khoa`}</Text>
           {/* <Button
             containerStyle={cStyles.btnwrap}
             titleStyle={cStyles.btnText}

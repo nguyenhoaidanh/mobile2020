@@ -42,8 +42,9 @@ class Footer extends Component<Props> {
           <Text style={{ width: '100%', fontSize: 20, alignContent: 'center', fontWeight: 'bold' }}>
             {currentClass.name_subject} - {title}
           </Text>
-          <Text style={styles.textLeft}>
-            Thời gian điểm danh: {formatTime(data.start_time)} đến {formatTime(data.end_time)}
+          <Text style={{ fontSize: 15 }}>Thời gian điểm danh:</Text>
+          <Text style={{ fontWeight: 'bold', color: 'green', fontSize: 15, alignSelf: 'center', alignItems: 'center', alignContent: 'center', width: '100%' }}>
+            {formatTime(data.start_time)} <Text style={{ color: 'black' }}>-</Text> {formatTime(data.end_time)}
           </Text>
         </View>
         {isAuthor ? (

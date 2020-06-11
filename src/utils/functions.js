@@ -4,11 +4,12 @@ import appConfig from '../constants/config';
 import dayjs from 'dayjs';
 import AsyncStorage from '@react-native-community/async-storage';
 import { list_screen_map, goolge_url } from '../constants/constants';
-export const showImageInput = ({ picker, camera, cropping = false, callback = () => {} }) => {
+export const showImageInput = ({ useFrontCamera = false, picker, camera, cropping = false, callback = () => {} }) => {
   let func = ImagePicker.openPicker;
   if (camera) func = ImagePicker.openCamera;
   func({
     cropping,
+    useFrontCamera,
   })
     .then((image) => {
       callback(image);
@@ -54,8 +55,8 @@ export const changeTime = (str = '') => {
   return new Date(year, mon, day, hour, min, 0, 0).getTime();
 };
 export const setAvatar = (image) => {
+  // return require('../../img/default-avatar.jpg');
   if (typeof image == 'string') {
-    if (image.includes(goolge_url)) return { uri: image };
     return { uri: appConfig.api_domain + '/static' + image };
   }
   return image.path ? { uri: image.path } : require('../../img/default-avatar.jpg');

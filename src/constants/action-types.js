@@ -5,4 +5,5 @@ export default ACTIONS = {
   SET_CUR_ROOM: 'SET_CUR_ROOM',
   LOGOUT: 'LOGOUT',
   SET_CUR_CLASS: 'SET_CUR_CLASS',
+  GO_BACK: 'GO_BACK',
 };

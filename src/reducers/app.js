@@ -1,9 +1,9 @@
 import ACTIONS from '../constants/action-types';
 const initialState = {
-  currentScreent: { icon: null, title: 'BK Attendance' },
+  currentScreent: { icon: null, title: 'BK Attendance', to: '/' },
   currentRoom: {},
   currentClass: {},
-  lastScreent: {},
+  lastScreent: [],
   loading: false,
   listClass: [],
 };
@@ -15,10 +15,24 @@ const reducer = (state = initialState, action) => {
         listClass: action.payload.listClass,
       };
     case ACTIONS.SET_CUR_SCREENT: {
+      const lastScreent = state.lastScreent;
+      lastScreent.push(state.currentScreent);
       return {
         ...state,
-        lastScreent: state.currentScreent,
+        lastScreent,
         ...action.payload,
+      };
+    }
+    case ACTIONS.GO_BACK: {
+      const cur = state.lastScreent.pop();
+      if (cur)
+        return {
+          ...state,
+          lastScreent: state.lastScreent,
+          currentScreent: cur,
+        };
+      return {
+        ...state,
       };
     }
     case ACTIONS.SET_CUR_ROOM: {

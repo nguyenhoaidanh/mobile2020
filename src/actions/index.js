@@ -23,6 +23,11 @@ export function setCurRoom(data) {
     payload: { ...data },
   };
 }
+export function goBack() {
+  return {
+    type: ACTIONS.GO_BACK,
+  };
+}
 export function setCurClass(data) {
   return {
     type: ACTIONS.SET_CUR_CLASS,

@@ -28,29 +28,30 @@ class Login extends Component<Props> {
   };
   login = () => {
     const { username, password, errorMessage = {}, image = {} } = this.state;
-    if (image.path) {
-      let msg;
-      this.setState({ loading: true });
-      uploadFileToServer([image], '', '/users/classify', 'POST')
-        .then(({ data }) => {
-          console.log('123456', 1, data);
-          msg = 'Đăng nhập thành công';
-          this.setState({ success: true });
-        })
-        .catch((err) => {
-          msg = 'Đăng nhập thất bại';
-          console.log(123456, err.toString());
-          checkTokenExpire(err, this);
-        })
-        .finally(() => {
-          this.setState({ loading: false });
-          this.showAlert(msg);
-        });
-      return;
-    }
+    // if (image.path) {
+    //   let msg;
+    //   this.setState({ loading: true });
+    //   uploadFileToServer([image], '', '/users/classify', 'POST')
+    //     .then(({ data }) => {
+    //       console.log('123456', 1, data);
+    //       msg = 'Đăng nhập thành công';
+    //       this.setState({ success: true });
+    //     })
+    //     .catch((err) => {
+    //       msg = 'Đăng nhập thất bại';
+    //       console.log(123456, err.toString());
+    //       checkTokenExpire(err, this);
+    //     })
+    //     .finally(() => {
+    //       this.setState({ loading: false });
+    //       this.showAlert(msg);
+    //     });
+    //   return;
+    // }
     console.log('123456', 1, username, password);
     if (!username || !password) return;
     const user = { username, password };
+    this.setState({ loading: true });
     AXIOS('/users/authenticate', 'POST', user)
       .then(({ data }) => {
         console.log('123456', 1, data);
@@ -61,6 +62,10 @@ class Login extends Component<Props> {
       .catch((err) => {
         console.log('123456', 2, err.response.data);
         this.setState({ errorMessage: { password: 'Thông tin đăng nhập chưa đúng' } });
+      })
+      .finally(() => {
+        this.setState({ loading: false });
+        //this.showAlert(msg);
       });
   };
   setImage = (image) => {
@@ -101,7 +106,14 @@ class Login extends Component<Props> {
               onChangeText={(value) => this.onchange('password', value)}
               secureTextEntry={true}
             />
-            <Button containerStyle={cStyles.btnwrap} titleStyle={cStyles.btnText} buttonStyle={cStyles.btnPrimary} title="Đăng nhập" onPress={this.login} />
+            <Button
+              loading={loading}
+              containerStyle={cStyles.btnwrap}
+              titleStyle={cStyles.btnText}
+              buttonStyle={cStyles.btnPrimary}
+              title="Đăng nhập"
+              onPress={this.login}
+            />
             {/* <View style={{ flexDirection: 'row', alignItems: 'center' }}>
               <View style={{ width: '100%', alignSelf: 'center' }}>
                 <Text style={{ marginTop: 15, marginBottom: 10, fontSize: 15, alignSelf: 'center', color: 'grey' }}>Hoặc đăng nhập bằng</Text>
@@ -128,21 +140,21 @@ class Login extends Component<Props> {
           </View>
         </ScrollView>
       );
-    return (
-      // face id
-      <View>
-        {/* <Text style={{ alignSelf: 'center', color: 'white', margin: 10, fontSize: 20 }}>Chạm để bật camera</Text> */}
-        <ImageInput showAccessory={false} backgroundColor="white" image={image} picker={true} callback={this.setImage} />
-        <Button
-          loading={loading}
-          containerStyle={cStyles.btnwrap}
-          titleStyle={cStyles.btnText}
-          buttonStyle={cStyles.btn}
-          title="Đăng nhập"
-          onPress={this.login}
-        />
-      </View>
-    );
+    // return (
+    // face id
+    // <View>
+    //   {/* <Text style={{ alignSelf: 'center', color: 'white', margin: 10, fontSize: 20 }}>Chạm để bật camera</Text> */}
+    //   <ImageInput showAccessory={false} backgroundColor="white" image={image} picker={true} callback={this.setImage} />
+    //   <Button
+    //     loading={loading}
+    //     containerStyle={cStyles.btnwrap}
+    //     titleStyle={cStyles.btnText}
+    //     buttonStyle={cStyles.btn}
+    //     title="Đăng nhập"
+    //     onPress={this.login}
+    //   />
+    // </View>
+    // );
   }
 }
 const mapStateToProps = (state) => {

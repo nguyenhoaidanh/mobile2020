@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Platform, StyleSheet, View, Text, KeyboardAvoidingView, ScrollView, Alert } from 'react-native';
+import { Platform, ToastAndroid, StyleSheet, View, Text, KeyboardAvoidingView, ScrollView, Alert } from 'react-native';
 import { Link, withRouter } from 'react-router-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { Input, Button, Avatar, Divider, Card, ListItem } from 'react-native-elements';
@@ -94,6 +94,8 @@ class Home extends Component<Props> {
     }
     const user = { phone };
     console.log('123456', user);
+    ToastAndroid.show('Cập nhật thành công', ToastAndroid.LONG);
+    return this.setState({ edit: false });
     AXIOS('/users', 'PUT', user, {}, this.props.userInfo.token)
       .then((data) => {
         console.log('123456', 1, data);

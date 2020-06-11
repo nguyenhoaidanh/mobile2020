@@ -24,8 +24,10 @@ class Home extends Component<Props> {
     this.props.history.push(url);
   };
   back = () => {
+    const { currentScreent = {} } = this.props.app;
+    if (currentScreent.to == '/') return;
     this.props.history.goBack();
-    this.props.appActions.setCurScreent({ currentScreent: this.props.app.lastScreent });
+    this.props.appActions.goBack({});
   };
   updateSearch = (keyword) => {
     this.setState({ keyword });
@@ -33,8 +35,10 @@ class Home extends Component<Props> {
   };
   render() {
     const { keyword = '' } = this.state;
-    const { currentScreent = {}, lastScreent = null } = this.props.app;
+    const { currentScreent = {}, lastScreent = [] } = this.props.app;
     const { title = '', icon = null, customIcon = null, to = '', showSearch = false } = currentScreent;
+    console.log(123456, currentScreent);
+
     if (false)
       return (
         <View style={styles.header}>
@@ -67,7 +71,9 @@ class Home extends Component<Props> {
       );
     return (
       <Header containerStyle={styles.header}>
-        {Object.keys(lastScreent).length == 0 ? null : <Icon onPress={this.back} name={'keyboard-backspace'} size={iconSize} color={iconColor} />}
+        {lastScreent.length == 0 || currentScreent.to == '/' ? null : (
+          <Icon onPress={this.back} name={'keyboard-backspace'} size={iconSize} color={iconColor} />
+        )}
         <Text style={{ color: iconColor, fontSize: title.length > 15 ? 20 : 25, fontWeight: 'bold' }}>{title}</Text>
         <Icon name={icon} size={iconSize} color={iconColor} />
       </Header>
@@ -78,6 +84,7 @@ const mapStateToProps = (state) => {
   // Redux Store --> Component
   return {
     app: state.app,
+    currentScreent: state.app.currentScreent,
     loggedIn: state.user.loggedIn,
   };
 };

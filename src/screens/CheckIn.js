@@ -4,9 +4,9 @@ import { Link, withRouter } from 'react-router-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { Input, Button, CheckBox } from 'react-native-elements';
 import ImageInput from '../components/ImageInput';
+import Loading from '../components/Loading';
 import cStyles from '../constants/common-styles';
 import { AXIOS, checkTokenExpire, shadow, uploadFileToServer, setAvatar } from '../utils/functions';
-
 import { list_screen_map } from '../constants/constants';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
@@ -25,14 +25,14 @@ class Home extends Component<Props> {
     if (!image.path) return;
     if (!image.path.includes('.jpg') && !image.path.includes('.jpeg')) return this.showAlert('Định dạng file không được hỗ trợ');
     console.log(123456, 'start upload');
-    this.setState({ loading: true });
+    this.setState({ loading: true, loadingText: 'Đang phân tích dữ liệu khuôn mặt' });
     uploadFileToServer([image], this.props.userInfo.token, '/users/classify')
       .then(({ data }) => {
         this.showConfirm(data.result);
       })
       .catch((err) => {
         checkTokenExpire(err, this);
-        this.showAlert('Điểm danh thất bại');
+        this.showAlert('Có lỗi xảy ra.');
       })
       .finally(() => {
         this.setState({ loading: false });
@@ -40,18 +40,17 @@ class Home extends Component<Props> {
   };
   showConfirm = (data) => {
     const { num_faces, out_image, predict } = data;
+    this.setState({ image: out_image });
     const { currentRoom = {} } = this.props;
     let { number: number_required } = currentRoom;
     if (!number_required) number_required = 1;
     if (num_faces == 0) return this.showAlert('Không có gương mặt nào trong ảnh, chụp lại');
     if (num_faces < number_required) return this.showAlert(`Số người cho phép là ${number_required}, chụp lại`);
     console.log(123456, 'num_faces', num_faces, 'predict', predict.length);
-    console.log(123456, currentRoom, predict.length, out_image);
     predict.forEach((element) => {
       console.log(123456, element.label.fullname, element.prob);
     });
     let canCheckin = false;
-    this.setState({ image: out_image });
     let str = predict.map((e) => `- ${e.label.fullname} - ${e.label.mssv}`);
     str = str.length ? str.join('\n') : '';
     if (num_faces > predict.length) {
@@ -79,7 +78,9 @@ class Home extends Component<Props> {
         },
         { text: 'Điểm danh', onPress: () => this.saveSession(predict) },
       ];
-    Alert.alert('', `Phát hiện ${num_faces} người:\n${str}`, arrbtn);
+    setTimeout(() => {
+      Alert.alert('', `Phát hiện ${num_faces} người:\n${str}`, arrbtn);
+    }, 1000);
   };
   showAlert = (msg, success = false, btnText = 'Đã hiểu') => {
     Alert.alert('Thông báo', msg, [
@@ -105,9 +106,11 @@ class Home extends Component<Props> {
           lattitude: 20.0,
         },
       },
+      room_id: currentRoom.id,
       list_users: predict.map((e) => e.label.id),
     };
     console.log(123456, sessions);
+    this.setState({ loading: true, loadingText: 'Đang xử lý' });
     AXIOS('/sessions/authorize', 'POST', sessions, {}, this.props.userInfo.token)
       .then(({ data }) => {
         this.showAlert('Điểm danh thành công', true);
@@ -115,6 +118,9 @@ class Home extends Component<Props> {
       .catch((err) => {
         checkTokenExpire(err, this);
         this.showAlert('Có lỗi xảy ra');
+      })
+      .finally(() => {
+        this.setState({ loading: false, loadingText: 'Đang xử lý' });
       });
   };
   checkRespondImage = (data) => {
@@ -158,19 +164,13 @@ class Home extends Component<Props> {
         </View>
       );
     return (
-      <View>
-        <ImageInput showAccessory={false} backgroundColor="white" image={image} picker={true} callback={this.setImage} />
-        <Button
-          loading={loading}
-          containerStyle={cStyles.btnwrap}
-          titleStyle={cStyles.btnText}
-          buttonStyle={cStyles.btn}
-          title="Điểm danh"
-          onPress={this.checkin}
-        />
+      <View style={{ backgroundColor: 'white', height: '100%' }}>
+        {loading ? <Loading loadingText={this.state.loadingText} /> : null}
+        <ImageInput small={false} showAccessory={false} backgroundColor="white" image={image} useFrontCamera camera={true} callback={this.setImage} />
         <View>
-          <Text>{message}</Text>
+          <Text style={{ color: 'orange', alignSelf: 'center' }}>Chạm vào hình để mở camera</Text>
         </View>
+        <Button containerStyle={cStyles.btnwrap} titleStyle={cStyles.btnText} buttonStyle={cStyles.btn} title="Điểm danh" onPress={this.checkin} />
       </View>
     );
   }

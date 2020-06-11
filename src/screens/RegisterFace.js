@@ -106,8 +106,25 @@ class Home extends Component<Props> {
             );
           },
         }))}
-        buttonStyle={{ marginLeft: 15, marginRight: 15 }}
-        containerStyle={{ height: 200, marginBottom: 10, marginTop: 10 }}
+        buttonStyle={{
+          padding: 0,
+          width: '100%',
+          margin: 0,
+          // borderTopColor: 'transparent',
+          // borderLeftColor: 'transparent',
+          // borderRightColor: 'transparent',
+          // borderBottomColor: 'transparent',
+        }}
+        containerStyle={{
+          // borderTopColor: 'transparent',
+          // borderLeftColor: 'transparent',
+          // borderRightColor: 'transparent',
+          // borderBottomColor: 'transparent',
+          padding: 0,
+          margin: 0,
+          height: 200,
+          backgroundColor: 'transparent',
+        }}
       />
     );
   };
@@ -129,9 +146,20 @@ class Home extends Component<Props> {
     return (
       <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
         <View style={{ width: '100%', alignItems: 'center' }}>
-          <Text style={{ paddingLeft: 10, paddingRight: 10, marginBottom: 10, marginTop: 10, alignSelf: 'center', fontSize: 25, color: 'white' }}>
-            {success ? <Icon name="check-circle" color="green" size={25} /> : null}
-            {success ? 'Đã đăng kí gương mặt ' : `Chọn ít nhất ${min_image} ảnh chân dung khác nhau có mặt của bạn`}
+          <Text
+            style={{
+              paddingLeft: 10,
+              paddingRight: 10,
+              marginBottom: 10,
+              marginTop: 10,
+              alignSelf: 'center',
+              fontSize: 20,
+              color: 'white',
+              fontWeight: 'bold',
+            }}
+          >
+            {success ? <Icon name="check-circle" color="white" size={25} style={{ marginRight: 15 }} /> : null}
+            {success ? ' Đã đăng kí gương mặt ' : ` Chọn ít nhất ${min_image} ảnh chân dung khác nhau có mặt của bạn`}
           </Text>
         </View>
         {list.map((row, idx) => this.renderRow(row, idx, success))}
