@@ -2,11 +2,13 @@ var nodemailer = require('nodemailer');
 var db = require('./../helper/db')
 var User = db.User;
 var Token = db.Token;
+var propertiesReader = require('properties-reader');
+var properties = process.env.ENV_NODE=="product"?propertiesReader('properties.product.file'):propertiesReader('properties.dev.file');
 var transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
-    user: "bk.face.mobile@gmail.com",
-    pass: "bachkhoa2020"
+    user: properties.get('gmail.username'),
+    pass: properties.get('gmail.password')
   }
 });
 module.exports ={
@@ -20,7 +22,7 @@ async function send(req,res){
     token.code=Math.floor(100000 + Math.random() * 900000).toString();
     console.log("token created");
     var mailOptions = {
-        from: process.env.GMAIL_USERNAME,
+        from: properties.get('gmail.username'),
         to: req.body.email,
         subject: 'BK Face: Khôi phục mật khẩu',
         text: 'Chúng tôi nhận được yêu cầu khôi phục mật khẩu, nếu là bạn vui lòng nhập mã xác thực để hoàn thành\n'+

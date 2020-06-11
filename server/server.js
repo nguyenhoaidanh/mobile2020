@@ -15,6 +15,9 @@ const cors = require('cors');
 var app = express();
 var User = db.User;
 const expressSwagger = require('express-swagger-generator')(app);
+/*properties */
+var propertiesReader = require('properties-reader');
+var properties = process.env.ENV_NODE=="staging"?propertiesReader('properties.staging.file'):propertiesReader('properties.dev.file');
 //option swagger
 let options = {
   swaggerDefinition: {
@@ -87,12 +90,12 @@ app.get('/models', (req, res) => {
   res.sendFile(__dirname+'/classify/model.json');
 });
 async function init(){
-  var user = await User.findOne({gmail:constant.ADMIN_GMAIL});
+  var user = await User.findOne({gmail:properties.get('account.admin.username')});
   if(!user){
     var user_new = new User();
-    console.log(constant.ADMIN_GMAIL)
-    user_new.gmail=constant.ADMIN_GMAIL;
-    user_new.hash=bcrypt.hashSync(constant.ADMIN_PASS, 10);
+    console.log(properties.get('account.admin.username'));
+    user_new.gmail=properties.get('account.admin.username');
+    user_new.hash=bcrypt.hashSync(properties.get('account.admin.password'), 10);
     user_new.role=role.Admin;
     user_new.avatar_link="null";
     user_new.fullname="admin";
@@ -107,8 +110,8 @@ async function init(){
 }
 init();
 // app.use('/static/',express.static('store'));
-app.listen(3000, () => {
-  console.log(`app is running on port ${3000}`);
+app.listen(properties.get('server.host.port'), () => {
+  console.log(`app is running on port ${properties.get('server.host.port')}`);
 });
 
 module.exports = app;
