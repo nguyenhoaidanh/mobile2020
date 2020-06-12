@@ -2,12 +2,11 @@ version: '2'
 services:
   app:
     image: node-server
-    container_name: node-ser
+    container_name: node-server
     build: .
     restart: always
     command: npm start
     volumes:
-      - /logs/:/logs/
       - .:/usr/app/
       - /usr/app/node_modules
     ports:

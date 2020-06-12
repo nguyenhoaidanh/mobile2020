@@ -14,6 +14,7 @@ const schema = new Schema({
   class_id: { type: String, required: true },
   title: { type: String, required: true },
   secret: { type: String, required: true },
+  number:{type:Number,required:true},
   location: { type: { longtitude: { type: Float }, latitude: { type: Float } } },
   user_create: { type: String },
   start_time: { type: String, required: true },

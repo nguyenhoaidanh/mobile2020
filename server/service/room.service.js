@@ -59,14 +59,21 @@ async function close(request) {
   }
   return {message:"Đã đóng lớp học",object:room}
 }
-async function update(id, userParam) {
- 
+async function update(req) {
+    var room = await Room.findOne({_id:req.body.room_id,isClosed:false});
+    if (!room) throw {code:404,message:"Phòng này không còn khả dụng"};
+    room.title=req.body.title;
+    room.start_time=req.body.start_time;
+    room.end_time=req.body.end_time;
+    return {message:"Cập nhật thành công",object:await room.save()}
 }
 async function isPassRoom(request) {
   const room = await Room.findOne({_id:request.body.room_id,isClosed:false});
   // validate
-  //||Number(room.start_time)>Date.now()||Number(room.end_time)<Date.now()
-  if (!room) throw {code:404,message:"Phòng này không còn khả dụng"};
+  //
+  console.log(Date.now())
+  console.log(Number(room.start_time))
+  if (!room||Number(room.start_time)>Date.now()||Number(room.end_time)<Date.now()) throw {code:404,message:"Phòng này không còn khả dụng"};
   if (request.body.secret) {
     if (bcrypt.compareSync(request.body.secret, room.secret)) {
       return {object:"",message:"Xác thực thành công"};;

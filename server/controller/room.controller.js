@@ -11,7 +11,7 @@ module.exports = router;
 
 
 router.post('/',authorize(role.Teacher),createRoom);
-// router.put('/',authorize(role.Teacher), updateRoom);
+router.put('/',authorize(role.Teacher), updateRoom);
 router.delete('/',authorize(role.Teacher), closeRoom);
 router.get('/:id', getOneRoom);
 router.get('/classes/:id',getAllRoomOfClass)
@@ -49,13 +49,10 @@ function closeRoom(req,res,next){
     .then((result) => res.json(result))
     .catch((err) => res.status(err.code==null?500:err.code).send({message:err.message}));
 }
-function updateRoom() {}
-function getOneRoom(req, res, next) {}
-function getAllStudentOfRoom(req, res, next) {
-  sessionService
-    .getAllStudentInRoom(req, res)
-    .then((result) => res.status(200).send({ result: result }))
-    .catch((err) => next(err));
+function updateRoom(req,res,next){
+    roomService.update(req)
+    .then((result) => res.json(result))
+    .catch((err) => res.status(err.code==null?500:err.code).send({message:err.message}));
 }
 /**
  * get a room

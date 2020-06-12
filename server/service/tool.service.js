@@ -14,7 +14,8 @@ const { v4: uuidv4 } = require('uuid');
 const {detectFaces} = require('./../classify/detect-face')
 
 const createCsvWriter = require('csv-writer').createObjectCsvWriter;
-
+var propertiesReader = require('properties-reader');
+var properties = process.env.ENV_NODE=="staging"?propertiesReader('./properties.staging.file'):process.env.ENV_NODE=="product"?propertiesReader('./properties.product.file'):propertiesReader('./properties.dev.file');
 // var storage = require('@google-cloud/storage');
 
 // Creates a client
@@ -26,7 +27,7 @@ const csvWriter = createCsvWriter({
 });
 var storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, dirmain + 'public/store/');
+    cb(null, './public/store/faces/');
   },
   filename: async function (req, file, cb) {
     let file_new_name = req.user.sub + '-'+uuidv4() +'-'+ Date.now()+"."+file.originalname.split('.').pop();
@@ -53,7 +54,7 @@ async function updateFileExpress(req, res) {
     var filenames = req.files.map((file)=>file.filename);
     var image_errs = [];
     for(var ind =0;ind<filenames.length;ind++){
-      var  path_in = './public/store/'+filenames[ind];
+      var  path_in = './public/store/faces/'+filenames[ind];
       var  path_out= './public/store/output/'+filenames[ind];
       var out_put = await detectFaces(path_in,path_out);
       console.log(out_put);
@@ -92,7 +93,7 @@ async function updateFileExpress(req, res) {
             label:req.user.label
           });
         }
-        await tranferToBucket('./public/store/'+filenames[ind],process.env.BUCKET_IMAGE_NAME);
+        await tranferToBucket('./public/store/faces/'+filenames[ind],process.env.BUCKET_IMAGE_NAME);
         console.log("upload image to bucket: "+filenames[ind]);
       }
        csvWriter.writeRecords(records);
@@ -100,13 +101,6 @@ async function updateFileExpress(req, res) {
     
     user.list_images=[].concat(user.list_images,filenames);
     await user.save();
-    for(let ind=0;ind<filenames.length;ind++){
-        fs.unlink('./public/store/'+filenames[ind],(err)=>{
-          if(err){
-            console.log(err);
-          }
-        });
-    }
     res.status(200);
     res.send({message:"Danh sách datataset",object:user.list_images})
   });
