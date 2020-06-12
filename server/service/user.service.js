@@ -5,7 +5,7 @@ const role = require('../helper/role');
 const utils = require('../utils/string');
 path = require('path');
 const { v4: uuidv4 } = require('uuid');
-
+var mailService = require('./mail.service');
 var multer = require('multer');
 var dirmain = path.join(__dirname, '../');
 var propertiesReader = require('properties-reader');
@@ -24,7 +24,8 @@ module.exports = {
   updateAvatar,
   getSelf,
   changePassword,
-  checkOTP
+  checkOTP,
+  resetPasswordAccount
 };
 var storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -203,5 +204,24 @@ async function checkOTP(req){
   if(!token)throw{code:404,message:"Phiên không được tìm thấy"};
   if((Date.now()-token.create_date)>5*60*1000)throw{code:400,message:"Hết hạn đổi mật khẩu"};
   if(token.isUsed)throw{code:400,message:"Token đã được sử dụng"};
+  return {message:"Xác thực thành công",object:""}
+}
+async function resetPasswordAccount(req){
+  const user = await User.findOne({gmail:req.body.gmail});
+  if (!user) throw {code:404,message:'Không tìm thấy user'};
+  var token  = new Token();
+    token.gmail=req.body.email;
+    token.code=Math.floor(100000 + Math.random() * 900000).toString();
+    console.log("token created");
+  
+  var mailOptions = {
+    from: properties.get('gmail.username'),
+    to: req.body.email,
+    subject: 'BK Face: Khôi phục mật khẩu',
+    text: 'Chúng tôi nhận được yêu cầu khôi phục mật khẩu, nếu là bạn vui lòng nhập mã xác thực để hoàn thành\n'+
+    'Đây là mã xác thực: '+token.code+'\n'+
+    'Chúc bạn một ngày tốt lành \nĐội ngũ BK Face'
+  };
+  mailService.send(mailOptions);
   return {message:"Xác thực thành công",object:""}
 }
