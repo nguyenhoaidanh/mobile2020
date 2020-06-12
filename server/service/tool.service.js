@@ -14,7 +14,8 @@ const { v4: uuidv4 } = require('uuid');
 const {detectFaces} = require('./../classify/detect-face')
 
 const createCsvWriter = require('csv-writer').createObjectCsvWriter;
-
+var propertiesReader = require('properties-reader');
+var properties = process.env.ENV_NODE=="staging"?propertiesReader('./properties.staging.file'):process.env.ENV_NODE=="product"?propertiesReader('./properties.product.file'):propertiesReader('./properties.dev.file');
 // var storage = require('@google-cloud/storage');
 
 // Creates a client

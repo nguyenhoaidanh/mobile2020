@@ -17,7 +17,8 @@ var User = db.User;
 const expressSwagger = require('express-swagger-generator')(app);
 /*properties */
 var propertiesReader = require('properties-reader');
-var properties = process.env.ENV_NODE=="staging"?propertiesReader('properties.staging.file'):propertiesReader('properties.dev.file');
+var properties = process.env.ENV_NODE=="staging"?propertiesReader('./properties.staging.file'):process.env.ENV_NODE=="product"?propertiesReader('./properties.product.file'):propertiesReader('./properties.dev.file');
+console.log("starting env:"+process.env.ENV_NODE);
 //option swagger
 let options = {
   swaggerDefinition: {

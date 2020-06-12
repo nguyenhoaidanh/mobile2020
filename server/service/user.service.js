@@ -8,7 +8,8 @@ const { v4: uuidv4 } = require('uuid');
 
 var multer = require('multer');
 var dirmain = path.join(__dirname, '../');
-
+var propertiesReader = require('properties-reader');
+var properties = process.env.ENV_NODE=="staging"?propertiesReader('./properties.staging.file'):process.env.ENV_NODE=="product"?propertiesReader('./properties.product.file'):propertiesReader('./properties.dev.file');
 const User = db.User;
 const Token = db.Token;
 module.exports = {
@@ -46,9 +47,10 @@ async function authenticate({ username, password }) {
   if(!user)throw {code:400,message:"username hoặc password sai"};
   var label = utils.removeAccents(user.fullname.split(' ')[user.fullname.split(' ').length - 1]) + '_' + user.mssv;
   if (user && bcrypt.compareSync(password, user.hash)) {
+    console.log(properties.get("server.host.secret").toString());
     const token = jwt.sign(
       { sub: user.id, username: user.fullname, mssv: user.mssv, role: user.role, label: label, link_avatar: user.link_avatar },
-      process.env.SECRET
+      properties.get("server.host.secret").toString()
     );
     return {message:"Đăng nhập thành công",object:{
       ...user.toJSON(),

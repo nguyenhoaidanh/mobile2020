@@ -29,7 +29,11 @@ async function getAllStudentInRoom(req,res){
   var users_of_classes = await User.find({class_ids:{$all:[class_obtain_room._id]}},{list_images:0});
   console.log(users_of_classes);
   for(let ind=0;ind<users_of_classes.length;ind++){
-    if(session_of_students.length>0 && session_of_students.includes(users_of_classes[ind])){
+    console.log("debug all student")
+    console.log(session_of_students.filter((ses)=>ses.user_checkin_id==users_of_classes[ind]._id).length);
+    console.log(session_of_students.filter((ses)=>ses.user_checkin_id==users_of_classes[ind]._id).length>0)
+    if(session_of_students.length>0 && session_of_students.filter((ses)=>ses.user_checkin_id==users_of_classes[ind]._id).length>0){
+      console.log('has session');
       result.push({
         user:users_of_classes[ind],
         isCheckin:true
@@ -73,19 +77,22 @@ async function getById(req) {
 async function create(req) {
   // validate
   console.log(req.body);
-  const room = await Room.findOne({_id:req.body.room_id,isClosed:false,});
+  var session_param = req.body.session;
+  var list_users = req.body.list_users;
+  const room = await Room.findOne({_id:session_param.room_id,isClosed:false,});
   if (!room||Number(room.start_time)>Date.now()||Number(room.end_time)<Date.now()) throw {code:404,message:"Phòng này không còn khả dụng"};
     //if (!room.isOpen) throw 'Room is closed';
-  if(req.body.list_users.length==0)throw {message:"Không có thông tin sinh viên",code:400};
-  if (!bcrypt.compareSync(req.body.secret_of_room, room.secret)) throw {message:"Xác thực mã phòng học thất bại",code:400};
-  for(let ind=0;ind<req.body.list_users.length;ind++){
-    let user = await User.findById(req.body.list_users[ind]);
+  if(list_users.length==0)throw {message:"Không có thông tin sinh viên",code:400};
+  if (!bcrypt.compareSync(session_param.secret_of_room, room.secret)) throw {message:"Xác thực mã phòng học thất bại",code:400};
+  for(let ind=0;ind<list_users.length;ind++){
+    let user = await User.findOne({mssv:list_users[ind].mssv});
     if(!user)throw {code:404,message:"Không tìm thấy sinh viên"};
     if (!user.class_ids.filter((xid) => xid == room.class_id).length < 0) throw {message:"Phát hiện sinh viên "+user.fullname +" không nằm trong lớp học này",code:404};
-    if(!await Session.findOne({ user_create: user._id, room_id: req.body.room_id }))throw {message:"Phát hiện sinh viên "+user.fullname +" đã điểm danh trước đó ",code:404};
-    var session = new Session(req.body.session);
+    if(await Session.findOne({ user_checkin_id: user._id, room_id: session_param.room_id }))throw {message:"Phát hiện sinh viên "+user.fullname +" đã điểm danh trước đó ",code:404};
+    var session = new Session(session_param);
     session.user_create=req.user.sub;
     session.user_checkin_id=user._id;
+    session.link_face=list_users[ind].link_face;
     await session.save();
   }
   return {message:"Điểm danh thành công",object:null}

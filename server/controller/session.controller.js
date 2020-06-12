@@ -7,7 +7,7 @@ const role = require('../helper/role');
 module.exports = router;
 
 
-router.post('/authorize',authorize(role.Student),createSession);
+router.post('/',authorize(role.Student),createSession);
 router.get('/checkins',authorize(role.Student),getAllSelfSession);
 // router.put('/',authorize(role.Student), updateSession);
 // router.delete('/',authorize(role.Teacher), removeSession);
@@ -27,8 +27,9 @@ router.get('/:id',authorize(role.Teacher), getOneSession);
  * @security JWT
  */
 function createSession(req, res, next){
+    console.log("debug create session _1")
     sessionService.create(req)
-    .then((result) => res.json({message:"Điểm danh thành công",object:result }))
+    .then((result) => res.json(result))
     .catch((err) => res.status(err.code==null?500:err.code).send({message:err.message}));
 }
 // function removeSession(){
