@@ -5,6 +5,7 @@ const db = require('../helper/db');
 const Room = db.Room;
 const Session = db.Session;
 const Class = db.Class;
+const User = db.User;
 module.exports = {
   getAll,
   getById,
@@ -60,11 +61,23 @@ async function close(request) {
   return {message:"Đã đóng lớp học",object:room}
 }
 async function update(req) {
+    if(!req.body.room_id||!req.body.user_pass)throw {code:400,message:"Vui lòng điền đầy đủ thông tin"};
+    var user = await User.findById(req.user.sub);
     var room = await Room.findOne({_id:req.body.room_id,isClosed:false});
-    if (!room) throw {code:404,message:"Phòng này không còn khả dụng"};
+    if(!room) throw {code:404,message:"Phòng này không còn khả dụng"};
+    if(!(room.user_create==req.user.sub))throw {code:404,message:"Bạn không có quyền chỉnh sửa phòng"};
+    if(!bcrypt.compareSync(req.body.user_pass,user.hash))throw {code:404,message:"Xác thực không thành công"};
+    if(req.body.title)
     room.title=req.body.title;
+    if(req.body.start_time)
     room.start_time=req.body.start_time;
+    if(req.body.end_time)
     room.end_time=req.body.end_time;
+    if(req.body.number)
+    room.number=req.body.number;
+    if(req.body.secret){
+      room.secret = bcrypt.hashSync(req.body.secret, 10);
+    }
     return {message:"Cập nhật thành công",object:await room.save()}
 }
 async function isPassRoom(request) {

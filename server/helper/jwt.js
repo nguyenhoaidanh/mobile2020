@@ -14,7 +14,8 @@ function jwt() {
             '/models',
             '/mails/forget/',
             '/users/tokens/auth',
-            '/users/passwords/restore'
+            '/users/passwords/restore',
+            '/users/mails/reset'
         ]
     });
 }

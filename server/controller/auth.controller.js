@@ -14,6 +14,8 @@ router.get('/infor', get_self);
 router.post('/passwords/restore', restore_password);
 router.post('/passwords/update', update_password);
 router.get('/tokens/auth', check_token);
+router.post('/mails/reset', forgot_password);
+
 
 
 
@@ -107,7 +109,11 @@ function check_token(req,res,next){
   .catch((err) => res.status(err.code==null?500:err.code).send({message:err.message}));
 }
 
-
+async function forgot_password(req,res,next){
+  userService.resetPasswordAccount(req,req)
+  .then((result) => res.json(result))
+  .catch((err) => res.status(err.code==null?500:err.code).send({message:err.message}));
+}
 // var getOneUser = function (req, res) {
 //   res.json(req.user);
 // };
