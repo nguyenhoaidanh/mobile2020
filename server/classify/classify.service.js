@@ -5,7 +5,7 @@ const automl = require('@tensorflow/tfjs-automl');
 const express = require('express');
 const router = express.Router();
 var multer = require('multer');
-const { detectFaces } = require('./detect-face');
+const { extract_faces } = require('./detect-face');
 const { v4: uuidv4 } = require('uuid');
 const db = require('../helper/db');
 const User = db.User;
@@ -14,14 +14,14 @@ const User = db.User;
 //in backend JavaScript applications under the Node.js runtime.
 const tfnode = require('@tensorflow/tfjs-node');
 var propertiesReader = require('properties-reader');
-var properties = process.env.ENV_NODE=="product"?propertiesReader('properties.product.file'):propertiesReader('properties.dev.file');
+var properties = process.env.ENV_NODE == 'product' ? propertiesReader('properties.product.file') : propertiesReader('properties.dev.file');
 // const automl = require('@tensorflow/tfjs-automl');
 //The fs module provides an API for interacting with the file system.
 module.exports = {
   uploadFile,
 };
 const fs = require('fs');
-const model_url = properties.get('server.host.name')+":"+properties.get('server.host.port')+"/models";
+const model_url = properties.get('server.host.name') + ':' + properties.get('server.host.port') + '/models';
 // const model_url = "http://localhost:9000/test";
 var storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -44,36 +44,40 @@ const readImage = (path) => {
   //it returns a 3D or 4D tensor of the decoded image. Supports BMP, GIF, JPEG and PNG formats.
   const tfimage = tfnode.node.decodeImage(imageBuffer);
   return tfimage;
-}
-async function uploadFile(req,res){
-  await upload(req,res,async function(err){
-    if(!req.file){
+};
+async function uploadFile(req, res) {
+  await upload(req, res, async function (err) {
+    if (!req.file) {
       res.status(400);
-      res.send({message:"Lỗi upload file"});
+      res.send({ message: 'Lỗi upload file' });
     }
-    const path_in = './public/store/checkin/'+req.file.filename;
-    const path_out= './public/store/output/'+req.file.filename;
-    console.log(req.file.filename);
-    var faces = await detectFaces(path_in, path_out);
+    const fileInput = './public/store/checkin/' + req.file.filename;
+    const path_out = './public/store/output/';
+    var { faces, hightLightFace, list_face_url } = await extract_faces(fileInput, path_out);
 
-    var predict = await imageClassification(path_in);
-    console.log(predict);
+    /// TO DO
+    // for list_face_url;
+    let predict = [];
+    for (let url of list_face_url) {
+      rs = await imageClassification(url);
+      predict = predict.concat(rs);
+      console.log(predict);
+    }
+    return;
+    // end TO DO
     predict = predict.sort((x, y) => -x.prob + y.prob).filter((x) => x.label != 'None');
     predict = predict.filter((x) => {
-      console.log(x.prob >= 0.3);
       return x.prob >= 0.3;
     });
 
-    for (let ind=0;ind<predict.length;ind++){
-      var user = await User.findOne({mssv:predict[ind].label.split('_').pop()});
-      if(user)predict[ind].label=user;
+    for (let ind = 0; ind < predict.length; ind++) {
+      var user = await User.findOne({ mssv: predict[ind].label.split('_').pop() });
+      if (user) predict[ind].label = user;
     }
     console.log(predict);
     res.status(200);
-    res.send({ result: { predict: predict, out_image: faces.out.replace('./public', ''), num_faces: faces.num_face } });
-    // console.log(faces);
+    res.send({ result: { predict, out_image: hightLightFace.replace('./public', ''), num_faces: faces.length } });
   });
-  // console.log(result);
 
   return result;
 }
