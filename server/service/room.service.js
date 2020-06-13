@@ -20,7 +20,7 @@ async function getAll(req) {
   let rs = [];
   for (const room of rooms) {
    // var session_of_students = await Session.find({ room_id: room.id });
-    rs.push({room});
+    rs.push(room);
   }
   return {message:"Danh sách các phòng",object:rs};
 }
