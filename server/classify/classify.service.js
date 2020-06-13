@@ -54,11 +54,12 @@ async function uploadFile(req, res) {
     const fileInput = './public/store/checkin/' + req.file.filename;
     const path_out = './public/store/output/';
     var { faces, hightLightFace, list_face_url } = await extract_faces(fileInput, path_out);
-
+    console.log("completed extract_faces");
     /// TO DO
     // for list_face_url;
     let predict = [];
     console.log(list_face_url.length);
+    console.log("detect a face");
     for (let url of list_face_url) {
       console.log("file anh"+url);
       rs = await imageClassification(url);
@@ -78,6 +79,7 @@ async function uploadFile(req, res) {
       // predict = predict.concat(rs);
       // console.log(predict);
     }
+    console.log("for looped")
     // return;
     // end TO DO
     console.log(predict);

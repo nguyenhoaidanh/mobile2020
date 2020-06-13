@@ -65,6 +65,7 @@ async function highlightFaces(inputFile, faces, outputFile, PImage) {
 async function detectFaces(inputFile, outPath, hightlight = true) {
   const outputFile = outPath + Math.random() + getFileType(inputFile);
   const faces = await _detectFaces(inputFile);
+  console.log("hightlighting...")
   if (hightlight) {
     try {
       await highlightFaces(inputFile, faces, outputFile, PImage);
@@ -98,7 +99,10 @@ async function splitTo2Image(inputFile, path) {
 
 async function extract_faces(inputFile, path) {
   //google support extract only 10faces
+  console.log("detecting face");
   const { faces } = await detectFaces(inputFile);
+  console.log("detected face");
+  console.log(faces);
   let links = [];
   const promise = [];
   for (let cnt = 0; cnt < faces.length; cnt++) {
@@ -123,6 +127,7 @@ async function extract_faces(inputFile, path) {
       fs.writeFileSync(outputFile, buffer);
     });
   }
+  console.log("extract completed")
   return links;
 }
 async function extractManyPeople(inputFile, path) {
