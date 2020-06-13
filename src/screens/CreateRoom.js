@@ -1,12 +1,12 @@
 import React, { Component } from 'react';
-import { TouchableOpacity, KeyboardAvoidingView, ScrollView, Platform, StyleSheet, Text, View, Image } from 'react-native';
+import { ToastAndroid, TouchableOpacity, KeyboardAvoidingView, ScrollView, Platform, StyleSheet, Text, View, Image } from 'react-native';
 import { Link, withRouter } from 'react-router-native';
 import DatePicker from 'react-native-datepicker';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { Input, Button, CheckBox, Overlay } from 'react-native-elements';
 import cStyles from '../constants/common-styles';
 import { AXIOS, checkTokenExpire, formatTime, changeTime } from '../utils/functions';
-
+import { list_screen_map } from '../constants/constants';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { WheelPicker, TimePicker } from 'react-native-wheel-picker-android';
@@ -28,7 +28,7 @@ class CreateRoom extends Component<Props> {
   };
   makeRoom = () => {
     const { currentClass = {} } = this.props;
-    let { start_time, end_time, title, password, repPassword, secret_create_room, number } = this.state;
+    let { start_time, end_time, title, password, repPassword, secret_create_room, number = 1 } = this.state;
     let valid = true;
     console.log(123456, this.state);
     if (!title) return this.setState({ errorMessage: { title: 'Trường ngày là bắt buộc' } });
@@ -39,6 +39,8 @@ class CreateRoom extends Component<Props> {
     if (!end_time) return this.setState({ errorMessage: { end_time: 'Trường ngày là bắt buộc' } });
     start_time = changeTime(start_time);
     end_time = changeTime(end_time);
+    console.log(123456, start_time, end_time);
+
     if (password != repPassword) return this.setState({ errorMessage: { password: 'Hai password không khớp' } });
     if (Date.now() > end_time) return this.setState({ errorMessage: { end_time: 'Thời gian không hợp lệ' } });
     if (Date.now() > start_time) return this.setState({ errorMessage: { start_time: 'Thời gian không hợp lệ' } });
@@ -63,7 +65,10 @@ class CreateRoom extends Component<Props> {
         console.log('123456', 1, data);
         this.setState({ respData: data, success: true });
       })
-      .catch((err) => checkTokenExpire(err, this))
+      .catch((err) => {
+        ToastAndroid.show('Tạo phòng thất bại', ToastAndroid.LONG);
+        checkTokenExpire(err, this);
+      })
       .finally(() => {
         this.setState({ loading: false });
       });

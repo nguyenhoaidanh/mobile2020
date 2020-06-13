@@ -33,9 +33,10 @@ class Footer extends Component<Props> {
     let { index = 0, data = {}, currentClass = {}, userInfo = {} } = this.props;
     const { title, user_create, num_checked, isCheckIn } = data;
     const curTime = Date.now();
-    const canCheckin = true || (curTime >= +data.start_time && curTime <= +data.end_time);
-    const isAuthor = user_create == userInfo.id;
+    const canCheckin = curTime >= +data.start_time && curTime <= +data.end_time;
+    const isAuthor = true || user_create == userInfo.id;
     const isStudent = userInfo.role == ROLES.student;
+    // console.log(123456, data);
     return (
       <Card>
         <View style={styles.row}>

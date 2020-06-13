@@ -52,7 +52,7 @@ export const changeTime = (str = '') => {
   const day = +dmy.split('-')[0];
   const mon = +dmy.split('-')[1];
   const year = +dmy.split('-')[2];
-  return new Date(year, mon, day, hour, min, 0, 0).getTime();
+  return new Date(year, mon - 1, day, hour, min, 0, 0).getTime();
 };
 export const setAvatar = (image) => {
   // return require('../../img/default-avatar.jpg');
