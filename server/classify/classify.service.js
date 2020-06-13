@@ -58,34 +58,49 @@ async function uploadFile(req, res) {
     /// TO DO
     // for list_face_url;
     let predict = [];
+    console.log(list_face_url.length);
     for (let url of list_face_url) {
+      console.log("file anh"+url);
       rs = await imageClassification(url);
-      predict = predict.concat(rs);
-      console.log(predict);
+      console.log(rs);
+      const max_label = rs.sort((x, y) => -x.prob + y.prob)[0];
+      if(!predict.find((e)=>e.label==max_label.label)){
+        predict.push(max_label);
+      }else{
+        var object = predict.find((e)=>e.label==max_label.label);
+        var index = predict.findIndex((e)=>e.label==max_label.label);
+        if(object.prob<max_label.prob){
+          predict[index]=max_label;
+        }
+      }
+        
+      console.log(rs.sort((x, y) => -x.prob + y.prob)[0])
+      // predict = predict.concat(rs);
+      // console.log(predict);
     }
-    return;
+    // return;
     // end TO DO
+    console.log(predict);
     predict = predict.sort((x, y) => -x.prob + y.prob).filter((x) => x.label != 'None');
     predict = predict.filter((x) => {
-      return x.prob >= 0.3;
+      console.log(x.prob >= 0.85);
+      return x.prob >= 0.85;
     });
-
+    console.log(predict);
     for (let ind = 0; ind < predict.length; ind++) {
       var user = await User.findOne({ mssv: predict[ind].label.split('_').pop() });
       if (user) predict[ind].label = user;
     }
-    console.log(predict);
+    // console.log(predict);
     res.status(200);
     res.send({ result: { predict, out_image: hightLightFace.replace('./public', ''), num_faces: faces.length } });
   });
-
-  return result;
 }
 async function imageClassification(path) {
   const image = readImage(path);
   // Load the model.
   console.log('model loading...');
-  const model = await automl.loadImageClassification(process.env.HOST + '/models');
+  const model = await automl.loadImageClassification(model_url);
   console.log('model loaded');
   const predictions = await model.classify(image);
   return predictions;

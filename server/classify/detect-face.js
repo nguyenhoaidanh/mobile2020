@@ -84,14 +84,14 @@ async function splitTo2Image(inputFile, path) {
   let context = canvas.getContext('2d');
   let image = await loadImage(inputFile);
   context.drawImage(image, 0, 0, img.width / 2, img.height, 0, 0, img.width / 2, img.height);
-  let buffer = canvas.toBuffer('image/png');
+  let buffer = canvas.toBuffer('image/jpeg');
   fs.writeFileSync(outputFile1, buffer);
 
   let canvas2 = new createCanvas(img.width / 2, img.height);
   let context2 = canvas2.getContext('2d');
   image = await loadImage(inputFile);
   context2.drawImage(image, img.width / 2, 0, img.width / 2, img.height, 0, 0, img.width / 2, img.height);
-  buffer = canvas2.toBuffer('image/png');
+  buffer = canvas2.toBuffer('image/jpeg');
   fs.writeFileSync(outputFile2, buffer);
   return [outputFile1, outputFile2];
 }
@@ -119,7 +119,7 @@ async function extract_faces(inputFile, path) {
     links.push(outputFile);
     loadImage(inputFile).then((image) => {
       context.drawImage(image, x, y, width, height, 0, 0, width, height);
-      const buffer = canvas.toBuffer('image/png');
+      const buffer = canvas.toBuffer('image/jpeg');
       fs.writeFileSync(outputFile, buffer);
     });
   }
