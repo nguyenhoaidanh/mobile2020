@@ -9,7 +9,7 @@ const User = db.User;
 var multer = require('multer');
 var dirmain = path.join(__dirname, '../');
 var fs = require('fs');
-var Request = require('request');
+var req = require('req');
 const { v4: uuidv4 } = require('uuid');
 const {detectFaces} = require('./../classify/detect-face')
 
@@ -58,7 +58,7 @@ async function updateFileExpress(req, res) {
       var  path_out= './public/store/output/'+filenames[ind];
       var out_put = await detectFaces(path_in,path_out);
       console.log(out_put);
-      if(out_put.num_face==0||out_put.num_face>1){
+      if(out_put.faces.length==0||out_put.faces.length>1){
           image_errs.push(path_out.replace("./public",""));
       }
     }

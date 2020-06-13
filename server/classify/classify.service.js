@@ -85,8 +85,8 @@ async function uploadFile(req, res) {
     console.log(predict);
     predict = predict.sort((x, y) => -x.prob + y.prob).filter((x) => x.label != 'None');
     predict = predict.filter((x) => {
-      console.log(x.prob >= 0.85);
-      return x.prob >= 0.85;
+      console.log(x.prob >= 0.8);
+      return x.prob >= 0.8;
     });
     console.log(predict);
     for (let ind = 0; ind < predict.length; ind++) {

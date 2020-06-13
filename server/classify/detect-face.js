@@ -6,6 +6,7 @@ const { createCanvas, loadImage } = require('canvas');
 const client = new vision.ImageAnnotatorClient();
 module.exports = {
   extract_faces: main,
+  detectFaces
 };
 
 async function _detectFaces(inputFile) {
