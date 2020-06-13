@@ -79,6 +79,8 @@ async function create(req) {
   console.log(req.body);
   var session_param = req.body.session;
   var list_users = req.body.list_users;
+  var user_own = await User.findById(req.sub.user);
+  if(!list_users.find((e)=>e.mssv==user_own.mssv))throw {message:"Bạn không nằm trong danh sách điểm danh",code:400}
   const room = await Room.findOne({_id:session_param.room_id,isClosed:false,});
   if (!room||Number(room.start_time)>Date.now()||Number(room.end_time)<Date.now()) throw {code:404,message:"Phòng này không còn khả dụng"};
     //if (!room.isOpen) throw 'Room is closed';
