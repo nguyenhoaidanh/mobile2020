@@ -89,6 +89,7 @@ async function uploadFile(req, res) {
     if(!setting_sv){
       value=0.6;
     }else value=setting_sv.value;
+    console.log("value predict large than "+value);
     predict = predict.sort((x, y) => -x.prob + y.prob).filter((x) => x.label != 'None');
     predict = predict.filter((x) => {
       console.log(x.prob >= value);
