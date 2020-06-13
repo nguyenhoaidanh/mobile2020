@@ -47,9 +47,9 @@ async function create(request) {
     throw {code:404,message:"Không tìm thấy lớp học"};;
   }
 }
-async function close(request) {
+async function close(req) {
   if(!req.body.room_id||!req.body.user_pass)throw{code:404,message:"Vui lòng điền đầy đủ thông tin"};
-  var room = await Room.findOne({_id:request.body.room_id,isClosed:false});
+  var room = await Room.findOne({_id:req.body.room_id,isClosed:false});
   var user = await User.findById(req.user.sub);
   if(!room)throw {code:404,message:"Không tìm thấy phòng"};
   
