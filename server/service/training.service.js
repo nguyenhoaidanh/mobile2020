@@ -43,7 +43,7 @@ module.exports = {
 };
 
 async function uploadFileModel(req, res) {
-  name_folder=Date.now();
+  var name_folder=Date.now();
   listfile_model=["dict.txt","group1-shard1of3.bin","group1-shard2of3.bin","group1-shard3of3.bin","model.json"]
   fs.mkdir('./classify/old/'+name_folder, { recursive: false }, (err) => {
     if (err) throw err;
