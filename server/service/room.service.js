@@ -29,17 +29,17 @@ async function getById(id) {
   return {object:await Room.findById(id),message:"Thông tin phòng học"};
 }
 
-async function create(request) {
+async function create(req) {
   // validate
-  console.log(request.body);
-  var class_object = await Class.findOne({ _id: request.body.class_id });
+  console.log(req.body);
+  var class_object = await Class.findOne({ _id: req.body.class_id });
   if (class_object) {
-    if (bcrypt.compareSync(request.body.secret_create_room, class_object.secret)) {
-      const room = new Room(request.body);
-      room.secret = bcrypt.hashSync(request.body.secret, 10);
-      room.start_time=request.body.start_time;
-      room.end_time=request.body.end_time;
-      room.user_create = request.user.sub;
+    if (bcrypt.compareSync(req.body.secret_create_room, class_object.secret)) {
+      const room = new Room(req.body);
+      room.secret = bcrypt.hashSync(req.body.secret, 10);
+      room.start_time=req.body.start_time;
+      room.end_time=req.body.end_time;
+      room.user_create = req.user.sub;
       return {message:"Tạo phòng thành công",object:await room.save()};
     }
     throw {code:400,message:"Xác thực không thành công"};
@@ -52,9 +52,8 @@ async function close(req) {
   var room = await Room.findOne({_id:req.body.room_id,isClosed:false});
   var user = await User.findById(req.user.sub);
   if(!room)throw {code:404,message:"Không tìm thấy phòng"};
-  
   if(!(user._id==room.user_create))throw {code:401,message:"Bạn không phải người tạo phòng"};
-  if(bcrypt.compareSync(request.body.user_pass,user.hash)){
+  if(bcrypt.compareSync(req.body.user_pass,user.hash)){
     room.isClosed=true;
     console.log("debug close room 1");
     return {message:"Đã đóng phòng học",object:await room.save()};
@@ -82,15 +81,15 @@ async function update(req) {
     }
     return {message:"Cập nhật thành công",object:await room.save()}
 }
-async function isPassRoom(request) {
-  const room = await Room.findOne({_id:request.body.room_id,isClosed:false});
+async function isPassRoom(req) {
+  const room = await Room.findOne({_id:req.body.room_id,isClosed:false});
   // validate
   //
   console.log(Date.now())
   console.log(Number(room.start_time))
   if (!room||Number(room.start_time)>Date.now()||Number(room.end_time)<Date.now()) throw {code:404,message:"Phòng này không còn khả dụng"};
-  if (request.body.secret) {
-    if (bcrypt.compareSync(request.body.secret, room.secret)) {
+  if (req.body.secret) {
+    if (bcrypt.compareSync(req.body.secret, room.secret)) {
       return {object:"",message:"Xác thực thành công"};;
     }
     throw {code:400,message:"Xác thực không thành công"};

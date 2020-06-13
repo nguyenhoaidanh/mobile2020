@@ -35,22 +35,22 @@ async function getById(id) {
   return {message:"Thông tin chi tiết lớp học",object:await Class.findById(id)};
 }
 
-async function create(request, res) {
+async function create(req, res) {
   // validate
-  console.log(request.body.code_subject);
+  console.log(req.body.code_subject);
 
-  if (await Class.findOne({ code_subject: request.body.code_subject, code_class: request.body.code_class, semester: request.body.semester })) {
+  if (await Class.findOne({ code_subject: req.body.code_subject, code_class: req.body.code_class, semester: req.body.semester })) {
     throw  { code:400,message: 'Thông tin về lớp học đã tồn tại' };
   }
-  var user = await User.findOne({_id:request.body.teacher_id});
+  var user = await User.findOne({_id:req.body.teacher_id});
   if (!user) {
     console.log(404);
     throw { code:404,message: 'Không tìm thấy giảng viên' };
   }
-  const class_object = new Class(request.body);
+  const class_object = new Class(req.body);
   // hash password
-  class_object.user_create = request.user.sub;
-  class_object.secret = bcrypt.hashSync(request.body.secret, 10);
+  class_object.user_create = req.user.sub;
+  class_object.secret = bcrypt.hashSync(req.body.secret, 10);
   // save user
   return {object:await class_object.save(),message:"Tạo lớp học thành công"};
 }
@@ -95,10 +95,10 @@ async function updateSecret(req) {
   return {message:"Cập nhật thành công",object:await class_object.save()};
 }
 
-async function updateManyClassForUser(request) {
-  const user = await User.findById(request.user.sub);
+async function updateManyClassForUser(req) {
+  const user = await User.findById(req.user.sub);
   if (!user) throw { code:404,message: 'Không tìm thấy sinh viên' };;
-  var list_class = request.body.map((element) => element.class_id);
+  var list_class = req.body.map((element) => element.class_id);
   console.log(list_class);
   var newArray = user.class_ids;
 
@@ -107,10 +107,10 @@ async function updateManyClassForUser(request) {
   user.class_ids = [...new Set(newArray)];
   return {message:"Cập nhật thành công lớp học cho sinh viên",object:await user.save()};
 }
-async function updateClassForManyUsers(request, res) {
+async function updateClassForManyUsers(req, res) {
   var list_undifine_user = [];
-  var list_user = request.body.users;
-  var class_object = await Class.findOne({_id:request.body.class_id});
+  var list_user = req.body.users;
+  var class_object = await Class.findOne({_id:req.body.class_id});
   if (!class_object) {
     throw { code:404,message: 'Không tìm thấy lớp học' };
   } else {
@@ -119,7 +119,7 @@ async function updateClassForManyUsers(request, res) {
       if (!user) {
         list_undifine_user.push(list_user[stu]);
       } else {
-        if(user.class_ids.length!=0&&!user.class_ids.includes(request.body.class_id)!=-1)throw {message:"Sinh viên "+user.mssv+" đã được thêm trước đó",code:400};
+        if(user.class_ids.length!=0&&!user.class_ids.includes(req.body.class_id)!=-1)throw {message:"Sinh viên "+user.mssv+" đã được thêm trước đó",code:400};
         user.class_ids = [...new Set([].concat([class_object._id], user.class_ids))];
         await user.save();
       }
