@@ -14,7 +14,7 @@ const User = db.User;
 //in backend JavaScript applications under the Node.js runtime.
 const tfnode = require('@tensorflow/tfjs-node');
 var propertiesReader = require('properties-reader');
-var properties = process.env.ENV_NODE == 'product' ? propertiesReader('properties.product.file') : propertiesReader('properties.dev.file');
+var properties = process.env.ENV_NODE=="staging"?propertiesReader('./properties.staging.file'):process.env.ENV_NODE=="product"?propertiesReader('./properties.product.file'):propertiesReader('./properties.dev.file');
 // const automl = require('@tensorflow/tfjs-automl');
 //The fs module provides an API for interacting with the file system.
 module.exports = {
