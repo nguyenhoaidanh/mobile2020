@@ -9,6 +9,7 @@ const { extract_faces } = require('./detect-face');
 const { v4: uuidv4 } = require('uuid');
 const db = require('../helper/db');
 const User = db.User;
+const Config = db.Config;
 //MobileNet : pre-trained model for TensorFlow.js
 //The module provides native TensorFlow execution
 //in backend JavaScript applications under the Node.js runtime.
@@ -83,10 +84,15 @@ async function uploadFile(req, res) {
     // return;
     // end TO DO
     console.log(predict);
+    var setting_sv = await Config.findOne({label:"predict"});
+    var value=0.0;
+    if(!setting_sv){
+      value=0.6;
+    }else value=setting_sv.value;
     predict = predict.sort((x, y) => -x.prob + y.prob).filter((x) => x.label != 'None');
     predict = predict.filter((x) => {
-      console.log(x.prob >= 0.8);
-      return x.prob >= 0.8;
+      console.log(x.prob >= value);
+      return x.prob >= value;
     });
     console.log(predict);
     for (let ind = 0; ind < predict.length; ind++) {
