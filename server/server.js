@@ -77,7 +77,8 @@ app.use('/static', express.static('public'));
 app.use('/', express.static('classify'));
 //mail public api
 app.use('/mails/', require('./controller/mail.controller'));
-
+//model
+app.use('/trainings/',require('./controller/trainning.controller'));
 //jwt
 app.use(jwt());
 app.use(errorHandler);
