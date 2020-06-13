@@ -9,7 +9,6 @@ const User = db.User;
 var multer = require('multer');
 var dirmain = path.join(__dirname, '../');
 var fs = require('fs');
-var req = require('req');
 const { v4: uuidv4 } = require('uuid');
 const {detectFaces} = require('./../classify/detect-face')
 
