@@ -19,8 +19,8 @@ async function getAll(req) {
   let rooms = await Room.find({ class_id: req.params.id });
   let rs = [];
   for (const room of rooms) {
-    var session_of_students = await Session.find({ room_id: room.id });
-    rs.push({ ...room, num_checked: session_of_students.length });
+   // var session_of_students = await Session.find({ room_id: room.id });
+    rs.push({room});
   }
   return {message:"Danh sách các phòng",object:rs};
 }
