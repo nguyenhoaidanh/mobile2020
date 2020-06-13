@@ -56,8 +56,8 @@ async function getAllSelf(req) {
       if (room) {
         var class_var = await Class.findById(room.class_id);
         if (class_var) {
-          var author = await User.findById(class_var.user_create);
-          class_var.user_create = author.fullname;
+          var author = await User.findById(class_var.teacher_id);
+          class_var.teacher_id = author.fullname;
           var session_item = session[count];
           collections.push({ class: class_var, session: session_item });
         }

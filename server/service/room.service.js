@@ -86,8 +86,9 @@ async function isPassRoom(req) {
   // validate
   //
   console.log(Date.now())
-  console.log(Number(room.start_time))
+
   if (!room||Number(room.start_time)>Date.now()||Number(room.end_time)<Date.now()) throw {code:404,message:"Phòng này không còn khả dụng"};
+  console.log(Number(room.start_time))
   if (req.body.secret) {
     if (bcrypt.compareSync(req.body.secret, room.secret)) {
       return {object:"",message:"Xác thực thành công"};;
