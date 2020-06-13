@@ -20,9 +20,9 @@ async function getAll(req) {
   let rs = [];
   for (const room of rooms) {
     var session_of_students = await Session.find({ room_id: room.id });
-    rs.push({ room, num_checked: session_of_students.length });
+    rs.push({ ...room, num_checked: session_of_students.length });
   }
-  return rs;
+  return {message:"Danh sách các phòng",object:rs};
 }
 
 async function getById(id) {
@@ -40,9 +40,9 @@ async function create(request) {
       room.start_time=request.body.start_time;
       room.end_time=request.body.end_time;
       room.user_create = request.user.sub;
-      return await room.save();
+      return {message:"Tạo phòng thành công",object:await room.save()};
     }
-    throw {code:400,message:"Xác thực không thành công"};;
+    throw {code:400,message:"Xác thực không thành công"};
   } else {
     throw {code:404,message:"Không tìm thấy lớp học"};;
   }
@@ -55,10 +55,10 @@ async function close(request) {
   if(bcrypt.compareSync(request.body.room_secret,room.secret)){
     room.isClosed=true;
     console.log("debug close room 1");
-    await room.save();
+    return {message:"Đã đóng phòng học",object:await room.save()};
     
-  }
-  return {message:"Đã đóng lớp học",object:room}
+  }else
+  throw {code:400,message:"Xác thực không thành công"};
 }
 async function update(req) {
     if(!req.body.room_id||!req.body.user_pass)throw {code:400,message:"Vui lòng điền đầy đủ thông tin"};
