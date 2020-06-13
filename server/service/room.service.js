@@ -48,11 +48,13 @@ async function create(request) {
   }
 }
 async function close(request) {
+  if(!req.body.room_id||!req.body.user_pass)throw{code:404,message:"Vui lòng điền đầy đủ thông tin"};
   var room = await Room.findOne({_id:request.body.room_id,isClosed:false});
-  
+  var user = await User.findById(req.user.sub);
   if(!room)throw {code:404,message:"Không tìm thấy phòng"};
   
-  if(bcrypt.compareSync(request.body.room_secret,room.secret)){
+  if(!(user._id==room.user_create))throw {code:401,message:"Bạn không phải người tạo phòng"};
+  if(bcrypt.compareSync(request.body.user_pass,user.hash)){
     room.isClosed=true;
     console.log("debug close room 1");
     return {message:"Đã đóng phòng học",object:await room.save()};
