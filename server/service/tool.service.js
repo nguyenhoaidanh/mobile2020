@@ -55,7 +55,7 @@ async function updateFileExpress(req, res) {
     for(var ind =0;ind<filenames.length;ind++){
       var  path_in = './public/store/faces/'+filenames[ind];
       var  path_out= './public/store/output/'+filenames[ind];
-      var out_put = await detectFaces(path_in,path_out);
+      var out_put = await detectFaces(path_in,path_out,false);
       console.log(out_put);
       if(out_put.faces.length==0||out_put.faces.length>1){
           image_errs.push(path_out.replace("./public",""));
@@ -76,26 +76,28 @@ async function updateFileExpress(req, res) {
         if(ind==0){
           records.push({
             type:"TEST",
-            link:"gs://"+process.env.BUCKET_NAME+"/"+filenames[ind],
+            link:"gs://"+properties.get("google.bucket.image")+"/"+filenames[ind],
             label:req.user.label
           });
         } else if (ind == 1) {
           records.push({
             type:"VALIDATION",
-            link:"gs://"+process.env.BUCKET_NAME+"/"+filenames[ind],
+            link:"gs://"+properties.get("google.bucket.image")+"/"+filenames[ind],
             label:req.user.label
           });
         } else {
           records.push({
             type:"TRAIN",
-            link:"gs://"+process.env.BUCKET_NAME+"/"+filenames[ind],
+            link:"gs://"+properties.get("google.bucket.image")+"/"+filenames[ind],
             label:req.user.label
           });
         }
-        await tranferToBucket('./public/store/faces/'+filenames[ind],process.env.BUCKET_IMAGE_NAME);
+        await tranferToBucket('./public/store/faces/'+filenames[ind],properties.get("google.bucket.image"));
         console.log("upload image to bucket: "+filenames[ind]);
       }
        csvWriter.writeRecords(records);
+       //chua gui dataset
+       //TODO
     }
     
     user.list_images=[].concat(user.list_images,filenames);
@@ -110,11 +112,11 @@ async function createBucket() {
 
   // Creates a client
   const storage = new Storage({
-    projectId: process.env.PROJECT_ID,
-    keyFilename: dirmain + '/resource/' + process.env.CONFIG_GOOGLE_SERVICE,
+    projectId: properties.get("google.project.id"),
+    keyFilename: dirmain + '/resource/' + properties.get("google.service.path"),
   });
-    return await storage.createBucket(process.env.BUCKET_NAME,{
-      location:process.env.BUCKET_LOCATION
+    return await storage.createBucket(properties.get("google.bucket.image"),{
+      location:properties.get("google.bucket.region")
     });
 }
 async function tranferToBucket(path) {
@@ -122,10 +124,10 @@ async function tranferToBucket(path) {
     const {Storage} = require('@google-cloud/storage');
     // Creates a client
     const storage = new Storage({
-      projectId: process.env.PROJECT_ID,
-      keyFilename: dirmain+'/resource/'+process.env.CONFIG_GOOGLE_SERVICE
+      projectId: properties.get("google.project.id"),
+      keyFilename:'./resource/'+properties.get("google.service.path")
   });
-  await storage.bucket(process.env.BUCKET_NAME).upload(dirmain+'public/store/'+path,function(err,file){
+  await storage.bucket(properties.get("google.bucket.image")).upload(path,function(err,file){
     if(err)throw err;
     console.log("tranfer to Bucket"+path);
   });

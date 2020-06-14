@@ -188,3 +188,13 @@ TRAIN,gs://avatars-mobileapp2020/5edce1e7367d1de02fc5154f-1b7dda11-5f67-4a9f-bdb
 TRAIN,gs://avatars-mobileapp2020/5edce1e7367d1de02fc5154f-cc1fef97-fdf3-412d-a944-4c0dd4bbf772-1591603685263.jpg,Chi_1610304
 TRAIN,gs://avatars-mobileapp2020/5edce1e7367d1de02fc5154f-f6b26863-5d63-49af-93b4-54a93708f5c9-1591603685265.jpg,Chi_1610304
 TRAIN,gs://avatars-mobileapp2020/5edce1e7367d1de02fc5154f-c490f86e-2ef6-438a-9fd5-85692606d148-1591603685266.jpeg,Chi_1610304
+TEST,gs://avatars-mobileapp2020/5edbd8b1bb69c8c92e3e8665-03f0a024-4439-443c-b599-06aa7bfd58e3-1592130608976.jpg,Thuc_1613494
+VALIDATION,gs://avatars-mobileapp2020/5edbd8b1bb69c8c92e3e8665-4ec8ee4b-e368-4d5b-91eb-65502fe9ef48-1592130608978.jpeg,Thuc_1613494
+TRAIN,gs://avatars-mobileapp2020/5edbd8b1bb69c8c92e3e8665-8256e7a4-802b-4e71-9edb-ad78c6c38ce7-1592130608979.jpeg,Thuc_1613494
+TRAIN,gs://avatars-mobileapp2020/5edbd8b1bb69c8c92e3e8665-e45a2bad-33d6-4685-a995-a8b5d0451af2-1592130608982.jpg,Thuc_1613494
+TRAIN,gs://avatars-mobileapp2020/5edbd8b1bb69c8c92e3e8665-656587d0-46b2-46c3-ba69-9c5b9e58c2cd-1592130608988.jpg,Thuc_1613494
+TRAIN,gs://avatars-mobileapp2020/5edbd8b1bb69c8c92e3e8665-81833995-d94a-480b-935b-d8d2b4136c83-1592130608989.jpg,Thuc_1613494
+TRAIN,gs://avatars-mobileapp2020/5edbd8b1bb69c8c92e3e8665-ae0ad42f-e007-4a82-888f-a0d069966d08-1592130608991.jpeg,Thuc_1613494
+TRAIN,gs://avatars-mobileapp2020/5edbd8b1bb69c8c92e3e8665-2a8c8bcc-a14a-4aa3-9c18-ac6e6fae19cf-1592130608992.jpg,Thuc_1613494
+TRAIN,gs://avatars-mobileapp2020/5edbd8b1bb69c8c92e3e8665-f051ac4f-19a8-4c9c-9ef5-24d10e914254-1592130608993.jpg,Thuc_1613494
+TRAIN,gs://avatars-mobileapp2020/5edbd8b1bb69c8c92e3e8665-566e7419-a6a4-4de9-8da4-b7a29c45926f-1592130608994.jpeg,Thuc_1613494
