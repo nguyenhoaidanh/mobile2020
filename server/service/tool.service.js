@@ -100,7 +100,7 @@ async function updateFileExpress(req, res) {
        //TODO
     }
     
-    user.list_images=[].concat(user.list_images,filenames);
+    user.list_images=[].concat(user.list_images,filenames.map((item)=>"/store/faces/"+item));
     await user.save();
     res.status(200);
     res.send({message:"Danh sách datataset",object:user.list_images})
