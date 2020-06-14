@@ -32,7 +32,6 @@ const list = [
   { showRole: [ROLES.student, ROLES.teacher], name: 'listRoom', to: '/list-room', text: 'Phòng học', image: imgRoom },
   { showRole: [ROLES.student], name: 'registerFace', to: '/register-face', text: 'Gương mặt', image: imgFace },
   { showRole: [ROLES.student], name: 'history', to: '/history', text: 'Lịch sử', image: imgHistory },
-  { showRole: [ROLES.teacher], text: 'Giáo viên', image: imgTeacher },
   { showRole: [ROLES.student, ROLES.teacher], name: 'account', to: '/account', text: 'Tài khoản', image: imgDefaultAva },
 ];
 type Props = {};

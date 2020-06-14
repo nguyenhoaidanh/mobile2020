@@ -173,7 +173,7 @@ class Home extends Component<Props> {
     return (
       <View style={{ backgroundColor: 'white', height: '100%' }}>
         <Loading show={loading} loadingText={this.state.loadingText} />
-        <ImageInput picker={true} small={false} showAccessory={false} backgroundColor="white" image={image} useFrontCamera callback={this.setImage} />
+        <ImageInput camera={true} small={false} showAccessory={false} backgroundColor="white" image={image} useFrontCamera callback={this.setImage} />
         <View>
           <Text style={{ color: 'orange', alignSelf: 'center' }}>Chạm vào hình để mở camera</Text>
         </View>

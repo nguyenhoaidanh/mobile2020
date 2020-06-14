@@ -56,5 +56,5 @@ export const imgCheckin = <Image source={require('../../img/checkin.png')} style
 export const imgRoom = <Image source={require('../../img/room.png')} style={_style.img} />;
 export const imgFace = <Image source={require('../../img/face.png')} style={_style.img} />;
 export const imgHistory = <Image source={require('../../img/history.png')} style={_style.img} />;
-export const imgDefaultAva = <Image source={require('../../img/default-avatar.png')} style={_style.img} />;
+export const imgDefaultAva = <Image source={require('../../img/default2-avatar.png')} style={_style.img} />;
 export const imgBku = <Image source={require('../../img/bku.png')} style={{ alignSelf: 'center', width: 200, height: 200 }} />;
