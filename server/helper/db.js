@@ -11,4 +11,5 @@ module.exports = {
     Room:require('../model/room'),
     Session:require('../model/session'),
     Token:require('../model/token'),
+    Config:require('../model/config'),
 };

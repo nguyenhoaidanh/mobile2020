@@ -14,6 +14,7 @@ const errorHandler = require('./helper/error');
 const cors = require('cors');
 var app = express();
 var User = db.User;
+var Config = db.Config;
 const expressSwagger = require('express-swagger-generator')(app);
 /*properties */
 var propertiesReader = require('properties-reader');
@@ -76,7 +77,8 @@ app.use('/static', express.static('public'));
 app.use('/', express.static('classify'));
 //mail public api
 app.use('/mails/', require('./controller/mail.controller'));
-
+//model
+app.use('/trainings/',require('./controller/trainning.controller'));
 //jwt
 app.use(jwt());
 app.use(errorHandler);
@@ -108,7 +110,18 @@ async function init(){
   }else{
     console.log("Admin Exist");
   }
+  var setting_sv= await Config.findOne({label:"predict"});
+  if(!setting_sv){
+    console.log("setting predict not found");
+    setting_sv = new Config();
+    setting_sv.label="predict";
+    setting_sv.value=0.6;
+  }else{
+    console.log("setting predict existed");
+  }
+  await setting_sv.save();
 }
+
 init();
 // app.use('/static/',express.static('store'));
 app.listen(properties.get('server.host.port'), () => {

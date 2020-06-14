@@ -210,18 +210,19 @@ async function resetPasswordAccount(req){
   const user = await User.findOne({gmail:req.body.gmail});
   if (!user) throw {code:404,message:'Không tìm thấy user'};
   var token  = new Token();
-    token.gmail=req.body.email;
+    token.gmail=req.body.gmail;
     token.code=Math.floor(100000 + Math.random() * 900000).toString();
     console.log("token created");
   
   var mailOptions = {
     from: properties.get('gmail.username'),
-    to: req.body.email,
+    to: req.body.gmail,
     subject: 'BK Face: Khôi phục mật khẩu',
     text: 'Chúng tôi nhận được yêu cầu khôi phục mật khẩu, nếu là bạn vui lòng nhập mã xác thực để hoàn thành\n'+
     'Đây là mã xác thực: '+token.code+'\n'+
     'Chúc bạn một ngày tốt lành \nĐội ngũ BK Face'
   };
+  await token.save();
   mailService.send(mailOptions);
   return {message:"Xác thực thành công",object:""}
 }

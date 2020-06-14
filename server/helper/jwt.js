@@ -6,7 +6,7 @@ module.exports = jwt;
 
 function jwt() {
     // const secret = properties.get('server.host.secret').toString;
-    const secret = process.env.SECRET;
+    const secret = properties.get("server.host.secret").toString();
     return expressJwt({ secret, isRevoked }).unless({
         path: [
             // public routes that don't require authentication
