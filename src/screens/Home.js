@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { ScrollView, Platform, StyleSheet, Text, View, BackHandler, Dimensions } from 'react-native';
+import { ScrollView, Platform, StyleSheet, Text, View, BackHandler, Dimensions, TouchableOpacity } from 'react-native';
 import { NativeRouter, Route, Link } from 'react-router-native';
 import { Divider, Card, Avatar, Button, Image } from 'react-native-elements';
 import Icon from 'react-native-vector-icons/FontAwesome';
@@ -8,7 +8,7 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import * as appActions from '../actions/index';
 import { setAvatar, shadow } from '../utils/functions';
-import { list_screen_map, ROLES } from '../constants/constants';
+import { list_screen_map, ROLES, imgBku, imgCheckin, imgDefaultAva, imgFace, imgHistory, imgRoom, imgTeacher } from '../constants/constants';
 import cStyles from '../constants/common-styles';
 import AsyncStorage from '@react-native-community/async-storage';
 
@@ -28,12 +28,12 @@ const styles = StyleSheet.create({
   ava: { flexDirection: 'row', width: '100%' },
 });
 const list = [
-  { showRole: [ROLES.student, ROLES.teacher], name: 'listRoom', to: '/list-room', text: 'Điểm danh', image: require('../../img/checkin.png') },
-  { showRole: [ROLES.student, ROLES.teacher], name: 'listRoom', to: '/list-room', text: 'Phòng học', image: require('../../img/room.png') },
-  { showRole: [ROLES.student, ROLES.teacher], name: 'registerFace', to: '/register-face', text: 'Gương mặt', image: require('../../img/face.png') },
-  { showRole: [ROLES.student], name: 'history', to: '/history', text: 'Lịch sử', image: require('../../img/history.png') },
-  { showRole: [ROLES.teacher], text: 'Giáo viên', image: require('../../img/teacher.png') },
-  { showRole: [ROLES.student, ROLES.teacher], name: 'account', to: '/account', text: 'Tài khoản', image: require('../../img/default-avatar.png') },
+  { showRole: [ROLES.student], name: 'listRoom', to: '/list-room', text: 'Điểm danh', image: imgCheckin },
+  { showRole: [ROLES.student, ROLES.teacher], name: 'listRoom', to: '/list-room', text: 'Phòng học', image: imgRoom },
+  { showRole: [ROLES.student], name: 'registerFace', to: '/register-face', text: 'Gương mặt', image: imgFace },
+  { showRole: [ROLES.student], name: 'history', to: '/history', text: 'Lịch sử', image: imgHistory },
+  { showRole: [ROLES.teacher], text: 'Giáo viên', image: imgTeacher },
+  { showRole: [ROLES.student, ROLES.teacher], name: 'account', to: '/account', text: 'Tài khoản', image: imgDefaultAva },
 ];
 type Props = {};
 class Home extends Component<Props> {
@@ -90,14 +90,14 @@ class Home extends Component<Props> {
     if (loading)
       return (
         <View style={styles.container}>
-          <Image source={require('../../img/bku.png')} style={{ width: 200, height: 200 }} />
+          {imgBku}
           <Text style={styles.welcome}>{`Ứng dụng điểm danh Bách Khoa`}</Text>
         </View>
       );
     if (!loggedIn)
       return (
         <View style={styles.container}>
-          <Image source={require('../../img/bku.png')} style={{ width: 200, height: 200 }} />
+          {imgBku}
           <Text style={styles.welcome}>{`Ứng dụng điểm danh Bách Khoa`}</Text>
           {/* <Button
             containerStyle={cStyles.btnwrap}
@@ -136,16 +136,20 @@ class Home extends Component<Props> {
             if (!e.showRole.includes(userInfo.role)) return null;
             const imageWidth = width - 40;
             return (
-              <View key={i} style={{ ...shadow(), margin: 5, alignItems: 'center', backgroundColor: 'white', borderRadius: 10, height: width, width: width }}>
-                <Avatar
+              <TouchableOpacity onPress={() => this.navigate(e.to, list_screen_map[e.name])}>
+                <View key={i} style={{ ...shadow(), margin: 5, alignItems: 'center', backgroundColor: 'white', borderRadius: 10, height: width, width: width }}>
+                  {/* <Avatar
                   onPress={() => this.navigate(e.to, list_screen_map[e.name])}
                   size="xlarge"
+                  ImageComponent={() => e.image}
                   source={e.image}
                   containerStyle={{ marginTop: 10, alignSelf: 'center', width: imageWidth, height: imageWidth }}
                   avatarStyle={{ alignSelf: 'center', width: imageWidth, height: imageWidth }}
-                />
-                <Text style={{ fontWeight: 'bold', fontSize: 15, color: 'black' }}>{e.text}</Text>
-              </View>
+                /> */}
+                  {e.image}
+                  <Text style={{ fontWeight: 'bold', fontSize: 15, color: 'black' }}>{e.text}</Text>
+                </View>
+              </TouchableOpacity>
             );
           })}
         </View>

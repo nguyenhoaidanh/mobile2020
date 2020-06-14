@@ -4,12 +4,13 @@ import appConfig from '../constants/config';
 import dayjs from 'dayjs';
 import AsyncStorage from '@react-native-community/async-storage';
 import { list_screen_map, goolge_url } from '../constants/constants';
-export const showImageInput = ({ useFrontCamera = false, picker, camera, cropping = false, callback = () => {} }) => {
+export const showImageInput = ({ multiple = false, useFrontCamera = false, picker, camera, cropping = false, callback = () => {} }) => {
   let func = ImagePicker.openPicker;
   if (camera) func = ImagePicker.openCamera;
   func({
     cropping,
     useFrontCamera,
+    multiple,
   })
     .then((image) => {
       callback(image);
@@ -44,11 +45,12 @@ export const shadow = () => ({
   elevation: 19,
 });
 export const changeTime = (str = '') => {
-  //05:01 26-06-2020 => 1231231232312
-  const hm = str.split(' ')[0];
-  const dmy = str.split(' ')[1];
-  const hour = +hm.split(':')[0];
-  const min = +hm.split(':')[1];
+  //05:01 PM, 26-06-2020 => 1231231232312
+  const hm = str.split(', ')[0];
+  const dmy = str.split(', ')[1];
+  const hour = +hm.split(':')[0] + (str.toLowerCase().includes('pm') ? 12 : 0);
+  const min = +hm.split(':')[1].split(' ')[0];
+  console.log(123456, dmy);
   const day = +dmy.split('-')[0];
   const mon = +dmy.split('-')[1];
   const year = +dmy.split('-')[2];
@@ -64,8 +66,10 @@ export const setAvatar = (image) => {
 export const shorterString = (str = '', maxlength) => {
   return str.length > maxlength ? str.substring(0, maxlength) + '...' : str;
 };
-export const formatTime = (time, strFormat = 'hh:mm DD-MM-YYYY') => {
-  time = +time;
+export const formatTime = (time, strFormat = 'hh:mm A, DD-MM-YYYY') => {
+  if (!isNaN(+time)) {
+    time = +time;
+  }
   let denta = Date.parse(new Date()) - Date.parse(time);
   denta /= 1000;
   let min = Math.floor(denta / 60);
@@ -89,7 +93,7 @@ export const uploadFileToServer = (listFile, token, path, method = 'POST', onUpl
       name: fileName,
     });
   }
-  return AXIOS(path || '/users/images/uploadfile', method, formData, { onUploadProgress, timeout: 1000 * 60 }, token, true);
+  return AXIOS(path || '/users/images/uploadfile', method, formData, { onUploadProgress, timeout: 1000 * 30 * listFile.length }, token, true);
 };
 export const checkTokenExpire = (err, that) => {
   console.log('123456', 'errror axios');

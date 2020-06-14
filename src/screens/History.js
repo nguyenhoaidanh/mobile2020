@@ -2,14 +2,14 @@ import React, { Component } from 'react';
 import { Platform, StyleSheet, Text, View, SafeAreaView, ScrollView } from 'react-native';
 import { Link, withRouter } from 'react-router-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import { Input, Button, Card } from 'react-native-elements';
+import { Input, Button, Card, Overlay, Image } from 'react-native-elements';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import * as appActions from '../actions/index';
 import HistoryItem from '../components/HistoryItem';
 import Loading from '../components/Loading';
-import { itemHeight } from '../constants/constants';
-import { AXIOS, checkTokenExpire, shadow } from '../utils/functions';
+import { itemHeight, imgBku } from '../constants/constants';
+import { AXIOS, checkTokenExpire, shadow, setAvatar } from '../utils/functions';
 import cStyles from '../constants/common-styles';
 const styles = StyleSheet.create({});
 
@@ -19,8 +19,11 @@ class Home extends Component<Props> {
   componentDidMount() {
     AXIOS('/sessions/checkins', 'GET', {}, {}, this.props.userInfo.token)
       .then(({ data }) => {
-        console.log('123456', `found ${data.result.length} session`);
-        this.setState({ history: data.result });
+        console.log('123456', `found ${data.object.length} session`);
+        this.setState({
+          history: data.object,
+          images: data.object.map((e) => <Image source={setAvatar(e.session.link_face)} style={{ width: '100%', height: '100%', resizeMode: 'contain' }} />),
+        });
       })
       .catch((err) => {
         checkTokenExpire(err, this);
@@ -34,6 +37,16 @@ class Home extends Component<Props> {
     this.props.history.push(url);
     this.props.appActions.setCurScreent({ currentScreent: { title: 'Tạo room' } });
   };
+  renderPopupInfo = () => {
+    const { curiItem, urlIdx, images = [] } = this.state;
+    const { session = {} } = curiItem;
+    console.log(123456, 'session', images[urlIdx], session.link_face, setAvatar(session.link_face));
+    return (
+      <Overlay overlayStyle={{ width: '90%' }} isVisible={this.state.showForm} onBackdropPress={() => this.setState({ showForm: false })}>
+        <View>{images[urlIdx]}</View>
+      </Overlay>
+    );
+  };
   render() {
     const iconSize = 24;
     const iconColor = 'black';
@@ -41,8 +54,9 @@ class Home extends Component<Props> {
     const itemHeight = 190;
     return (
       <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+        {this.state.showForm ? this.renderPopupInfo() : null}
         {history.map((item, idx) => (
-          <HistoryItem data={item} key={idx} />
+          <HistoryItem data={item} key={idx} onClick={() => this.setState({ showForm: true, curiItem: item, urlIdx: idx })} />
         ))}
         {loading ? (
           <Loading />

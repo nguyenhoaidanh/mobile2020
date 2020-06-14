@@ -48,7 +48,6 @@ class Login extends Component<Props> {
     //     });
     //   return;
     // }
-    console.log('123456', 1, username, password);
     if (!username || !password) return;
     const user = { username, password };
     this.setState({ loading: true });

@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Platform, StyleSheet, Text, View, Alert, Image } from 'react-native';
+import { Platform, StyleSheet, Text, View, Alert, Image, ScrollView } from 'react-native';
 import { Link, withRouter } from 'react-router-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { Input, Button, CheckBox } from 'react-native-elements';
@@ -24,9 +24,14 @@ class Home extends Component<Props> {
     const { image = {} } = this.state;
     if (!image.path) return;
     if (!image.path.includes('.jpg') && !image.path.includes('.jpeg')) return this.showAlert('Định dạng file không được hỗ trợ');
-    console.log(123456, 'start upload');
-    this.setState({ loading: true, loadingText: 'Đang phân tích dữ liệu khuôn mặt' });
-    uploadFileToServer([image], this.props.userInfo.token, '/users/classify')
+
+    this.setState({ loading: true, loadingText: '' });
+    uploadFileToServer([image], this.props.userInfo.token, '/users/classify', 'POST', (progressEvent) => {
+      const { loaded, total } = progressEvent;
+      let percent = Math.floor((loaded / total) * 100);
+      const loadingText = percent < 100 ? `Đang tải ảnh lên ${percent}%` : `Đang phân tích dữ liệu gương mặt`;
+      this.setState({ loadingText });
+    })
       .then(({ data }) => {
         this.showConfirm(data.result);
       })
@@ -38,7 +43,7 @@ class Home extends Component<Props> {
         this.setState({ loading: false });
       });
   };
-  showConfirm = (data) => {
+  showConfirm = async (data) => {
     const { num_faces, out_image, predict } = data;
     this.setState({ image: out_image });
     const { currentRoom = {} } = this.props;
@@ -87,19 +92,20 @@ class Home extends Component<Props> {
       {
         text: btnText,
         onPress: () => {
-          this.setState({ success });
+          if (!success) this.setState({ success, image: {} });
+          else this.setState({ success });
         },
       },
     ]);
   };
   saveSession = (predict = []) => {
-    const { currentRoom = {} } = this.props;
+    const { currentRoom = {}, userInfo = {} } = this.props;
     this.setState({ predict });
     const { image = {} } = this.state;
+    if (!predict.find((e) => e.label.mssv == userInfo.mssv)) return this.showAlert('Không có gương mặt của bạn, chụp lại.');
     const sessions = {
       session: {
         room_id: currentRoom.id,
-        link_face: image,
         secret_of_room: currentRoom.secret || 123456,
         location: {
           longtitude: 20.0,
@@ -107,11 +113,12 @@ class Home extends Component<Props> {
         },
       },
       room_id: currentRoom.id,
-      list_users: predict.map((e) => e.label.id),
+      list_users: predict.map((e) => ({ mssv: e.label.mssv, link_face: image })),
     };
+
     console.log(123456, sessions);
     this.setState({ loading: true, loadingText: 'Đang xử lý' });
-    AXIOS('/sessions/authorize', 'POST', sessions, {}, this.props.userInfo.token)
+    AXIOS('/sessions', 'POST', sessions, {}, this.props.userInfo.token)
       .then(({ data }) => {
         this.showAlert('Điểm danh thành công', true);
       })
@@ -135,38 +142,38 @@ class Home extends Component<Props> {
     const iconSize = 24;
     const iconColor = 'black';
     const { currentClass = {} } = this.props;
-    const { message = '', valid = 1, image = {}, success = false, loading = false } = this.state;
+    const { message = '', valid = 1, image = {}, success = false, loading = false, predict = [] } = this.state;
     if (success)
       return (
-        <View>
-          <View style={{ backgroundColor: 'white', padding: 20, height: '100%' }}>
-            <Image style={{ width: 100, height: 100, alignSelf: 'center' }} source={require('../../img/success.png')} />
-            <Text style={{ fontSize: 20, color: 'green', alignSelf: 'center', marginBottom: 10, fontWeight: 'bold' }}>Điểm danh thành công:</Text>
-            <Text style={{ fontSize: 20, color: 'black' }}>Môn học: </Text>
-            <Text style={{ fontSize: 20, color: 'brown', alignSelf: 'center', fontWeight: 'bold' }}>{currentClass.name_subject} - 20/12/2020</Text>
-            <Text style={{ fontSize: 20, color: 'black' }}>Sinh viên:</Text>
-            {predict.map((e, i) => (
-              <Text style={{ fontSize: 20, color: 'blue', alignSelf: 'center', fontWeight: 'bold' }}>
-                - {e.label.fullname} - {e.label.mssv}
-              </Text>
-            ))}
-            <Button
-              containerStyle={cStyles.btnwrap}
-              titleStyle={cStyles.btnText}
-              buttonStyle={cStyles.btnPrimary}
-              title="Về trang chủ"
-              onPress={() => {
-                this.props.history.push('/');
-                this.props.appActions.setCurScreent({ currentScreent: list_screen_map.home });
-              }}
-            />
-          </View>
-        </View>
+        <ScrollView contentContainerStyle={{ flexGrow: 1, backgroundColor: 'white', padding: 20, minHeight: '100%' }}>
+          <Image style={{ width: 100, height: 100, alignSelf: 'center' }} source={require('../../img/success.png')} />
+          <Text style={{ fontSize: 20, color: 'green', alignSelf: 'center', marginBottom: 10, fontWeight: 'bold' }}>Điểm danh thành công:</Text>
+          <Text style={{ fontSize: 20, color: 'black' }}>Môn học: </Text>
+          <Text style={{ fontSize: 20, color: 'brown', alignSelf: 'center', fontWeight: 'bold' }}>{currentClass.name_subject} - 20/12/2020</Text>
+          <Text style={{ fontSize: 20, color: 'black' }}>Sinh viên:</Text>
+          {predict.map((e, i) => (
+            <Text style={{ fontSize: 20, color: 'blue', alignSelf: 'center', fontWeight: 'bold' }}>
+              - {e.label.fullname} - {e.label.mssv}
+            </Text>
+          ))}
+          <Image source={setAvatar(image)} style={{ flex: 1, width: null, height: null, resizeMode: 'contain' }} />
+          <Button
+            containerStyle={cStyles.btnwrap}
+            titleStyle={cStyles.btnText}
+            buttonStyle={cStyles.btnPrimary}
+            title="Về trang chủ"
+            onPress={() => {
+              this.props.history.push('/');
+              this.props.appActions.setCurScreent({ currentScreent: list_screen_map.home });
+            }}
+          />
+          <View style={{ height: 65 }} />
+        </ScrollView>
       );
     return (
       <View style={{ backgroundColor: 'white', height: '100%' }}>
-        {loading ? <Loading loadingText={this.state.loadingText} /> : null}
-        <ImageInput small={false} showAccessory={false} backgroundColor="white" image={image} useFrontCamera picker={true} callback={this.setImage} />
+        <Loading show={loading} loadingText={this.state.loadingText} />
+        <ImageInput picker={true} small={false} showAccessory={false} backgroundColor="white" image={image} useFrontCamera callback={this.setImage} />
         <View>
           <Text style={{ color: 'orange', alignSelf: 'center' }}>Chạm vào hình để mở camera</Text>
         </View>

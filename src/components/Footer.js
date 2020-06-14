@@ -29,7 +29,6 @@ type Props = {};
 class Footer extends Component<Props> {
   constructor(props) {
     super(props);
-
     this.state = { list: list_screen };
   }
   componentDidMount() {

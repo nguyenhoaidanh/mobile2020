@@ -18,8 +18,9 @@ const styles = StyleSheet.create({
 type Props = {};
 class Footer extends Component<Props> {
   render() {
+    const { show = true } = this.props;
+    if (!show) return null;
     return <Spinner animation={'fade'} visible={true} textContent={this.props.loadingText || 'Đang tải'} textStyle={styles.spinnerTextStyle} />;
   }
 }
-
 export default Footer;

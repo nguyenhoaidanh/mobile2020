@@ -42,7 +42,6 @@ class Home extends Component<Props> {
       AXIOS(path, 'GET', {}, {}, token)
         .then(({ data }) => {
           console.log('123456', `found ${data.object.length} class`);
-          //console.log('123456', data.object);
           this.props.appActions.setListClass({ listClass: data.object });
         })
         .catch((err) => {
@@ -65,8 +64,14 @@ class Home extends Component<Props> {
     if (isListClass) {
       listClass = listClass.sort((x, y) => (sort ? -1 : 1) * x.name_subject.localeCompare(y.name_subject));
     } else {
-      isExpire = (room) => !(Date.now() >= +room.start_time && Date.now() <= +room.end_time);
-      listRoom = [...listRoom.filter((e) => sort && isExpire(e)), ...listRoom.filter((e) => !sort && isExpire(e))];
+      const funct = (room) => {
+        const curTime = Date.now();
+        const isExpire = !(curTime >= +room.start_time && curTime <= +room.end_time);
+        return !isExpire && !room.isClosed;
+      };
+      listRoom = sort
+        ? [...listRoom.filter((e) => funct(e)), ...listRoom.filter((e) => !funct(e))]
+        : [...listRoom.filter((e) => !funct(e)), ...listRoom.filter((e) => funct(e))];
     }
     this.setState({ sort: !sort, listRoom, listClass });
   };
@@ -81,7 +86,6 @@ class Home extends Component<Props> {
     AXIOS(`/rooms/classes/${_class.id}`, 'GET', {}, {}, this.props.userInfo.token)
       .then(({ data }) => {
         console.log('123456', `found ${data.object.length} room`);
-        //console.log('123456', data.object);
         let listRoom = data.object.map((e) => {
           return { ...e, isCheckIn: history.find((hi) => e.id == hi.session.room_id) !== undefined };
         });
@@ -115,7 +119,6 @@ class Home extends Component<Props> {
               title="Xác nhận"
               onPress={() => {
                 this.setState({ showPicker: false, [key]: dataList[this.state.selectedItem] });
-                console.log('123123', dataList[this.state.selectedItem]);
               }}
             />
           </View>
@@ -140,10 +143,10 @@ class Home extends Component<Props> {
     if (!password) return;
     this.setState({ smallLoading: true });
     let data = { room_id: currentRoom.id, secret: password };
-    console.log(123456, currentRoom, data);
+    console.log(123456, data);
+
     AXIOS(`/rooms/authorize`, 'POST', data, {}, this.props.userInfo.token)
       .then(({ data }) => {
-        console.log('123456', 11, data);
         this.props.appActions.setCurRoom({ currentRoom: { ...currentRoom, secret: password } });
         this.props.appActions.setCurScreent({ currentScreent: { title: 'Điểm danh' } });
         this.navigate('/check-in');
@@ -198,8 +201,6 @@ class Home extends Component<Props> {
     const { userInfo = {} } = this.props;
     let { listClass = [], showForm = false, loading = true, errorMessage = {}, isListClass = true, listRoom = [] } = this.state;
     const itemHeight = 195;
-    console.log(123456, userInfo.role, ROLES.student);
-
     return (
       <View>
         {showForm ? this.renderPopupPassword() : null}
@@ -221,7 +222,7 @@ class Home extends Component<Props> {
             </Text>
           </View>
         </View>
-        <ScrollView contentContainerStyle={{ flexGrow: 1, paddingLeft: 15, paddingRight: 15, marginTop: 10, paddingTop: 0 }}>
+        <ScrollView contentContainerStyle={{ flexGrow: 1, paddingLeft: 10, paddingRight: 10, marginTop: 10, paddingTop: 0 }}>
           {!isListClass
             ? listRoom.map((room, idx) => (
                 <RoomItem

@@ -34,13 +34,14 @@ class Login extends Component<Props> {
     console.log(123456, 'email', email);
     if (!email) return;
     if (!`${email}`.includes('@') || !`${email}`.includes('.')) return this.setState({ errorMessage: { email: 'Địa chỉ mail không hợp lệ' } });
-    const data = { email };
+    const data = { gmail: email };
     console.log(123456, data);
     this.setState({ otpLoading: true });
-    AXIOS('/mails/forget', 'POST', data)
+    AXIOS('/users/mails/reset', 'POST', data)
       .then(({ data }) => {
         this.showToast(`Hãy kiểm tra email: ${email} để nhận mã otp`);
         console.log('123456', 1, data);
+        this.setState({ errorMessage: {} });
       })
       .catch((err) => {
         checkTokenExpire(err, this);

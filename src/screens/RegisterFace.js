@@ -6,11 +6,11 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import { ButtonGroup, Card, Button, CheckBox, Avatar } from 'react-native-elements';
 import ImageInput from '../components/ImageInput';
 import cStyles from '../constants/common-styles';
-import { AXIOS, checkTokenExpire, uploadFileToServer, setAvatar } from '../utils/functions';
+import { AXIOS, checkTokenExpire, uploadFileToServer, setAvatar, showImageInput } from '../utils/functions';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import * as appActions from '../actions/index';
-import { goolge_url } from '../constants/constants';
+import Loading from '../components/Loading';
 const styles = StyleSheet.create({});
 const iconSize = 24;
 const iconColor = 'black';
@@ -25,35 +25,32 @@ class Home extends Component<Props> {
     const { list_images = [] } = userInfo;
     const n = list_images.length > min_image ? list_images.length : min_image;
     for (let i = 0; i < n; i++) {
-      list.push({ index: i, image: list_images[i] ? goolge_url + list_images[i] : {} });
+      if (list_images[i]) list.push({ index: i, image: list_images[i] || {} });
     }
     this.state = { userInfo, list };
   }
-
-  addImage = () => {
-    const { list = [] } = this.state;
-    const length = list.length;
-    list.push({ index: length + 1, image: {} });
-    list.push({ index: length + 2, image: {} });
-    this.setState({ list });
+  showImageInput = () => {
+    let { picker, callback, multiple = true } = this.props;
+    showImageInput({ picker: true, callback: (img) => this.setImage(img), multiple: true });
   };
   register = () => {
     let { list = [] } = this.state;
     let count = 0;
     list = list.filter((e) => e.image.path);
     list = list.map((e) => e.image);
-    // if (list.length < min_image) return this.showAlert(`Hãy chọn ít nhất ${min_image} ảnh bạn nhé`);
-    this.setState({ loading: true });
+    if (list.length < min_image) return this.showAlert(`Hãy chọn ít nhất ${min_image} ảnh bạn nhé`);
+    this.setState({ loading: true, loadingText: '' });
     let msg = '';
     uploadFileToServer(list, this.props.userInfo.token, '/users/images/uploadfile', 'POST', (progressEvent) => {
       const { loaded, total } = progressEvent;
       let percent = Math.floor((loaded / total) * 100);
-      console.log(123456, percent);
+      const loadingText = percent < 100 ? `Đang tải ảnh lên ${percent}%` : `Đang xử lý`;
+      this.setState({ loadingText });
     })
       .then(({ data }) => {
         console.log('123456', 1, data);
         this.props.appActions.setUserInfo({ userInfo: { list_images: data.object } });
-        this.setState({ list: data.object.map((e, i) => ({ index: i, image: goolge_url + e })) });
+        this.setState({ list: data.object.map((e, i) => ({ index: i, image: e })) });
         msg = 'Đăng kí gương mặt thành công';
         this.setState({ success: true });
       })
@@ -68,7 +65,9 @@ class Home extends Component<Props> {
   };
   setImage = (image, index) => {
     let { list = [] } = this.state;
-    list[index].image = image;
+    for (const img of image) {
+      list.push({ index: list.length, image: img });
+    }
     this.setState({ list });
   };
   showAlert = (msg) => {
@@ -96,6 +95,7 @@ class Home extends Component<Props> {
           element: () => {
             return (
               <ImageInput
+                multiple={true}
                 disabled={success}
                 key={idx}
                 image={el.image}
@@ -139,12 +139,13 @@ class Home extends Component<Props> {
   render() {
     let { errorMessage = {}, list = [], loading = false, userInfo = {}, success = false } = this.state;
     const { list_images = [] } = userInfo;
-    console.log(123456, 'found image', list_images.length);
+    console.log(123456, 'found image', list.length);
     if (!success) success = list_images.length >= min_image;
     const rowHeight = 200;
     list = this.parseList(list);
     return (
       <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+        {loading ? <Loading loadingText={this.state.loadingText} /> : null}
         <View style={{ width: '100%', alignItems: 'center' }}>
           <Text
             style={{
@@ -172,16 +173,15 @@ class Home extends Component<Props> {
                 buttonStyle={{ borderRadius: 20, backgroundColor: '#55d646' }}
                 title={'Thêm ảnh'}
                 icon={<MaterialCommunityIcons style={{ marginRight: 10 }} name="plus-circle" size={iconSize} color={'white'} />}
-                onPress={this.addImage}
+                onPress={this.showImageInput}
               />
             </View>
             <View style={{ width: '50%', alignItems: 'center' }}>
               <Button
                 containerStyle={{ width: '90%' }}
-                loading={loading}
                 titleStyle={cStyles.btnText}
                 buttonStyle={{ borderRadius: 20, width: '90%', backgroundColor: '#55d646' }}
-                title={loading ? 'Đang xử lý' : 'Đăng kí '}
+                title={'Đăng kí '}
                 onPress={this.register}
                 iconRight
                 icon={<MaterialCommunityIcons style={{ marginLeft: 10 }} name="face-recognition" size={iconSize} color={'white'} />}

@@ -37,8 +37,6 @@ class Home extends Component<Props> {
     const { keyword = '' } = this.state;
     const { currentScreent = {}, lastScreent = [] } = this.props.app;
     const { title = '', icon = null, customIcon = null, to = '', showSearch = false } = currentScreent;
-    console.log(123456, currentScreent);
-
     if (false)
       return (
         <View style={styles.header}>

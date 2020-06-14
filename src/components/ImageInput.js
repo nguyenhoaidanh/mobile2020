@@ -10,6 +10,7 @@ import * as appActions from '../actions/index';
 import { showImageInput, setAvatar } from '../utils/functions';
 const styles = StyleSheet.create({
   img: { flex: 1, width: null, height: null, resizeMode: 'contain' },
+  img2: { flex: 1, width: '100%', height: '100%' },
   wrapAvatar: { width: '100%', height: Dimensions.get('window').height - 210, padding: 0 },
 });
 const iconSize = 24,
@@ -18,9 +19,9 @@ type Props = {};
 class Footer extends Component<Props> {
   state = {};
   showImageInput = () => {
-    let { picker, camera, callback, disabled, useFrontCamera } = this.props;
+    let { picker, camera, callback, disabled, useFrontCamera, multiple = false } = this.props;
     if (disabled) return;
-    showImageInput({ picker, camera, callback });
+    showImageInput({ picker, camera, callback, multiple });
   };
   render() {
     const {
@@ -28,15 +29,16 @@ class Footer extends Component<Props> {
       showAccessory = true,
       backgroundColor = 'transparent',
       margin = 20,
-      image = {},
+
       height = '80%',
       width = '100%',
       small = true,
       component = null,
     } = this.props;
+    const { image = {} } = this.props;
     return (
       <Avatar
-        avatarStyle={{ flex: 1, width: null, height: null, resizeMode: small ? 'stretch' : 'contain' }}
+        avatarStyle={small ? styles.img2 : styles.img}
         containerStyle={styles.wrapAvatar}
         source={setAvatar(image)}
         showAccessory={!showAccessory ? false : !disabled}

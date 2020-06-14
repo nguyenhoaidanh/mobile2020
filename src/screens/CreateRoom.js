@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { ToastAndroid, TouchableOpacity, KeyboardAvoidingView, ScrollView, Platform, StyleSheet, Text, View, Image } from 'react-native';
 import { Link, withRouter } from 'react-router-native';
 import DatePicker from 'react-native-datepicker';
+import Loading from '../components/Loading';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { Input, Button, CheckBox, Overlay } from 'react-native-elements';
 import cStyles from '../constants/common-styles';
@@ -9,7 +10,7 @@ import { AXIOS, checkTokenExpire, formatTime, changeTime } from '../utils/functi
 import { list_screen_map } from '../constants/constants';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import { WheelPicker, TimePicker } from 'react-native-wheel-picker-android';
+import { WheelPicker } from 'react-native-wheel-picker-android';
 import * as appActions from '../actions/index';
 import dayjs from 'dayjs';
 const styles = StyleSheet.create({});
@@ -59,14 +60,15 @@ class CreateRoom extends Component<Props> {
       start_time,
       end_time,
     };
-    this.setState({ loading: true });
+    this.setState({ loading: true, loadingText: 'Đang xử lý' });
     AXIOS('/rooms', 'POST', room, {}, this.props.userInfo.token)
       .then(({ data }) => {
         console.log('123456', 1, data);
-        this.setState({ respData: data, success: true });
+        this.setState({ respData: data.object, success: true });
       })
       .catch((err) => {
-        ToastAndroid.show('Tạo phòng thất bại', ToastAndroid.LONG);
+        this.setState({ errorMessage: { secret_create_room: 'Mật khẩu tạo phòng không đúng' } });
+        // ToastAndroid.show('Tạo phòng thất bại, mật khẩu tạo phòng không đúng', ToastAndroid.LONG);
         checkTokenExpire(err, this);
       })
       .finally(() => {
@@ -146,6 +148,7 @@ class CreateRoom extends Component<Props> {
       );
     return (
       <KeyboardAvoidingView style={{ flex: 1, flexDirection: 'column' }}>
+        {this.state.loading ? <Loading loadingText={this.state.loadingText} /> : null}
         <ScrollView style={cStyles.scroll}>
           <View>
             <Input
@@ -200,9 +203,10 @@ class CreateRoom extends Component<Props> {
             />
             <Text style={cStyles.label}>Thời gian bắt đầu điểm danh</Text>
             <DatePicker
+              is24Hour
               style={{ width: '100%' }}
               mode="datetime"
-              format="hh:mm DD-MM-YYYY"
+              format="hh:mm A, DD-MM-YYYY"
               placeholder="Chạm để chọn thời gian"
               onDateChange={(start_time) => {
                 this.setState({ start_time });
@@ -223,11 +227,13 @@ class CreateRoom extends Component<Props> {
                 },
               }}
             />
+            <Text style={cStyles.errorStyle}>{errorMessage.start_time}</Text>
             <Text style={cStyles.label}> Thời gian kết thúc điểm danh</Text>
             <DatePicker
+              is24Hour
               style={{ width: '100%' }}
               mode="datetime"
-              format="hh:mm DD-MM-YYYY"
+              format="hh:mm A, DD-MM-YYYY"
               placeholder="Chạm để chọn thời gian"
               onDateChange={(end_time) => {
                 this.setState({ end_time });
@@ -248,14 +254,8 @@ class CreateRoom extends Component<Props> {
                 },
               }}
             />
-            <Button
-              loading={this.state.loading}
-              containerStyle={cStyles.btnwrap}
-              titleStyle={cStyles.btnText}
-              buttonStyle={cStyles.btnPrimary}
-              title="Tạo phòng"
-              onPress={this.makeRoom}
-            />
+            <Text style={cStyles.errorStyle}>{errorMessage.end_time}</Text>
+            <Button containerStyle={cStyles.btnwrap} titleStyle={cStyles.btnText} buttonStyle={cStyles.btnPrimary} title="Tạo phòng" onPress={this.makeRoom} />
             <View style={{ height: 265 }} />
           </View>
         </ScrollView>

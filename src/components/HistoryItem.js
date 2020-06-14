@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Platform, StyleSheet, Text, View, ScrollView } from 'react-native';
+import { Platform, StyleSheet, Text, View, ScrollView, TouchableOpacity, Overlay, Image } from 'react-native';
 import { NativeRouter, Route, Link } from 'react-router-native';
 import { Button, Badge, ButtonGroup, Card } from 'react-native-elements';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -7,7 +7,7 @@ import { withRouter } from 'react-router';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import * as appActions from '../actions/index';
-import { formatTime } from '../utils/functions';
+import { formatTime, setAvatar } from '../utils/functions';
 import cStyles from '../constants/common-styles';
 const styles = StyleSheet.create({
   textLeft: {
@@ -19,24 +19,28 @@ const iconSize = 24,
 type Props = {};
 class Footer extends Component<Props> {
   state = {};
-  navigate = (url) => {
-    this.props.history.push(url);
-    this.props.appActions.setCurScreent({ currentScreent: { title: 'Điểm danh' } });
-  };
   render() {
     const { index = 0, data = {} } = this.props;
     const { session = {} } = data;
     const _class = data.class;
     return (
-      <Card>
-        <Text style={styles.textLeft}>
-          Bạn đã điểm danh lớp <Text style={{ fontWeight: 'bold' }}>{_class.name_subject}</Text>
-        </Text>
-        <Text style={styles.textLeft}>
-          Giảng viên: <Text style={{ fontWeight: 'bold' }}>{_class.user_create}</Text>
-        </Text>
-        <Text style={{ alignSelf: 'flex-end', color: 'green', fontSize: 15 }}>{formatTime(session.create_date)}</Text>
-      </Card>
+      <View>
+        <TouchableOpacity onPress={this.props.onClick}>
+          <Card>
+            <Text style={styles.textLeft}>
+              Bạn đã điểm danh lớp
+              <Text style={{ fontWeight: 'bold' }}>
+                {_class.code_subject} - {_class.name_subject}
+              </Text>
+            </Text>
+            <Text style={styles.textLeft}>
+              Giảng viên: <Text style={{ fontWeight: 'bold' }}>{_class.teacher_id}</Text>
+            </Text>
+            <Text style={{ color: 'orange', fontSize: 20 }}>Chạm để xem hình</Text>
+            <Text style={{ alignSelf: 'flex-end', color: 'green', fontSize: 15 }}>{formatTime(session.create_date)}</Text>
+          </Card>
+        </TouchableOpacity>
+      </View>
     );
   }
 }
