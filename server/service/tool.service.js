@@ -4,6 +4,7 @@ const db = require('../helper/db');
 var formidable = require('formidable');
 var fs = require('fs');
 path = require('path');
+var compress_images = require('compress-images');
 const express = require('express');
 const User = db.User;
 var multer = require('multer');
@@ -99,8 +100,32 @@ async function updateFileExpress(req, res) {
        //chua gui dataset
        //TODO
     }
-    
-    user.list_images=[].concat(user.list_images,filenames.map((item)=>"/store/faces/"+item));
+    // compress image
+    const filecompress = './public/store/faces/compress/';
+    for(var ind in filenames){
+      compress_images('./public/store/faces/'+filenames[ind], filecompress, {compress_force: false, statistic: true, autoupdate: true}, false,
+        {jpg: {engine: 'mozjpeg', command: ['-quality', '60']}},
+        {png: {engine: 'pngquant', command: ['--quality=20-50']}},
+        {svg: {engine: false, command: false}},
+        {gif: {engine: false, command: false}},function(error, completed, statistic){
+        
+        console.log('-------------');
+        console.log(error);
+        console.log(completed);
+        console.log(statistic);
+        console.log('-------------');  
+        if(completed){
+          try{
+            console.log('./public/store/faces/'+filenames[ind])
+            // fs.unlinkSync('./public/store/faces/'+filenames[ind]);
+          }catch(err){
+            console.log(err);
+          }
+          
+        }                                 
+      });
+    }
+    user.list_images=[].concat(user.list_images,filenames.map((item)=>"/store/faces/compress/"+item));
     await user.save();
     res.status(200);
     res.send({message:"Danh sách datataset",object:user.list_images})
