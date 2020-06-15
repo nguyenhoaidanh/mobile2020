@@ -8,6 +8,8 @@ var multer = require('multer');
 const { extract_faces } = require('./detect-face');
 const { v4: uuidv4 } = require('uuid');
 const db = require('../helper/db');
+var compress_images = require('compress-images');
+
 const User = db.User;
 const Config = db.Config;
 //MobileNet : pre-trained model for TensorFlow.js
@@ -101,8 +103,29 @@ async function uploadFile(req, res) {
       if (user) predict[ind].label = user;
     }
     // console.log(predict);
+    const filecompress = './public/store/output/compress/';
+    compress_images(hightLightFace, filecompress, {compress_force: false, statistic: true, autoupdate: true}, false,
+      {jpg: {engine: 'mozjpeg', command: ['-quality', '60']}},
+      {png: {engine: 'pngquant', command: ['--quality=20-50']}},
+      {svg: {engine: false, command: false}},
+      {gif: {engine: false, command: false}},function(error, completed, statistic){
+      
+      console.log('-------------');
+      console.log(error);
+      console.log(completed);
+      console.log(statistic);
+      console.log('-------------');  
+      if(completed){
+        try{
+          fs.unlinkSync(hightLightFace);
+        }catch(err){
+          console.log(err);
+        }
+        
+      }                                 
+      });
     res.status(200);
-    res.send({ result: { predict, out_image: hightLightFace.replace('./public', ''), num_faces: faces.length } });
+    res.send({ result: { predict, out_image: (filecompress+hightLightFace.split('/').pop()).replace('./public', ''), num_faces: faces.length } });
   });
 }
 async function imageClassification(path) {

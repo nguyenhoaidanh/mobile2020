@@ -23,7 +23,7 @@ const getFileType = (str) => '.' + str.split('.').pop();
 const getImageFromInput = (inputFile) => {
   const stream = fs.createReadStream(inputFile);
   let promise;
-  if (inputFile.match(/\.jpg$/)) {
+  if (inputFile.match(/\.jpg$/)||inputFile.match(/\.jpeg$/)) {
     try {
       promise = PImage.decodeJPEGFromStream(stream);
     } catch (e) {}

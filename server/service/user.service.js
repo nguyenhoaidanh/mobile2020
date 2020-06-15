@@ -4,6 +4,7 @@ const db = require('../helper/db');
 const role = require('../helper/role');
 const utils = require('../utils/string');
 path = require('path');
+var compress_images = require('compress-images');
 const { v4: uuidv4 } = require('uuid');
 var mailService = require('./mail.service');
 var multer = require('multer');
@@ -168,7 +169,29 @@ async function updateAvatar(req, res) {
       res.send({message:'Chọn file upload'});
     }
     var filename = req.file.filename;
-    user.avatar_link="/store/avatar/"+filename;
+    compress_images('./public/store/avatar/'+filename, './public/store/avatar/compress/', {compress_force: false, statistic: true, autoupdate: true}, false,
+        {jpg: {engine: 'mozjpeg', command: ['-quality', '60']}},
+        {png: {engine: 'pngquant', command: ['--quality=20-50']}},
+        {svg: {engine: false, command: false}},
+        {gif: {engine: false, command: false}},function(error, completed, statistic){
+        
+        console.log('-------------');
+        console.log(error);
+        console.log(completed);
+        console.log(statistic);
+        console.log('-------------');  
+        if(completed){
+          try{
+            // console.log('./public/store/faces/'+filenames[ind])
+            // fs.unlinkSync('./public/store/faces/'+filenames[ind]);
+          }catch(err){
+            console.log(err);
+          }
+          
+        }                                 
+      });
+   
+    user.avatar_link="/store/avatar/compress/"+filename;
     await user.save();
     res.status(200);
     res.send({message:'Đổi avatar thành công',object:user.avatar_link});
