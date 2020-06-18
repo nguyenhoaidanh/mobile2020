@@ -1,5 +1,5 @@
-var db = require('./helper/db');
-var role = require('./helper/role');
+var db = require('../helper/db');
+var role = require('../helper/role');
 const bcrypt = require('bcryptjs');
 
 var User = db.User;
@@ -60,11 +60,13 @@ async function init() {
                 } else {
                     console.log(user_list[i].mssv + "not found");
                 }
-
             }
         }
 
     }
-
+    return {message:"Khởi tạo class thành công",object:""}
 }
-init();
+
+module.exports={
+    init
+}

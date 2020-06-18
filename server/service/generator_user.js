@@ -1,5 +1,5 @@
-var db = require('./helper/db');
-var role =require('./helper/role');
+var db = require('../helper/db');
+var role =require('../helper/role');
 const bcrypt = require('bcryptjs');
 
 var User = db.User;
@@ -79,6 +79,9 @@ async function init(){
         user.createDate=Date.now();
         await user.save();
     }
+    return {message:"Khởi tạo user thành công",object:""}
    
 }
-init();
+module.exports={
+    init
+}
