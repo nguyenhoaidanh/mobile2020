@@ -98,7 +98,8 @@ async function init(){
     var user_new = new User();
     console.log(properties.get('account.admin.username'));
     user_new.gmail=properties.get('account.admin.username');
-    user_new.hash=await bcrypt.hashSync(properties.get('account.admin.password'), 10);
+    // console.log(properties.get('account.admin.password'));
+    user_new.hash= bcrypt.hashSync(properties.get('account.admin.password').toString(), 10);
     user_new.role=role.Admin;
     user_new.avatar_link="null";
     user_new.fullname="admin";
