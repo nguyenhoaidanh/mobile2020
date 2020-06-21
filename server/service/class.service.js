@@ -119,7 +119,7 @@ async function updateClassForManyUsers(req, res) {
       if (!user) {
         list_undifine_user.push(list_user[stu]);
       } else {
-        if(user.class_ids.length!=0&&!user.class_ids.includes(req.body.class_id)!=-1)throw {message:"Sinh viên "+user.mssv+" đã được thêm trước đó",code:400};
+        if(user.class_ids.length!=0&&!user.class_ids.includes(req.body.class_id))throw {message:"Sinh viên "+user.mssv+" đã được thêm trước đó",code:400};
         user.class_ids = [...new Set([].concat([class_object._id], user.class_ids))];
         await user.save();
       }

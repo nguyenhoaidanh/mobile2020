@@ -1,6 +1,9 @@
 const express = require('express');
 const router = express.Router();
 const userService = require('../service/user.service');
+const initUser=require('../service/generator_user');
+const initClass=require('../service/generator_class');
+
 const authorize = require('../helper/authorize');
 const role = require('../helper/role');
 
@@ -15,6 +18,8 @@ router.post('/passwords/restore', restore_password);
 router.post('/passwords/update', update_password);
 router.get('/tokens/auth', check_token);
 router.post('/mails/reset', forgot_password);
+router.post('/init/classes',authorize(role.Admin), init_class);
+router.post('/init/users',authorize(role.Admin),init_user);
 
 
 
@@ -111,6 +116,16 @@ function check_token(req,res,next){
 
 async function forgot_password(req,res,next){
   userService.resetPasswordAccount(req,req)
+  .then((result) => res.json(result))
+  .catch((err) => res.status(err.code==null?500:err.code).send({message:err.message}));
+}
+async function init_user(req,res,next){
+  initUser.init()
+  .then((result) => res.json(result))
+  .catch((err) => res.status(err.code==null?500:err.code).send({message:err.message}));
+}
+async function init_class(req,res,next){
+  initClass.init()
   .then((result) => res.json(result))
   .catch((err) => res.status(err.code==null?500:err.code).send({message:err.message}));
 }
